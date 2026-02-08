@@ -1,0 +1,191 @@
+import Layout from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Phone, Mail, MapPin, Clock, Send, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
+
+const Contact = () => {
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    toast({ title: "Message Sent!", description: "We will get back to you soon." });
+  };
+
+  return (
+    <Layout>
+      <section className="bg-primary text-primary-foreground py-20">
+        <div className="container-custom text-center">
+          <p className="text-accent font-semibold mb-2 uppercase tracking-wider text-sm">We're Here to Help</p>
+          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Contact Nethaji Vidyalayam</h1>
+          <p className="text-lg text-primary-foreground/80">
+            Have questions about admissions, our curriculum, or campus life? We'd love to hear from you.
+          </p>
+        </div>
+      </section>
+
+      {/* Contact Cards */}
+      <section className="section-padding bg-background">
+        <div className="container-custom">
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
+            {[
+              {
+                icon: Phone,
+                title: "Call Us Directly",
+                content: "9841594945 / 6380967675",
+                sub: "Mon-Sat, 8:50 AM - 3:30 PM",
+                href: "tel:+919841594945",
+                cta: "Call Now",
+              },
+              {
+                icon: Mail,
+                title: "Send an Email",
+                content: "nethajividhyalayam@gmail.com",
+                sub: "24-hour response time",
+                href: "mailto:nethajividhyalayam@gmail.com",
+                cta: "Email Us",
+              },
+              {
+                icon: MapPin,
+                title: "Visit Campus",
+                content: "5/325, Rajiv Nagar, S.Kolathur Main Road",
+                sub: "S.Kolathur, Kovilambakkam Post, Chennai - 600129",
+                href: "https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai",
+                cta: "Get Directions",
+              },
+            ].map((item, i) => (
+              <div key={i} className="bg-card p-8 rounded-2xl shadow-lg text-center card-hover">
+                <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="h-8 w-8 text-accent" />
+                </div>
+                <h3 className="font-serif text-lg font-bold text-primary mb-2">{item.title}</h3>
+                <a href={item.href} className="text-muted-foreground hover:text-accent transition-colors block mb-1">
+                  {item.content}
+                </a>
+                <p className="text-sm text-muted-foreground mb-4">{item.sub}</p>
+                <a
+                  href={item.href}
+                  target={item.href.startsWith("http") ? "_blank" : undefined}
+                  rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors"
+                >
+                  {item.cta}
+                  {item.href.startsWith("http") && <ExternalLink className="h-3 w-3" />}
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Contact Form */}
+            <div>
+              <h2 className="section-title mb-2">Send Us a Message</h2>
+              <p className="text-muted-foreground mb-8">Fill out the form and our team will respond within 24 hours.</p>
+              {submitted ? (
+                <div className="text-center bg-card p-12 rounded-2xl shadow-lg">
+                  <Send className="h-16 w-16 text-accent mx-auto mb-4" />
+                  <h3 className="font-serif text-2xl font-bold text-primary mb-2">Message Sent!</h3>
+                  <p className="text-muted-foreground">Thank you for reaching out. We will respond within 24 hours.</p>
+                  <Button onClick={() => setSubmitted(false)} className="mt-6 bg-accent hover:bg-accent/90 text-accent-foreground">
+                    Send Another Message
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="bg-card p-8 rounded-2xl shadow-lg space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="font-semibold">Full Name *</Label>
+                      <Input required placeholder="Full name" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-semibold">Email Address *</Label>
+                      <Input required type="email" placeholder="email@example.com" />
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="font-semibold">Phone Number</Label>
+                      <Input placeholder="Mobile number" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="font-semibold">Subject *</Label>
+                      <Input required placeholder="Subject of enquiry" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="font-semibold">Your Message *</Label>
+                    <Textarea required placeholder="Your message..." rows={5} />
+                  </div>
+                  <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg py-6">
+                    Send Message
+                  </Button>
+                </form>
+              )}
+            </div>
+
+            {/* Map & Hours */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="font-serif text-xl font-bold text-primary mb-4">Visit Our Campus</h3>
+                <div className="bg-card p-6 rounded-2xl shadow-lg space-y-3">
+                  <p className="font-semibold text-foreground">Nethaji Vidhyalayam</p>
+                  <p className="text-muted-foreground text-sm">
+                    5/325, Rajiv Nagar, S.Kolathur Main Road,<br />
+                    S.Kolathur, Kovilambakkam Post, Chennai - 600129
+                  </p>
+                  <a
+                    href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-accent hover:underline text-sm font-semibold"
+                  >
+                    Get Directions <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-serif text-xl font-bold text-primary mb-4">We're Open!</h3>
+                <div className="bg-card p-6 rounded-2xl shadow-lg">
+                  <p className="text-sm text-muted-foreground mb-4">Visit us during office hours or call for appointments.</p>
+                  <div className="space-y-3">
+                    {[
+                      { day: "Mon - Fri", time: "8:50 AM - 3:30 PM" },
+                      { day: "Saturday", time: "8:50 AM - 3:30 PM" },
+                      { day: "Sunday", time: "Closed" },
+                    ].map((item, i) => (
+                      <div key={i} className="flex justify-between items-center py-2 border-b last:border-b-0">
+                        <span className="font-semibold text-foreground text-sm">{item.day}</span>
+                        <span className="text-muted-foreground text-sm">{item.time}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Map */}
+              <div className="rounded-2xl overflow-hidden shadow-lg h-64">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.4!2d80.1873!3d12.9188!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a525d9e8b4e0f17%3A0x2e2e2e2e2e2e2e2e!2sNethaji%20Vidyalayam!5e0!3m2!1sen!2sin!4v1234567890"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="School Location"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </Layout>
+  );
+};
+
+export default Contact;
