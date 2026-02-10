@@ -2,3 +2,6 @@ project_id = "ytqqkadcaihfzichukvw"
 
 [functions.send-contact-email]
 verify_jwt = false
+
+[functions.school-chat]
+verify_jwt = false
