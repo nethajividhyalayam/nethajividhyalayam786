@@ -44,7 +44,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Nethaji Vidhyalayam <onboarding@resend.dev>",
+      from: "Nethaji Vidhyalayam <info@nethajividhyalayam.org>",
       to: ["nethajividhyalayam@gmail.com", "nethajividhyalayam@yahoo.com"],
       subject: `Website Enquiry: ${subject}`,
       html: htmlContent,
