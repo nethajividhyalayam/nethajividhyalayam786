@@ -3,17 +3,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, MapPin, Clock, Send, ExternalLink } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, ExternalLink, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    toast({ title: "Message Sent!", description: "We will get back to you soon." });
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-contact-email", {
+        body: formData,
+      });
+      if (error) throw error;
+      setSubmitted(true);
+      toast({ title: "Message Sent!", description: "We will get back to you soon." });
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Failed to send", description: err.message || "Please try again later.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,29 +118,29 @@ const Contact = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="font-semibold">Full Name *</Label>
-                      <Input required placeholder="Full name" />
+                      <Input required name="name" value={formData.name} onChange={handleChange} placeholder="Full name" />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-semibold">Email Address *</Label>
-                      <Input required type="email" placeholder="email@example.com" />
+                      <Input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" />
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="font-semibold">Phone Number</Label>
-                      <Input placeholder="Mobile number" />
+                      <Input name="phone" value={formData.phone} onChange={handleChange} placeholder="Mobile number" />
                     </div>
                     <div className="space-y-2">
                       <Label className="font-semibold">Subject *</Label>
-                      <Input required placeholder="Subject of enquiry" />
+                      <Input required name="subject" value={formData.subject} onChange={handleChange} placeholder="Subject of enquiry" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label className="font-semibold">Your Message *</Label>
-                    <Textarea required placeholder="Your message..." rows={5} />
+                    <Textarea required name="message" value={formData.message} onChange={handleChange} placeholder="Your message..." rows={5} />
                   </div>
-                  <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg py-6">
-                    Send Message
+                  <Button type="submit" disabled={loading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg py-6">
+                    {loading ? <><Loader2 className="h-5 w-5 animate-spin mr-2" /> Sending...</> : "Send Message"}
                   </Button>
                 </form>
               )}
