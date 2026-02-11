@@ -133,6 +133,12 @@ const Footer = () => {
             <p className="text-sm text-primary-foreground/80 mb-4">
               Subscribe to our newsletter for updates on events, admissions, and more.
             </p>
+            <p className="text-xs text-primary-foreground/60 mb-2 flex items-center gap-1">
+              <Mail className="h-3 w-3" />
+              <a href="mailto:nethajividhyalayam@gmail.com" className="hover:text-accent transition-colors underline">
+                nethajividhyalayam@gmail.com
+              </a>
+            </p>
             <form className="space-y-3" onSubmit={(e) => {
               e.preventDefault();
               const form = e.target as HTMLFormElement;
