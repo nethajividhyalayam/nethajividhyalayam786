@@ -152,12 +152,12 @@ const Footer = () => {
             {/* FeeDesk Link */}
             <div className="mt-6 p-4 bg-accent/20 rounded-lg">
               <p className="text-sm font-medium mb-2">Pay School Fees Online</p>
-              <a
-                href="/admissions#fees"
+              <Link
+                to="/feedesk"
                 className="inline-flex items-center gap-2 text-accent hover:underline text-sm"
               >
                 Visit FeeDesk Portal →
-              </a>
+              </Link>
             </div>
           </div>
         </div>

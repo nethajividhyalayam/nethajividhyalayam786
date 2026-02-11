@@ -1,4 +1,5 @@
 import { Phone, Mail, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const TopBar = () => {
   return (
@@ -33,13 +34,13 @@ const TopBar = () => {
             Login
           </a>
           <span className="text-primary-foreground/50">|</span>
-          <a 
-            href="/admissions#fees"
+          <Link 
+            to="/feedesk"
             className="flex items-center gap-1 bg-accent text-accent-foreground px-3 py-1 rounded font-bold hover:bg-accent/90 transition-colors"
           >
             <span>FeeDesk</span>
             <ExternalLink className="h-3 w-3" />
-          </a>
+          </Link>
         </div>
       </div>
     </div>
