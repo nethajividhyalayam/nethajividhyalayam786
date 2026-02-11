@@ -1,26 +1,54 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Mic, MicOff, Volume2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { MessageCircle, X, Send, Mic, MicOff, ChevronDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/school-chat`;
+const IDLE_TIMEOUT = 30000; // 30 seconds
 
 const ChatWidget = () => {
   const [open, setOpen] = useState(false);
+  const [minimized, setMinimized] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: "👋 Welcome to Nethaji Vidhyalayam! How can I help you today?" },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [pulseAnim, setPulseAnim] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
+
+  // Pulse animation cycle for the floating button
+  useEffect(() => {
+    if (open) return;
+    const interval = setInterval(() => {
+      setPulseAnim((p) => !p);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [open]);
+
+  // Auto-collapse if idle for 30s (when chat is open)
+  const resetIdleTimer = useCallback(() => {
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    if (!open || minimized) return;
+    idleTimerRef.current = setTimeout(() => {
+      setMinimized(true);
+    }, IDLE_TIMEOUT);
+  }, [open, minimized]);
+
+  useEffect(() => {
+    resetIdleTimer();
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [open, minimized, messages, input, resetIdleTimer]);
 
   const streamChat = useCallback(async (allMessages: Msg[]) => {
     const resp = await fetch(CHAT_URL, {
@@ -81,17 +109,17 @@ const ChatWidget = () => {
     setMessages(updated);
     setInput("");
     setIsLoading(true);
+    resetIdleTimer();
 
     try {
       const reply = await streamChat(updated);
-      // Speak the reply using browser TTS
       if (reply && window.speechSynthesis) {
         const utt = new SpeechSynthesisUtterance(reply.replace(/[#*_`]/g, ""));
         utt.rate = 1;
         utt.lang = "en-IN";
         window.speechSynthesis.speak(utt);
       }
-    } catch (e: any) {
+    } catch {
       setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I couldn't respond right now. Please try again." }]);
     } finally {
       setIsLoading(false);
@@ -123,22 +151,83 @@ const ChatWidget = () => {
     setIsListening(true);
   };
 
+  const handleOpen = () => {
+    setOpen(true);
+    setMinimized(false);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setMinimized(false);
+  };
+
+  const handleMinimize = () => {
+    setMinimized(true);
+  };
+
+  const handleRestore = () => {
+    setMinimized(false);
+    resetIdleTimer();
+  };
+
   return (
     <>
-      {/* Floating button */}
+      {/* Floating button - always visible when chat is closed */}
       {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-accent text-accent-foreground rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition-transform"
-          aria-label="Open chat"
-        >
-          <MessageCircle className="h-6 w-6" />
-        </button>
+        <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-center gap-2">
+          {/* Close/dismiss X button */}
+          <button
+            onClick={() => setOpen(false)}
+            className="w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-xs"
+            aria-label="Dismiss chat"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+          {/* Main chat button with dancing animation */}
+          <button
+            onClick={handleOpen}
+            className={`w-14 h-14 bg-accent text-accent-foreground rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 ${
+              pulseAnim
+                ? "scale-110 shadow-[0_0_30px_rgba(var(--accent),0.5)] rotate-[5deg]"
+                : "scale-100 shadow-lg rotate-[-3deg]"
+            }`}
+            style={{
+              animation: "chat-bounce 2s ease-in-out infinite, chat-glow 3s ease-in-out infinite",
+            }}
+            aria-label="Open chat"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </button>
+        </div>
       )}
 
-      {/* Chat panel */}
-      {open && (
-        <div className="fixed bottom-4 right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-2rem)] bg-card rounded-2xl shadow-2xl border flex flex-col overflow-hidden">
+      {/* Minimized bar - shown when chat is open but minimized */}
+      {open && minimized && (
+        <div className="fixed bottom-4 right-4 z-[60] flex items-center gap-2">
+          <button
+            onClick={handleRestore}
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-full shadow-2xl hover:scale-105 transition-all duration-300"
+            style={{
+              animation: "chat-bounce 3s ease-in-out infinite",
+            }}
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="text-sm font-semibold">Nethaji AI</span>
+            <ChevronDown className="h-4 w-4 rotate-180" />
+          </button>
+          <button
+            onClick={handleClose}
+            className="w-7 h-7 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+            aria-label="Close chat"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Chat panel - z-[60] to overlap social sidebar (z-50) */}
+      {open && !minimized && (
+        <div className="fixed bottom-4 right-4 z-[60] w-[360px] max-w-[calc(100vw-2rem)] h-[520px] max-h-[calc(100vh-2rem)] bg-card rounded-2xl shadow-2xl border flex flex-col overflow-hidden animate-scale-in">
           {/* Header */}
           <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2">
@@ -148,13 +237,33 @@ const ChatWidget = () => {
                 <p className="text-xs opacity-80">Ask me anything!</p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="hover:opacity-80" aria-label="Close chat">
-              <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-1">
+              {/* Minimize / down arrow */}
+              <button
+                onClick={handleMinimize}
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+                aria-label="Minimize chat"
+              >
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              {/* Close X */}
+              <button
+                onClick={handleClose}
+                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors"
+                aria-label="Close chat"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
+          <div
+            ref={scrollRef}
+            className="flex-1 overflow-y-auto p-3 space-y-3"
+            onMouseMove={resetIdleTimer}
+            onClick={resetIdleTimer}
+          >
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
@@ -204,7 +313,10 @@ const ChatWidget = () => {
               </button>
               <input
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  resetIdleTimer();
+                }}
                 placeholder="Type your question..."
                 className="flex-1 bg-muted rounded-full px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-accent"
                 disabled={isLoading}
@@ -221,6 +333,18 @@ const ChatWidget = () => {
           </div>
         </div>
       )}
+
+      {/* CSS animations for the floating button */}
+      <style>{`
+        @keyframes chat-bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        @keyframes chat-glow {
+          0%, 100% { box-shadow: 0 0 10px rgba(var(--accent), 0.3); }
+          50% { box-shadow: 0 0 25px rgba(var(--accent), 0.6), 0 0 50px rgba(var(--accent), 0.2); }
+        }
+      `}</style>
     </>
   );
 };
