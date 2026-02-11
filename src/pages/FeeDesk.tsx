@@ -24,6 +24,7 @@ const FeeDesk = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
 
   // Students
   const [students, setStudents] = useState<any[]>([]);
@@ -73,11 +74,21 @@ const FeeDesk = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast({ title: "Login Failed", description: error.message, variant: "destructive" });
+    if (isSignUp) {
+      const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/feedesk" } });
+      if (error) {
+        toast({ title: "Sign Up Failed", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Account Created!", description: "Please check your email to verify your account, then sign in." });
+        setIsSignUp(false);
+      }
     } else {
-      toast({ title: "Welcome!", description: "Logged in successfully." });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast({ title: "Login Failed", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Welcome!", description: "Logged in successfully." });
+      }
     }
     setLoginLoading(false);
   };
@@ -190,7 +201,7 @@ const FeeDesk = () => {
         <div className="bg-background rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="font-serif text-3xl font-bold text-primary">FeeDesk</h1>
-            <p className="text-muted-foreground mt-2">Nethaji Vidhyalayam — Staff Login</p>
+            <p className="text-muted-foreground mt-2">Nethaji Vidhyalayam — {isSignUp ? "Create Account" : "Staff Login"}</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
@@ -199,13 +210,19 @@ const FeeDesk = () => {
             </div>
             <div className="space-y-2">
               <Label>Password</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required />
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
             </div>
             <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loginLoading}>
               {loginLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Sign In
+              {isSignUp ? "Sign Up" : "Sign In"}
             </Button>
           </form>
+          <p className="text-center text-sm text-muted-foreground mt-4">
+            {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
+            <button onClick={() => setIsSignUp(!isSignUp)} className="text-accent font-semibold hover:underline">
+              {isSignUp ? "Sign In" : "Sign Up"}
+            </button>
+          </p>
         </div>
       </div>
     );
