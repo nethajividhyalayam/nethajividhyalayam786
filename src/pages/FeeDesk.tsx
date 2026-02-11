@@ -42,6 +42,7 @@ const FeeDesk = () => {
 
   // Payments history
   const [payments, setPayments] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("students");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -256,7 +257,7 @@ const FeeDesk = () => {
       </div>
 
       <div className="container-custom py-6">
-        <Tabs defaultValue="students" className="space-y-6">
+        <Tabs defaultValue="students" value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-background shadow-sm rounded-xl p-1 flex-wrap h-auto">
             <TabsTrigger value="students" className="gap-2"><Users className="h-4 w-4" /> Students</TabsTrigger>
             <TabsTrigger value="collect-fee" className="gap-2"><CreditCard className="h-4 w-4" /> Collect Fee</TabsTrigger>
@@ -327,12 +328,13 @@ const FeeDesk = () => {
                       <th className="p-3 font-semibold">Section</th>
                       <th className="p-3 font-semibold">Parent</th>
                       <th className="p-3 font-semibold">Phone</th>
+                      <th className="p-3 font-semibold">Total Fee Paid</th>
                       <th className="p-3 font-semibold">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredStudents.length === 0 ? (
-                      <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No students found. Add students to get started.</td></tr>
+                      <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">No students found. Add students to get started.</td></tr>
                     ) : filteredStudents.map((s) => (
                       <tr key={s.id} className="border-b hover:bg-secondary/50 transition-colors">
                         <td className="p-3 font-mono text-xs">{s.admission_number}</td>
@@ -341,8 +343,9 @@ const FeeDesk = () => {
                         <td className="p-3">{s.section}</td>
                         <td className="p-3">{s.parent_name || "—"}</td>
                         <td className="p-3">{s.parent_phone || "—"}</td>
+                        <td className="p-3 font-semibold text-green-700">₹{payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</td>
                         <td className="p-3">
-                          <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => { setSelectedStudent(s); document.querySelector('[data-value="collect-fee"]')?.dispatchEvent(new Event('click', { bubbles: true })); }}>
+                          <Button size="sm" className="gap-1 text-xs bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-md" onClick={() => { setSelectedStudent(s); setActiveTab("collect-fee"); }}>
                             <DollarSign className="h-3 w-3" /> Pay Fee
                           </Button>
                         </td>
