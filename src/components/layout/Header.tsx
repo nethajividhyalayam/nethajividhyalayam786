@@ -109,10 +109,10 @@ const Header = () => {
                 <Link
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-1 px-3 py-2 text-sm font-bold rounded-md transition-colors",
+                    "nav-link-animated flex items-center gap-1 px-3 py-2 text-sm font-bold rounded-md transition-all duration-300",
                     isActive(item.path)
                       ? "text-accent"
-                      : "text-foreground hover:text-accent"
+                      : "text-foreground hover:text-accent hover:scale-105"
                   )}
                 >
                   {item.label}

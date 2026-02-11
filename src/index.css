@@ -170,6 +170,26 @@
     @apply relative inline-block after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-accent after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
   }
 
+  .nav-link-animated {
+    @apply relative overflow-hidden;
+  }
+  .nav-link-animated::before {
+    content: '';
+    @apply absolute inset-0 rounded-md opacity-0 transition-all duration-300;
+    background: linear-gradient(135deg, hsl(var(--accent) / 0.15), hsl(var(--primary) / 0.1));
+  }
+  .nav-link-animated:hover::before {
+    @apply opacity-100;
+  }
+  .nav-link-animated::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 w-0 h-0.5 bg-accent transition-all duration-300;
+    transform: translateX(-50%);
+  }
+  .nav-link-animated:hover::after {
+    @apply w-3/4;
+  }
+
   .section-title {
     @apply text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-4;
   }

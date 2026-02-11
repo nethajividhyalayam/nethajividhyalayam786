@@ -175,14 +175,6 @@ const ChatWidget = () => {
       {/* Floating button - always visible when chat is closed */}
       {!open && (
         <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-center gap-2">
-          {/* Close/dismiss X button */}
-          <button
-            onClick={() => setOpen(false)}
-            className="w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-md hover:scale-110 transition-transform text-xs"
-            aria-label="Dismiss chat"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
           {/* Main chat button with dancing animation */}
           <button
             onClick={handleOpen}
