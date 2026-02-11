@@ -1,8 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Play } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+
+const getAcademicYear = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0-indexed, so January = 0, February = 1
+  // After February (month >= 2), next academic year starts
+  const startYear = month >= 2 ? year : year - 1;
+  return `${startYear}-${String(startYear + 1).slice(-2)}`;
+};
 
 const HeroSection = () => {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
+  const dateStr = now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+  const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+
   return (
     <section className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
       {/* Video Background */}
@@ -21,13 +42,22 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/60 to-primary/80" />
       </div>
 
+      {/* Live Date/Time Badge - Top Right */}
+      <div className="absolute top-4 right-4 z-20 hidden md:block">
+        <div className="bg-primary/60 backdrop-blur-md border border-white/20 rounded-2xl px-5 py-3 text-white text-center shadow-xl">
+          <div className="text-xs uppercase tracking-widest text-accent font-semibold">{dayName}</div>
+          <div className="text-2xl font-bold font-serif tabular-nums tracking-tight">{timeStr}</div>
+          <div className="text-xs text-white/70 mt-0.5">{dateStr}</div>
+        </div>
+      </div>
+
       {/* Content */}
       <div className="relative z-10 container-custom text-center text-white">
         <div className="max-w-4xl mx-auto space-y-6 animate-fade-up">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-accent/20 backdrop-blur-sm border border-accent/30 rounded-full px-4 py-2 text-sm">
             <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-            <span>Admissions Open for 2025-26</span>
+            <span>Admissions Open for {getAcademicYear()}</span>
           </div>
 
           {/* Heading */}
