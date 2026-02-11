@@ -16,7 +16,7 @@ const events = [
     id: 2,
     title: "Science Exhibition",
     date: "February 28, 2024",
-    description: "Students showcase their innovative science projects and experiments.",
+    description: "Students showcase their innovative science projects and experiments to judges and parents.",
     image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&h=400&fit=crop",
     category: "Academic",
   },
@@ -36,6 +36,46 @@ const events = [
     image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&h=400&fit=crop",
     category: "Meeting",
   },
+  {
+    id: 5,
+    title: "School Annual Picnic",
+    date: "November 15, 2024",
+    description: "A fun-filled outing for students and teachers to relax, play games, and enjoy nature together.",
+    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=400&fit=crop",
+    category: "Recreation",
+  },
+  {
+    id: 6,
+    title: "Art & Craft Exhibition",
+    date: "October 20, 2024",
+    description: "Students display their creative artwork, paintings, handicrafts, and sculptures for parents and visitors.",
+    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop",
+    category: "Cultural",
+  },
+  {
+    id: 7,
+    title: "Teachers' Day Celebration",
+    date: "September 5, 2024",
+    description: "Students honour their beloved teachers with performances, speeches, and heartfelt gratitude.",
+    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
+    category: "Celebration",
+  },
+  {
+    id: 8,
+    title: "Yoga & Wellness Day",
+    date: "June 21, 2024",
+    description: "Promoting physical and mental well-being through yoga sessions, meditation, and wellness workshops.",
+    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=400&fit=crop",
+    category: "Wellness",
+  },
+  {
+    id: 9,
+    title: "Career Guidance Workshop",
+    date: "August 10, 2024",
+    description: "Expert sessions to guide students on career paths, higher education options, and skill development.",
+    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop",
+    category: "Workshop",
+  },
 ];
 
 const EventsSection = () => {
@@ -44,21 +84,14 @@ const EventsSection = () => {
 
   useEffect(() => {
     if (!isAutoPlaying) return;
-
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % events.length);
     }, 4000);
-
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
 
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + events.length) % events.length);
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % events.length);
-  };
+  const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + events.length) % events.length);
+  const handleNext = () => setCurrentIndex((prev) => (prev + 1) % events.length);
 
   return (
     <section className="section-padding bg-secondary">
@@ -66,15 +99,12 @@ const EventsSection = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
           <div>
-            <p className="text-accent font-medium mb-2 uppercase tracking-wider text-sm">
-              What's Happening
-            </p>
+            <p className="text-accent font-medium mb-2 uppercase tracking-wider text-sm">What's Happening</p>
             <h2 className="section-title">Latest Events</h2>
           </div>
           <Link to="/events">
             <Button variant="outline" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground">
-              View All Events
-              <ArrowRight className="ml-2 h-4 w-4" />
+              View All Events <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
         </div>
@@ -83,18 +113,17 @@ const EventsSection = () => {
         <div className="relative">
           <div className="overflow-hidden rounded-2xl">
             <div
-              className="flex transition-transform duration-500 ease-in-out"
+              className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
             >
               {events.map((event) => (
                 <div key={event.id} className="w-full flex-shrink-0">
                   <div className="grid md:grid-cols-2 bg-background rounded-2xl overflow-hidden shadow-lg">
-                    {/* Image */}
-                    <div className="relative h-64 md:h-96">
+                    <div className="relative h-64 md:h-96 overflow-hidden">
                       <img
                         src={event.image}
                         alt={event.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
                       />
                       <div className="absolute top-4 left-4">
                         <span className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm font-medium">
@@ -102,26 +131,16 @@ const EventsSection = () => {
                         </span>
                       </div>
                     </div>
-
-                    {/* Content */}
                     <div className="p-8 md:p-12 flex flex-col justify-center">
                       <div className="flex items-center gap-2 text-muted-foreground mb-4">
                         <Calendar className="h-4 w-4" />
                         <span className="text-sm">{event.date}</span>
                       </div>
-
-                      <h3 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-4">
-                        {event.title}
-                      </h3>
-
-                      <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-                        {event.description}
-                      </p>
-
-                      <Link to={`/events/${event.id}`}>
+                      <h3 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-4">{event.title}</h3>
+                      <p className="text-muted-foreground text-lg leading-relaxed mb-6">{event.description}</p>
+                      <Link to="/events">
                         <Button className="bg-accent hover:bg-accent/90 text-accent-foreground w-fit">
-                          Read More
-                          <ArrowRight className="ml-2 h-4 w-4" />
+                          Read More <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                       </Link>
                     </div>
@@ -131,69 +150,33 @@ const EventsSection = () => {
             </div>
           </div>
 
-          {/* Navigation Arrows */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handlePrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm hidden md:flex"
-          >
+          {/* Desktop Navigation Arrows */}
+          <Button variant="outline" size="icon" onClick={handlePrev} className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm hidden md:flex">
             <ChevronLeft className="h-5 w-5" />
           </Button>
-
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm hidden md:flex"
-          >
+          <Button variant="outline" size="icon" onClick={handleNext} className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm hidden md:flex">
             <ChevronRight className="h-5 w-5" />
           </Button>
 
           {/* Controls */}
           <div className="flex items-center justify-center gap-4 mt-6">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handlePrev}
-              className="rounded-full md:hidden"
-            >
+            <Button variant="outline" size="icon" onClick={handlePrev} className="rounded-full md:hidden">
               <ChevronLeft className="h-5 w-5" />
             </Button>
-
-            {/* Dots */}
             <div className="flex gap-2">
               {events.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentIndex ? "bg-accent" : "bg-muted-foreground/30"
-                  }`}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-accent w-6" : "bg-muted-foreground/30"}`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
             </div>
-
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-              className="rounded-full"
-            >
-              {isAutoPlaying ? (
-                <Pause className="h-4 w-4" />
-              ) : (
-                <Play className="h-4 w-4" />
-              )}
+            <Button variant="outline" size="icon" onClick={() => setIsAutoPlaying(!isAutoPlaying)} className="rounded-full">
+              {isAutoPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             </Button>
-
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleNext}
-              className="rounded-full md:hidden"
-            >
+            <Button variant="outline" size="icon" onClick={handleNext} className="rounded-full md:hidden">
               <ChevronRight className="h-5 w-5" />
             </Button>
           </div>

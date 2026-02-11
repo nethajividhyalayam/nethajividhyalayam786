@@ -13,8 +13,7 @@ const quickLinks = [
     icon: CreditCard,
     title: "Pay Fees",
     description: "Online fee payment",
-    path: "https://feedesk.nethajividhyalayam.com",
-    external: true,
+    path: "/admissions#fees",
     color: "bg-school-green",
   },
   {
@@ -56,7 +55,7 @@ const QuickLinksSection = () => {
               </div>
             );
 
-            if (item.external) {
+            if ('external' in item && item.external) {
               return (
                 <a
                   key={item.title}
