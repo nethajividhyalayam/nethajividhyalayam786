@@ -57,10 +57,8 @@ const FeeDesk = () => {
 
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setLoading(true);
       if (session?.user) { setUser(session.user); await fetchRole(session.user.id); }
       else { setUser(null); setRole(null); }
-      setLoading(false);
     });
     return () => subscription.unsubscribe();
 
