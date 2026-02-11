@@ -32,6 +32,20 @@ const SocialSidebar = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // Auto-collapse date/time after 3s
+  useEffect(() => {
+    if (!expanded) return;
+    const t = setTimeout(() => setExpanded(false), 3000);
+    return () => clearTimeout(t);
+  }, [expanded]);
+
+  // Auto-collapse social after 2s
+  useEffect(() => {
+    if (!activeSocial) return;
+    const t = setTimeout(() => setActiveSocial(null), 2000);
+    return () => clearTimeout(t);
+  }, [activeSocial]);
+
   const dayName = now.toLocaleDateString("en-US", { weekday: "short" });
   const dateStr = now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
   const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
