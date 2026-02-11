@@ -71,15 +71,294 @@ export type Database = {
         }
         Relationships: []
       }
+      cash_register: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          payment_method: string | null
+          recorded_by: string | null
+          reference_id: string | null
+          transaction_date: string
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          payment_method?: string | null
+          recorded_by?: string | null
+          reference_id?: string | null
+          transaction_date?: string
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          payment_method?: string | null
+          recorded_by?: string | null
+          reference_id?: string | null
+          transaction_date?: string
+          transaction_type?: string
+        }
+        Relationships: []
+      }
+      fee_payments: {
+        Row: {
+          academic_year: string | null
+          amount: number
+          created_at: string
+          fee_structure_id: string | null
+          id: string
+          notes: string | null
+          payment_date: string
+          payment_method: string
+          receipt_number: string | null
+          recorded_by: string | null
+          reference_id: string | null
+          student_id: string
+          term: string | null
+        }
+        Insert: {
+          academic_year?: string | null
+          amount: number
+          created_at?: string
+          fee_structure_id?: string | null
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          receipt_number?: string | null
+          recorded_by?: string | null
+          reference_id?: string | null
+          student_id: string
+          term?: string | null
+        }
+        Update: {
+          academic_year?: string | null
+          amount?: number
+          created_at?: string
+          fee_structure_id?: string | null
+          id?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          receipt_number?: string | null
+          recorded_by?: string | null
+          reference_id?: string | null
+          student_id?: string
+          term?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fee_payments_fee_structure_id_fkey"
+            columns: ["fee_structure_id"]
+            isOneToOne: false
+            referencedRelation: "fee_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fee_payments_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fee_structure: {
+        Row: {
+          academic_year: string
+          amount: number
+          created_at: string
+          fee_type: string
+          id: string
+          standard: string
+          term: string
+        }
+        Insert: {
+          academic_year?: string
+          amount?: number
+          created_at?: string
+          fee_type: string
+          id?: string
+          standard: string
+          term: string
+        }
+        Update: {
+          academic_year?: string
+          amount?: number
+          created_at?: string
+          fee_type?: string
+          id?: string
+          standard?: string
+          term?: string
+        }
+        Relationships: []
+      }
+      school_expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          description: string
+          expense_date: string
+          id: string
+          payment_method: string | null
+          recorded_by: string | null
+          reference_id: string | null
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          description: string
+          expense_date?: string
+          id?: string
+          payment_method?: string | null
+          recorded_by?: string | null
+          reference_id?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          description?: string
+          expense_date?: string
+          id?: string
+          payment_method?: string | null
+          recorded_by?: string | null
+          reference_id?: string | null
+        }
+        Relationships: []
+      }
+      staff_profiles: {
+        Row: {
+          created_at: string
+          designation: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          designation?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          designation?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      students: {
+        Row: {
+          aadhaar_number: string | null
+          address: string | null
+          admission_number: string
+          blood_group: string | null
+          created_at: string
+          date_of_birth: string | null
+          gender: string | null
+          id: string
+          parent_email: string | null
+          parent_name: string | null
+          parent_phone: string | null
+          section: string | null
+          standard: string
+          status: string | null
+          student_name: string
+          updated_at: string
+        }
+        Insert: {
+          aadhaar_number?: string | null
+          address?: string | null
+          admission_number: string
+          blood_group?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          gender?: string | null
+          id?: string
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          section?: string | null
+          standard: string
+          status?: string | null
+          student_name: string
+          updated_at?: string
+        }
+        Update: {
+          aadhaar_number?: string | null
+          address?: string | null
+          admission_number?: string
+          blood_group?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          gender?: string | null
+          id?: string
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          section?: string | null
+          standard?: string
+          status?: string | null
+          student_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "staff"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -206,6 +485,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "staff"],
+    },
   },
 } as const
