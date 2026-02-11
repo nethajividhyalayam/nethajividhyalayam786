@@ -8,10 +8,10 @@ const XIcon = ({ className }: { className?: string }) => (
 );
 
 const socials = [
-  { icon: Facebook, href: "https://www.facebook.com/", label: "Facebook", bg: "bg-[#1877F2]", activeShadow: "shadow-[0_0_20px_rgba(24,119,242,0.5)]", color: "#1877F2" },
-  { icon: XIcon, href: "https://x.com/home", label: "X", bg: "bg-[#000000]", activeShadow: "shadow-[0_0_20px_rgba(0,0,0,0.5)]", color: "#000" },
-  { icon: Youtube, href: "https://www.youtube.com/", label: "YouTube", bg: "bg-[#FF0000]", activeShadow: "shadow-[0_0_20px_rgba(255,0,0,0.4)]", color: "#FF0000" },
-  { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", activeShadow: "shadow-[0_0_20px_rgba(225,48,108,0.4)]", color: "#e6683c" },
+  { icon: Facebook, href: "https://www.facebook.com/nethajividhyalayam", label: "Facebook", bg: "bg-[#1877F2]", activeShadow: "shadow-[0_0_20px_rgba(24,119,242,0.5)]", color: "#1877F2" },
+  { icon: XIcon, href: "https://x.com/nethajividhya", label: "X", bg: "bg-[#000000]", activeShadow: "shadow-[0_0_20px_rgba(0,0,0,0.5)]", color: "#000" },
+  { icon: Youtube, href: "https://www.youtube.com/@nethajividhyalayam", label: "YouTube", bg: "bg-[#FF0000]", activeShadow: "shadow-[0_0_20px_rgba(255,0,0,0.4)]", color: "#FF0000" },
+  { icon: Instagram, href: "https://www.instagram.com/nethajividhyalayam", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", activeShadow: "shadow-[0_0_20px_rgba(225,48,108,0.4)]", color: "#e6683c" },
 ];
 
 const getAcademicYear = () => {

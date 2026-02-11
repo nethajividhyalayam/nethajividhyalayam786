@@ -29,10 +29,10 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Youtube, href: "#", label: "YouTube" },
+    { icon: Facebook, href: "https://www.facebook.com/nethajividhyalayam", label: "Facebook" },
+    { icon: Instagram, href: "https://www.instagram.com/nethajividhyalayam", label: "Instagram" },
+    { icon: Twitter, href: "https://x.com/nethajividhya", label: "X" },
+    { icon: Youtube, href: "https://www.youtube.com/@nethajividhyalayam", label: "YouTube" },
   ];
 
   return (
@@ -51,7 +51,7 @@ const Footer = () => {
             </div>
             <p className="text-sm text-primary-foreground/80 leading-relaxed">
               Nethaji Vidhyalayam is committed to providing quality education that nurtures 
-              young minds and prepares them for a bright future. Established on 7th June 2001, we have 
+              young minds and prepares them for a bright future. Established on 11th June 2002, we have 
               been a beacon of academic excellence.
             </p>
             {/* Social Links */}
@@ -133,11 +133,19 @@ const Footer = () => {
             <p className="text-sm text-primary-foreground/80 mb-4">
               Subscribe to our newsletter for updates on events, admissions, and more.
             </p>
-            <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-3" onSubmit={(e) => {
+              e.preventDefault();
+              const form = e.target as HTMLFormElement;
+              const emailInput = form.querySelector('input[type="email"]') as HTMLInputElement;
+              if (emailInput?.value) {
+                window.location.href = `mailto:nethajividhyalayam@gmail.com?subject=Newsletter Subscription&body=Please subscribe me to the newsletter. My email: ${encodeURIComponent(emailInput.value)}`;
+              }
+            }}>
               <div className="relative">
                 <Input
                   type="email"
                   placeholder="Enter your email"
+                  required
                   className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 pr-12"
                 />
                 <Button 
