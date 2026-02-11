@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { sendEmail } from "@/lib/emailjs";
 import { QRCodeSVG } from "qrcode.react";
 import { CheckCircle, FileText, CreditCard, ClipboardList } from "lucide-react";
 
@@ -66,15 +67,27 @@ const Admissions = () => {
     }
 
     setSubmitting(true);
-    const { error } = await supabase.from("admission_applications").insert([applyForm]);
-    setSubmitting(false);
+    try {
+      // Save to database
+      const { error } = await supabase.from("admission_applications").insert([applyForm]);
+      if (error) throw error;
 
-    if (error) {
-      toast({ title: "Submission Failed", description: "Please try again later.", variant: "destructive" });
-    } else {
+      // Send email notification
+      await sendEmail({
+        from_name: applyForm.parent_name,
+        from_email: applyForm.parent_email || "Not provided",
+        phone: applyForm.parent_phone,
+        subject: `Admission Application: ${applyForm.student_name} - ${applyForm.standard_applying}`,
+        message: `Student: ${applyForm.student_name}\nDOB: ${applyForm.date_of_birth}\nGender: ${applyForm.gender}\nAadhaar: ${applyForm.aadhaar_number}\nParent: ${applyForm.parent_name}\nPhone: ${applyForm.parent_phone}\nEmail: ${applyForm.parent_email || "N/A"}\nAddress: ${applyForm.address}\nStandard: ${applyForm.standard_applying}\nPrevious School: ${applyForm.previous_school || "N/A"}\nBlood Group: ${applyForm.blood_group || "N/A"}\nNationality: ${applyForm.nationality}\nReligion: ${applyForm.religion || "N/A"}\nCommunity: ${applyForm.community || "N/A"}`,
+      });
+
       setSubmitted(true);
       toast({ title: "Application Submitted!", description: "We will contact you soon." });
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Submission Failed", description: "Please try again later.", variant: "destructive" });
     }
+    setSubmitting(false);
   };
 
   const upiPaymentString = isQrEnabled
