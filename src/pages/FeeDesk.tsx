@@ -19,6 +19,7 @@ const FeeDesk = () => {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [roleLoading, setRoleLoading] = useState(false);
 
   // Login state
   const [email, setEmail] = useState("");
@@ -58,8 +59,15 @@ const FeeDesk = () => {
 
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) { setUser(session.user); await fetchRole(session.user.id); }
-      else { setUser(null); setRole(null); }
+      if (session?.user) {
+        setUser(session.user);
+        setRoleLoading(true);
+        await fetchRole(session.user.id);
+        setRoleLoading(false);
+      } else {
+        setUser(null);
+        setRole(null);
+      }
     });
     return () => subscription.unsubscribe();
 
@@ -93,10 +101,8 @@ const FeeDesk = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setRole(null);
     window.location.href = "/";
+    supabase.auth.signOut();
   };
 
   // Fetch students
@@ -228,8 +234,11 @@ const FeeDesk = () => {
     );
   }
 
-  // No role assigned
+  // No role assigned (wait for role fetch to complete)
   if (!role) {
+    if (roleLoading) {
+      return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>;
+    }
     return (
       <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
         <div className="bg-background rounded-2xl shadow-2xl p-8 w-full max-w-md text-center">
