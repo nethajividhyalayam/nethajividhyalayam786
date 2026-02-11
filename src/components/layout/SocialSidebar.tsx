@@ -1,5 +1,5 @@
 import { Facebook, Youtube, Instagram } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const XIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -8,10 +8,10 @@ const XIcon = ({ className }: { className?: string }) => (
 );
 
 const socials = [
-  { icon: Facebook, href: "https://www.facebook.com/", label: "Facebook", bg: "bg-[#1877F2]", activeShadow: "shadow-[0_0_20px_rgba(24,119,242,0.5)]" },
-  { icon: XIcon, href: "https://x.com/home", label: "X", bg: "bg-[#000000]", activeShadow: "shadow-[0_0_20px_rgba(0,0,0,0.5)]", isCustom: true },
-  { icon: Youtube, href: "https://www.youtube.com/", label: "YouTube", bg: "bg-[#FF0000]", activeShadow: "shadow-[0_0_20px_rgba(255,0,0,0.4)]" },
-  { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", activeShadow: "shadow-[0_0_20px_rgba(225,48,108,0.4)]" },
+  { icon: Facebook, href: "https://www.facebook.com/", label: "Facebook", bg: "bg-[#1877F2]", activeShadow: "shadow-[0_0_20px_rgba(24,119,242,0.5)]", color: "#1877F2" },
+  { icon: XIcon, href: "https://x.com/home", label: "X", bg: "bg-[#000000]", activeShadow: "shadow-[0_0_20px_rgba(0,0,0,0.5)]", color: "#000" },
+  { icon: Youtube, href: "https://www.youtube.com/", label: "YouTube", bg: "bg-[#FF0000]", activeShadow: "shadow-[0_0_20px_rgba(255,0,0,0.4)]", color: "#FF0000" },
+  { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", activeShadow: "shadow-[0_0_20px_rgba(225,48,108,0.4)]", color: "#e6683c" },
 ];
 
 const getAcademicYear = () => {
@@ -26,25 +26,64 @@ const SocialSidebar = () => {
   const [now, setNow] = useState(new Date());
   const [expanded, setExpanded] = useState(false);
   const [activeSocial, setActiveSocial] = useState<string | null>(null);
+  const [mouseY, setMouseY] = useState<number | null>(null);
+  const socialRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Auto-collapse date/time after 3s
   useEffect(() => {
     if (!expanded) return;
     const t = setTimeout(() => setExpanded(false), 3000);
     return () => clearTimeout(t);
   }, [expanded]);
 
-  // Auto-collapse social after 2s
   useEffect(() => {
     if (!activeSocial) return;
     const t = setTimeout(() => setActiveSocial(null), 2000);
     return () => clearTimeout(t);
   }, [activeSocial]);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (window.innerWidth - e.clientX < 120) {
+      setMouseY(e.clientY);
+    } else {
+      setMouseY(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [handleMouseMove]);
+
+  const getIconStyle = (index: number) => {
+    if (!socialRef.current || mouseY === null) return {};
+    const rect = socialRef.current.getBoundingClientRect();
+    const iconY = rect.top + index * 48 + 24;
+    const dist = Math.abs(mouseY - iconY);
+    const maxDist = 150;
+    if (dist > maxDist) return {};
+    const proximity = 1 - dist / maxDist;
+    const translateX = -proximity * 14;
+    const scale = 1 + proximity * 0.2;
+    const rotate = Math.sin(Date.now() / 200 + index) * proximity * 6;
+    return {
+      transform: `translateX(${translateX}px) scale(${scale}) rotate(${rotate}deg)`,
+      transition: "transform 0.15s ease-out",
+    };
+  };
+
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    if (mouseY === null) return;
+    const raf = requestAnimationFrame(function tick() {
+      forceUpdate((n) => n + 1);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [mouseY, forceUpdate]);
 
   const dayName = now.toLocaleDateString("en-US", { weekday: "short" });
   const dateStr = now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
@@ -76,9 +115,10 @@ const SocialSidebar = () => {
       </div>
 
       {/* Floating Social - Right Side */}
-      <div className="fixed right-0 top-1/3 -translate-y-1/2 z-50 flex flex-col gap-1">
-        {socials.map(({ icon: Icon, href, label, bg, activeShadow, isCustom }) => {
+      <div ref={socialRef} className="fixed right-0 top-1/3 -translate-y-1/2 z-50 flex flex-col gap-1.5">
+        {socials.map(({ icon: Icon, href, label, bg, activeShadow }, index) => {
           const isActive = activeSocial === label;
+          const dynamicStyle = getIconStyle(index);
           return (
             <a
               key={label}
@@ -87,10 +127,11 @@ const SocialSidebar = () => {
               rel="noopener noreferrer"
               aria-label={label}
               onClick={() => setActiveSocial(label)}
+              style={!isActive ? dynamicStyle : undefined}
               className={`flex items-center ${bg} text-white transition-all duration-300 overflow-hidden rounded-l-xl ${isActive ? `w-36 scale-105 ${activeShadow}` : "w-11 shadow-lg"}`}
             >
               <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
-                <Icon className="h-5 w-5" />
+                <Icon className={`h-5 w-5 ${mouseY !== null && !isActive ? "animate-pulse" : ""}`} />
               </div>
               <span className={`whitespace-nowrap text-sm font-semibold transition-opacity duration-300 pr-3 ${isActive ? "opacity-100" : "opacity-0"}`}>
                 {label}
