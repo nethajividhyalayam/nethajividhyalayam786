@@ -24,6 +24,8 @@ const getAcademicYear = () => {
 
 const SocialSidebar = () => {
   const [now, setNow] = useState(new Date());
+  const [expanded, setExpanded] = useState(false);
+  const [activeSocial, setActiveSocial] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
@@ -38,14 +40,17 @@ const SocialSidebar = () => {
     <>
       {/* Floating Date/Time - Left Side */}
       <div className="fixed left-0 top-1/3 -translate-y-1/2 z-50 hidden md:flex flex-col">
-        <div className="group bg-primary/90 backdrop-blur-md border border-white/10 rounded-r-2xl px-3 py-4 text-white text-center shadow-2xl w-14 hover:w-44 transition-all duration-500 overflow-hidden cursor-default">
+        <div
+          onClick={() => setExpanded(!expanded)}
+          className={`bg-primary/90 backdrop-blur-md border border-white/10 rounded-r-2xl px-3 py-4 text-white text-center shadow-2xl cursor-pointer transition-all duration-500 overflow-hidden ${expanded ? "w-44" : "w-14"}`}
+        >
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 w-8 flex flex-col items-center">
               <span className="text-[10px] uppercase tracking-widest text-accent font-bold">{dayName}</span>
               <span className="text-lg font-bold font-serif leading-tight">{now.getDate()}</span>
               <span className="text-[9px] text-white/60 uppercase">{now.toLocaleDateString("en-US", { month: "short" })}</span>
             </div>
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 whitespace-nowrap text-left">
+            <div className={`transition-opacity duration-500 whitespace-nowrap text-left ${expanded ? "opacity-100" : "opacity-0"}`}>
               <div className="text-lg font-bold font-serif tabular-nums">{timeStr}</div>
               <div className="text-[10px] text-white/60">{dateStr}</div>
               <div className="mt-1.5 text-[9px] bg-accent/20 border border-accent/30 rounded-full px-2 py-0.5 text-accent font-semibold">
@@ -58,27 +63,29 @@ const SocialSidebar = () => {
 
       {/* Floating Social - Right Side */}
       <div className="fixed right-0 top-1/3 -translate-y-1/2 z-50 flex flex-col gap-1">
-        {socials.map(({ icon: Icon, href, label, bg, hoverBg, isCustom }) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={label}
-            className={`group flex items-center ${bg} ${hoverBg} text-white w-11 hover:w-36 transition-all duration-300 overflow-hidden rounded-l-xl shadow-lg hover:scale-105`}
-          >
-            <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
-              {isCustom ? (
+        {socials.map(({ icon: Icon, href, label, bg, hoverBg, isCustom }) => {
+          const isActive = activeSocial === label;
+          return (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              onMouseEnter={() => setActiveSocial(label)}
+              onMouseLeave={() => setActiveSocial(null)}
+              onTouchStart={() => setActiveSocial(prev => prev === label ? null : label)}
+              className={`flex items-center ${bg} ${hoverBg} text-white transition-all duration-300 overflow-hidden rounded-l-xl shadow-lg ${isActive ? "w-36 scale-105" : "w-11"}`}
+            >
+              <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
                 <Icon className="h-5 w-5" />
-              ) : (
-                <Icon className="h-5 w-5" />
-              )}
-            </div>
-            <span className="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 pr-3">
-              {label}
-            </span>
-          </a>
-        ))}
+              </div>
+              <span className={`whitespace-nowrap text-sm font-semibold transition-opacity duration-300 pr-3 ${isActive ? "opacity-100" : "opacity-0"}`}>
+                {label}
+              </span>
+            </a>
+          );
+        })}
       </div>
     </>
   );
