@@ -96,6 +96,7 @@ const FeeDesk = () => {
     await supabase.auth.signOut();
     setUser(null);
     setRole(null);
+    window.location.href = "/";
   };
 
   // Fetch students
