@@ -3,10 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Mail, MapPin, Clock, Send, ExternalLink, Loader2 } from "lucide-react";
+import { Phone, Mail, MapPin, Send, ExternalLink, Loader2, Printer } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { sendEmail } from "@/lib/emailjs";
+import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -17,16 +18,35 @@ const Contact = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const getFieldGroups = () => [
+    {
+      heading: "Contact Details",
+      fields: [
+        { label: "Full Name", value: formData.name },
+        { label: "Email Address", value: formData.email },
+        { label: "Phone Number", value: formData.phone || "Not provided" },
+      ],
+    },
+    {
+      heading: "Message Details",
+      fields: [
+        { label: "Subject", value: formData.subject },
+        { label: "Message", value: formData.message },
+      ],
+    },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      const fieldGroups = getFieldGroups();
       await sendEmail({
         from_name: formData.name,
         from_email: formData.email,
         phone: formData.phone || "Not provided",
         subject: `Contact Enquiry: ${formData.subject}`,
-        message: formData.message,
+        message: buildEmailMessage("Contact Us — Send Us a Message", fieldGroups),
       });
       setSubmitted(true);
       toast({ title: "Message Sent!", description: "We will get back to you soon." });
@@ -36,6 +56,14 @@ const Contact = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePrint = () => {
+    openPrintableTemplate({
+      title: "Contact Enquiry",
+      subtitle: "Send Us a Message",
+      fieldGroups: getFieldGroups(),
+    });
   };
 
   return (
@@ -50,51 +78,23 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* Contact Cards */}
       <section className="section-padding bg-background">
         <div className="container-custom">
+          {/* Contact Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {[
-              {
-                icon: Phone,
-                title: "Call Us Directly",
-                content: "9841594945 / 6380967675",
-                sub: "Mon-Sat, 8:50 AM - 3:30 PM",
-                href: "tel:+919841594945",
-                cta: "Call Now",
-              },
-              {
-                icon: Mail,
-                title: "Send an Email",
-                content: "nethajividhyalayam@gmail.com",
-                sub: "24-hour response time",
-                href: "mailto:nethajividhyalayam@gmail.com",
-                cta: "Email Us",
-              },
-              {
-                icon: MapPin,
-                title: "Visit Campus",
-                content: "5/325, Rajiv Nagar, S.Kolathur Main Road",
-                sub: "S.Kolathur, Kovilambakkam Post, Chennai - 600129",
-                href: "https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai",
-                cta: "Get Directions",
-              },
+              { icon: Phone, title: "Call Us Directly", content: "9841594945 / 6380967675", sub: "Mon-Sat, 8:50 AM - 3:30 PM", href: "tel:+919841594945", cta: "Call Now" },
+              { icon: Mail, title: "Send an Email", content: "nethajividhyalayam@gmail.com", sub: "24-hour response time", href: "mailto:nethajividhyalayam@gmail.com", cta: "Email Us" },
+              { icon: MapPin, title: "Visit Campus", content: "5/325, Rajiv Nagar, S.Kolathur Main Road", sub: "S.Kolathur, Kovilambakkam Post, Chennai - 600129", href: "https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai", cta: "Get Directions" },
             ].map((item, i) => (
               <div key={i} className="bg-card p-8 rounded-2xl shadow-lg text-center card-hover">
                 <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <item.icon className="h-8 w-8 text-accent" />
                 </div>
                 <h3 className="font-serif text-lg font-bold text-primary mb-2">{item.title}</h3>
-                <a href={item.href} className="text-muted-foreground hover:text-accent transition-colors block mb-1">
-                  {item.content}
-                </a>
+                <a href={item.href} className="text-muted-foreground hover:text-accent transition-colors block mb-1">{item.content}</a>
                 <p className="text-sm text-muted-foreground mb-4">{item.sub}</p>
-                <a
-                  href={item.href}
-                  target={item.href.startsWith("http") ? "_blank" : undefined}
-                  rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors"
-                >
+                <a href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined} className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors">
                   {item.cta}
                   {item.href.startsWith("http") && <ExternalLink className="h-3 w-3" />}
                 </a>
@@ -103,7 +103,6 @@ const Contact = () => {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
             <div>
               <h2 className="section-title mb-2">Send Us a Message</h2>
               <p className="text-muted-foreground mb-8">Fill out the form and our team will respond within 24 hours.</p>
@@ -112,9 +111,14 @@ const Contact = () => {
                   <Send className="h-16 w-16 text-accent mx-auto mb-4" />
                   <h3 className="font-serif text-2xl font-bold text-primary mb-2">Message Sent!</h3>
                   <p className="text-muted-foreground">Thank you for reaching out. We will respond within 24 hours.</p>
-                  <Button onClick={() => setSubmitted(false)} className="mt-6 bg-accent hover:bg-accent/90 text-accent-foreground">
-                    Send Another Message
-                  </Button>
+                  <div className="flex gap-3 justify-center mt-6">
+                    <Button onClick={handlePrint} variant="outline" className="gap-2">
+                      <Printer className="h-4 w-4" /> Print / Download Copy
+                    </Button>
+                    <Button onClick={() => { setSubmitted(false); setFormData({ name: "", email: "", phone: "", subject: "", message: "" }); }} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                      Send Another Message
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="bg-card p-8 rounded-2xl shadow-lg space-y-6">
@@ -155,21 +159,12 @@ const Contact = () => {
                 <h3 className="font-serif text-xl font-bold text-primary mb-4">Visit Our Campus</h3>
                 <div className="bg-card p-6 rounded-2xl shadow-lg space-y-3">
                   <p className="font-semibold text-foreground">Nethaji Vidhyalayam</p>
-                  <p className="text-muted-foreground text-sm">
-                    5/325, Rajiv Nagar, S.Kolathur Main Road,<br />
-                    S.Kolathur, Kovilambakkam Post, Chennai - 600129
-                  </p>
-                  <a
-                    href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-accent hover:underline text-sm font-semibold"
-                  >
+                  <p className="text-muted-foreground text-sm">5/325, Rajiv Nagar, S.Kolathur Main Road,<br />S.Kolathur, Kovilambakkam Post, Chennai - 600129</p>
+                  <a href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-accent hover:underline text-sm font-semibold">
                     Get Directions <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
               </div>
-
               <div>
                 <h3 className="font-serif text-xl font-bold text-primary mb-4">We're Open!</h3>
                 <div className="bg-card p-6 rounded-2xl shadow-lg">
@@ -188,19 +183,8 @@ const Contact = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Map */}
               <div className="rounded-2xl overflow-hidden shadow-lg h-64">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.4!2d80.1873!3d12.9188!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a525d9e8b4e0f17%3A0x2e2e2e2e2e2e2e2e!2sNethaji%20Vidyalayam!5e0!3m2!1sen!2sin!4v1234567890"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="School Location"
-                />
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.4!2d80.1873!3d12.9188!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a525d9e8b4e0f17%3A0x2e2e2e2e2e2e2e2e!2sNethaji%20Vidyalayam!5e0!3m2!1sen!2sin!4v1234567890" width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="School Location" />
               </div>
             </div>
           </div>

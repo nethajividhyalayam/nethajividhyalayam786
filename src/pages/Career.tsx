@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Users, Award, Heart, Send, Upload } from "lucide-react";
+import { Briefcase, Users, Award, Heart, Send, Printer } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { sendEmail } from "@/lib/emailjs";
+import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 
 const Career = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -22,16 +23,41 @@ const Career = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const getFieldGroups = () => [
+    {
+      heading: "Personal Details",
+      fields: [
+        { label: "Name of the Applicant", value: formData.name },
+        { label: "Date of Birth", value: formData.dob },
+        { label: "Gender", value: formData.gender || "N/A" },
+        { label: "Email ID", value: formData.email },
+        { label: "Contact Number", value: formData.phone },
+        { label: "Address", value: formData.address || "N/A" },
+      ],
+    },
+    {
+      heading: "Academic & Professional Details",
+      fields: [
+        { label: "Academic Qualification", value: formData.qualification },
+        { label: "Professional Degree", value: formData.professionalDegree },
+        { label: "Current Position", value: formData.currentPosition || "N/A" },
+        { label: "Position Applying For", value: formData.positionApplying || "N/A" },
+        { label: "Experience", value: formData.experience || "N/A" },
+      ],
+    },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      const fieldGroups = getFieldGroups();
       await sendEmail({
         from_name: formData.name,
         from_email: formData.email,
         phone: formData.phone || "Not provided",
         subject: `Career Application: ${formData.positionApplying || "General"}`,
-        message: `Name: ${formData.name}\nDOB: ${formData.dob}\nGender: ${formData.gender || "N/A"}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nAddress: ${formData.address || "N/A"}\nQualification: ${formData.qualification}\nProfessional Degree: ${formData.professionalDegree}\nCurrent Position: ${formData.currentPosition || "N/A"}\nApplying For: ${formData.positionApplying || "N/A"}\nExperience: ${formData.experience || "N/A"}`,
+        message: buildEmailMessage("Career Inquiry Form", fieldGroups),
       });
       setSubmitted(true);
       toast({ title: "Application Received!", description: "We will review your application and contact you soon." });
@@ -41,6 +67,14 @@ const Career = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePrint = () => {
+    openPrintableTemplate({
+      title: "Career Inquiry Form",
+      subtitle: "Job Application",
+      fieldGroups: getFieldGroups(),
+    });
   };
 
   return (
@@ -84,6 +118,14 @@ const Career = () => {
               <Send className="h-16 w-16 text-accent mx-auto mb-4" />
               <h3 className="font-serif text-2xl font-bold text-primary mb-2">Application Submitted!</h3>
               <p className="text-muted-foreground">We will review your application and contact you soon.</p>
+              <div className="flex gap-3 justify-center mt-6">
+                <Button onClick={handlePrint} variant="outline" className="gap-2">
+                  <Printer className="h-4 w-4" /> Print / Download Copy
+                </Button>
+                <Button onClick={() => { setSubmitted(false); setFormData({ name: "", dob: "", gender: "", email: "", phone: "", address: "", qualification: "", professionalDegree: "", currentPosition: "", positionApplying: "", experience: "" }); }} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                  Submit Another
+                </Button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="bg-card p-8 rounded-2xl shadow-lg space-y-6">

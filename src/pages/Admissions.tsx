@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { sendEmail } from "@/lib/emailjs";
+import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckCircle, FileText, CreditCard, ClipboardList } from "lucide-react";
+import { CheckCircle, FileText, CreditCard, ClipboardList, Printer, Loader2 } from "lucide-react";
 
 const standards = ["Pre-KG", "LKG", "UKG", "I", "II", "III", "IV", "V"];
 const sections = ["A", "B", "C", "D"];
@@ -21,7 +22,6 @@ const Admissions = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<"process" | "fees" | "apply">("process");
 
-  // Sync tab with URL hash
   useEffect(() => {
     const hash = location.hash.replace("#", "");
     if (hash === "fees") setActiveTab("fees");
@@ -30,8 +30,10 @@ const Admissions = () => {
   }, [location.hash]);
 
   // Fee payment state
-  const [feeForm, setFeeForm] = useState({ childName: "", standard: "", section: "" });
+  const [feeForm, setFeeForm] = useState({ childName: "", standard: "", section: "", referenceId: "", paymentMethod: "UPI (GPay/PhonePe/Paytm)", amount: "" });
   const isQrEnabled = feeForm.childName.trim() && feeForm.standard && feeForm.section;
+  const [feeSubmitted, setFeeSubmitted] = useState(false);
+  const [feeLoading, setFeeLoading] = useState(false);
 
   // Apply Now form state
   const [applyForm, setApplyForm] = useState({
@@ -43,24 +45,56 @@ const Admissions = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  const getApplyFieldGroups = () => [
+    {
+      heading: "Student Details",
+      fields: [
+        { label: "Student Name", value: applyForm.student_name },
+        { label: "Date of Birth", value: applyForm.date_of_birth },
+        { label: "Gender", value: applyForm.gender },
+        { label: "Aadhaar Number", value: applyForm.aadhaar_number },
+        { label: "Blood Group", value: applyForm.blood_group || "N/A" },
+        { label: "Standard Applying For", value: applyForm.standard_applying },
+      ],
+    },
+    {
+      heading: "Parent / Guardian Details",
+      fields: [
+        { label: "Parent/Guardian Name", value: applyForm.parent_name },
+        { label: "Phone Number", value: applyForm.parent_phone },
+        { label: "Email", value: applyForm.parent_email || "N/A" },
+        { label: "Nationality", value: applyForm.nationality },
+        { label: "Religion", value: applyForm.religion || "N/A" },
+        { label: "Community", value: applyForm.community || "N/A" },
+        { label: "Address", value: applyForm.address },
+        { label: "Previous School", value: applyForm.previous_school || "N/A" },
+      ],
+    },
+  ];
+
+  const getFeeFieldGroups = () => [
+    {
+      heading: "Student Details",
+      fields: [
+        { label: "Child's Name", value: feeForm.childName },
+        { label: "Standard", value: feeForm.standard },
+        { label: "Section", value: feeForm.section },
+      ],
+    },
+  ];
+
   const handleApplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate required fields
     if (!applyForm.student_name || !applyForm.date_of_birth || !applyForm.gender ||
       !applyForm.aadhaar_number || !applyForm.parent_name || !applyForm.parent_phone ||
       !applyForm.address || !applyForm.standard_applying) {
       toast({ title: "Missing Fields", description: "Please fill all required fields.", variant: "destructive" });
       return;
     }
-
-    // Validate Aadhaar (12 digits)
     if (!/^\d{12}$/.test(applyForm.aadhaar_number)) {
       toast({ title: "Invalid Aadhaar", description: "Aadhaar number must be exactly 12 digits.", variant: "destructive" });
       return;
     }
-
-    // Validate phone (10 digits)
     if (!/^\d{10}$/.test(applyForm.parent_phone)) {
       toast({ title: "Invalid Phone", description: "Phone number must be exactly 10 digits.", variant: "destructive" });
       return;
@@ -68,17 +102,16 @@ const Admissions = () => {
 
     setSubmitting(true);
     try {
-      // Save to database
       const { error } = await supabase.from("admission_applications").insert([applyForm]);
       if (error) throw error;
 
-      // Send email notification
+      const fieldGroups = getApplyFieldGroups();
       await sendEmail({
         from_name: applyForm.parent_name,
         from_email: applyForm.parent_email || "Not provided",
         phone: applyForm.parent_phone,
         subject: `Admission Application: ${applyForm.student_name} - ${applyForm.standard_applying}`,
-        message: `Student: ${applyForm.student_name}\nDOB: ${applyForm.date_of_birth}\nGender: ${applyForm.gender}\nAadhaar: ${applyForm.aadhaar_number}\nParent: ${applyForm.parent_name}\nPhone: ${applyForm.parent_phone}\nEmail: ${applyForm.parent_email || "N/A"}\nAddress: ${applyForm.address}\nStandard: ${applyForm.standard_applying}\nPrevious School: ${applyForm.previous_school || "N/A"}\nBlood Group: ${applyForm.blood_group || "N/A"}\nNationality: ${applyForm.nationality}\nReligion: ${applyForm.religion || "N/A"}\nCommunity: ${applyForm.community || "N/A"}`,
+        message: buildEmailMessage("Apply Now — Admission Application", fieldGroups),
       });
 
       setSubmitted(true);
@@ -88,6 +121,58 @@ const Admissions = () => {
       toast({ title: "Submission Failed", description: "Please try again later.", variant: "destructive" });
     }
     setSubmitting(false);
+  };
+
+  const handleFeeReceiptSubmit = async () => {
+    if (!feeForm.referenceId.trim()) {
+      toast({ title: "Missing Reference ID", description: "Please enter the GPay/Paytm transaction reference ID.", variant: "destructive" });
+      return;
+    }
+    setFeeLoading(true);
+    try {
+      const fieldGroups = getFeeFieldGroups();
+      await sendEmail({
+        from_name: feeForm.childName,
+        from_email: "Fee Payment",
+        phone: "N/A",
+        subject: `Fee Payment: ${feeForm.childName} - ${feeForm.standard} ${feeForm.section}`,
+        message: buildEmailMessage("Fee Payment Receipt", [
+          ...fieldGroups,
+          {
+            heading: "Payment Details",
+            fields: [
+              { label: "Reference / Transaction ID", value: feeForm.referenceId },
+              { label: "Payment Method", value: feeForm.paymentMethod },
+              { label: "Amount Paid", value: feeForm.amount ? `₹${feeForm.amount}` : "N/A" },
+            ],
+          },
+        ]),
+      });
+      setFeeSubmitted(true);
+      toast({ title: "Receipt Generated!", description: "Payment details sent to school." });
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Failed", description: "Please try again.", variant: "destructive" });
+    }
+    setFeeLoading(false);
+  };
+
+  const handleApplyPrint = () => {
+    openPrintableTemplate({ title: "Admission Application", subtitle: "Apply Now", fieldGroups: getApplyFieldGroups() });
+  };
+
+  const handleFeePrint = () => {
+    openPrintableTemplate({
+      title: "Fee Payment Receipt",
+      subtitle: `${feeForm.childName} — Class ${feeForm.standard} ${feeForm.section}`,
+      fieldGroups: getFeeFieldGroups(),
+      receiptMode: true,
+      receiptDetails: {
+        referenceId: feeForm.referenceId,
+        paymentMethod: feeForm.paymentMethod,
+        amount: feeForm.amount,
+      },
+    });
   };
 
   const upiPaymentString = isQrEnabled
@@ -102,7 +187,6 @@ const Admissions = () => {
 
   return (
     <Layout>
-      {/* Banner */}
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container-custom text-center">
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Admissions Overview</h1>
@@ -112,7 +196,6 @@ const Admissions = () => {
         </div>
       </section>
 
-      {/* Tabs */}
       <section className="section-padding bg-background">
         <div className="container-custom">
           <div className="flex flex-wrap gap-2 mb-12 justify-center">
@@ -120,10 +203,7 @@ const Admissions = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-base transition-colors ${activeTab === tab.id
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-secondary text-foreground hover:bg-secondary/80"
-                  }`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-base transition-colors ${activeTab === tab.id ? "bg-accent text-accent-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
               >
                 <tab.icon className="h-5 w-5" />
                 {tab.label}
@@ -144,9 +224,7 @@ const Admissions = () => {
                   { step: "05", title: "Welcome to the Family", desc: "Collect the admission kit, uniform details, and join the Nethaji Vidhyalayam family!" },
                 ].map((item) => (
                   <div key={item.step} className="flex gap-6 items-start">
-                    <div className="w-16 h-16 bg-accent text-accent-foreground rounded-xl flex items-center justify-center font-bold text-xl flex-shrink-0">
-                      {item.step}
-                    </div>
+                    <div className="w-16 h-16 bg-accent text-accent-foreground rounded-xl flex items-center justify-center font-bold text-xl flex-shrink-0">{item.step}</div>
                     <div>
                       <h3 className="font-serif text-xl font-bold text-primary mb-2">{item.title}</h3>
                       <p className="text-muted-foreground">{item.desc}</p>
@@ -161,62 +239,99 @@ const Admissions = () => {
           {activeTab === "fees" && (
             <div id="fees" className="max-w-xl mx-auto">
               <h2 className="section-title text-center mb-8">Fee Payment</h2>
-              <p className="text-center text-muted-foreground mb-8">
-                Fill in your child's details below to generate a UPI QR code for fee payment.
-              </p>
-              <div className="bg-card p-8 rounded-2xl shadow-lg space-y-6">
-                <div className="space-y-2">
-                  <Label className="font-semibold">Child's Name *</Label>
-                  <Input
-                    placeholder="Enter child's full name"
-                    value={feeForm.childName}
-                    onChange={(e) => setFeeForm({ ...feeForm, childName: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="font-semibold">Standard *</Label>
-                    <Select value={feeForm.standard} onValueChange={(v) => setFeeForm({ ...feeForm, standard: v })}>
-                      <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                      <SelectContent>
-                        {standards.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="font-semibold">Section *</Label>
-                    <Select value={feeForm.section} onValueChange={(v) => setFeeForm({ ...feeForm, section: v })}>
-                      <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                      <SelectContent>
-                        {sections.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+              <p className="text-center text-muted-foreground mb-8">Fill in your child's details below to generate a UPI QR code for fee payment.</p>
 
-                {/* QR Code */}
-                <div className={`text-center p-8 rounded-xl border-2 border-dashed transition-all ${isQrEnabled ? "border-accent bg-accent/5" : "border-muted bg-muted/30"}`}>
-                  {isQrEnabled ? (
-                    <div className="space-y-4">
-                      <p className="font-semibold text-primary">Scan QR Code to Pay</p>
-                      <div className="inline-block bg-white p-4 rounded-xl shadow-md">
-                        <QRCodeSVG value={upiPaymentString} size={200} />
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {feeForm.childName} — Class {feeForm.standard} {feeForm.section}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Use any UPI app (GPay, PhonePe, Paytm) to scan and pay
-                      </p>
+              {feeSubmitted ? (
+                <div className="text-center bg-card p-12 rounded-2xl shadow-lg">
+                  <CheckCircle className="h-16 w-16 text-accent mx-auto mb-4" />
+                  <h3 className="font-serif text-2xl font-bold text-primary mb-2">Payment Recorded!</h3>
+                  <p className="text-muted-foreground mb-6">Your fee payment details have been sent to the school.</p>
+                  <div className="flex gap-3 justify-center">
+                    <Button onClick={handleFeePrint} variant="outline" className="gap-2">
+                      <Printer className="h-4 w-4" /> Print / Download Receipt
+                    </Button>
+                    <Button onClick={() => { setFeeSubmitted(false); setFeeForm({ childName: "", standard: "", section: "", referenceId: "", paymentMethod: "UPI (GPay/PhonePe/Paytm)", amount: "" }); }} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                      New Payment
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-card p-8 rounded-2xl shadow-lg space-y-6">
+                  <div className="space-y-2">
+                    <Label className="font-semibold">Child's Name *</Label>
+                    <Input placeholder="Enter child's full name" value={feeForm.childName} onChange={(e) => setFeeForm({ ...feeForm, childName: e.target.value })} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="font-semibold">Standard *</Label>
+                      <Select value={feeForm.standard} onValueChange={(v) => setFeeForm({ ...feeForm, standard: v })}>
+                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent>{standards.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                      </Select>
                     </div>
-                  ) : (
-                    <div className="space-y-2 py-4">
-                      <CreditCard className="h-12 w-12 text-muted-foreground/50 mx-auto" />
-                      <p className="text-muted-foreground">Fill all fields above to generate QR code</p>
+                    <div className="space-y-2">
+                      <Label className="font-semibold">Section *</Label>
+                      <Select value={feeForm.section} onValueChange={(v) => setFeeForm({ ...feeForm, section: v })}>
+                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                        <SelectContent>{sections.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* QR Code */}
+                  <div className={`text-center p-8 rounded-xl border-2 border-dashed transition-all ${isQrEnabled ? "border-accent bg-accent/5" : "border-muted bg-muted/30"}`}>
+                    {isQrEnabled ? (
+                      <div className="space-y-4">
+                        <p className="font-semibold text-primary">Scan QR Code to Pay</p>
+                        <div className="inline-block bg-white p-4 rounded-xl shadow-md">
+                          <QRCodeSVG value={upiPaymentString} size={200} />
+                        </div>
+                        <p className="text-sm text-muted-foreground">{feeForm.childName} — Class {feeForm.standard} {feeForm.section}</p>
+                        <p className="text-xs text-muted-foreground">Use any UPI app (GPay, PhonePe, Paytm) to scan and pay</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 py-4">
+                        <CreditCard className="h-12 w-12 text-muted-foreground/50 mx-auto" />
+                        <p className="text-muted-foreground">Fill all fields above to generate QR code</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* After payment section */}
+                  {isQrEnabled && (
+                    <div className="border-t pt-6 space-y-4">
+                      <h3 className="font-serif text-lg font-bold text-primary">After Payment — Generate Receipt</h3>
+                      <p className="text-sm text-muted-foreground">After scanning and paying, enter your transaction details below to generate a receipt.</p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="font-semibold">Transaction / Reference ID *</Label>
+                          <Input placeholder="GPay/Paytm Ref ID" value={feeForm.referenceId} onChange={(e) => setFeeForm({ ...feeForm, referenceId: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="font-semibold">Amount Paid</Label>
+                          <Input placeholder="e.g. 5000" value={feeForm.amount} onChange={(e) => setFeeForm({ ...feeForm, amount: e.target.value })} />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="font-semibold">Payment Method</Label>
+                        <Select value={feeForm.paymentMethod} onValueChange={(v) => setFeeForm({ ...feeForm, paymentMethod: v })}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="UPI (GPay/PhonePe/Paytm)">UPI (GPay/PhonePe/Paytm)</SelectItem>
+                            <SelectItem value="GPay">GPay</SelectItem>
+                            <SelectItem value="PhonePe">PhonePe</SelectItem>
+                            <SelectItem value="Paytm">Paytm</SelectItem>
+                            <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button onClick={handleFeeReceiptSubmit} disabled={feeLoading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold py-4">
+                        {feeLoading ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Generating...</> : "Generate Receipt & Send to School"}
+                      </Button>
                     </div>
                   )}
                 </div>
-              </div>
+              )}
             </div>
           )}
 
@@ -229,6 +344,14 @@ const Admissions = () => {
                   <CheckCircle className="h-16 w-16 text-accent mx-auto mb-4" />
                   <h3 className="font-serif text-2xl font-bold text-primary mb-2">Application Submitted!</h3>
                   <p className="text-muted-foreground">Thank you for applying. Our team will contact you shortly.</p>
+                  <div className="flex gap-3 justify-center mt-6">
+                    <Button onClick={handleApplyPrint} variant="outline" className="gap-2">
+                      <Printer className="h-4 w-4" /> Print / Download Copy
+                    </Button>
+                    <Button onClick={() => { setSubmitted(false); setApplyForm({ student_name: "", date_of_birth: "", gender: "", aadhaar_number: "", parent_name: "", parent_phone: "", parent_email: "", address: "", standard_applying: "", previous_school: "", blood_group: "", nationality: "Indian", religion: "", community: "" }); }} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                      Submit Another
+                    </Button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleApplySubmit} className="bg-card p-8 rounded-2xl shadow-lg space-y-6">
@@ -261,20 +384,14 @@ const Admissions = () => {
                       <Label className="font-semibold">Blood Group</Label>
                       <Select value={applyForm.blood_group} onValueChange={(v) => setApplyForm({ ...applyForm, blood_group: v })}>
                         <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                        <SelectContent>
-                          {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
-                            <SelectItem key={bg} value={bg}>{bg}</SelectItem>
-                          ))}
-                        </SelectContent>
+                        <SelectContent>{["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => <SelectItem key={bg} value={bg}>{bg}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                     <div className="space-y-2">
                       <Label className="font-semibold">Standard Applying For *</Label>
                       <Select value={applyForm.standard_applying} onValueChange={(v) => setApplyForm({ ...applyForm, standard_applying: v })}>
                         <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                        <SelectContent>
-                          {standards.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                        </SelectContent>
+                        <SelectContent>{standards.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                       </Select>
                     </div>
                   </div>
@@ -298,7 +415,6 @@ const Admissions = () => {
                       <Input value={applyForm.nationality} onChange={(e) => setApplyForm({ ...applyForm, nationality: e.target.value })} />
                     </div>
                   </div>
-
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="font-semibold">Religion</Label>
@@ -309,17 +425,14 @@ const Admissions = () => {
                       <Input value={applyForm.community} onChange={(e) => setApplyForm({ ...applyForm, community: e.target.value })} placeholder="Community" />
                     </div>
                   </div>
-
                   <div className="space-y-2">
                     <Label className="font-semibold">Address *</Label>
                     <Textarea required value={applyForm.address} onChange={(e) => setApplyForm({ ...applyForm, address: e.target.value })} placeholder="Full address" rows={3} />
                   </div>
-
                   <div className="space-y-2">
                     <Label className="font-semibold">Previous School</Label>
                     <Input value={applyForm.previous_school} onChange={(e) => setApplyForm({ ...applyForm, previous_school: e.target.value })} placeholder="Previous school name (if any)" />
                   </div>
-
                   <Button type="submit" disabled={submitting} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg py-6">
                     {submitting ? "Submitting..." : "Submit Application"}
                   </Button>

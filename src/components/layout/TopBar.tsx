@@ -25,7 +25,7 @@ const TopBar = () => {
         {/* Quick Links */}
         <div className="flex items-center gap-4">
           <a 
-            href="https://nethajividhyalayam.com/login" 
+            href="https://mail.google.com/mail/u/nethajividhyalayam@gmail.com" 
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-accent transition-colors font-semibold"
