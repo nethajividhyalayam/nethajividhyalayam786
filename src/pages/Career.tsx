@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Briefcase, Users, Award, Heart, Send, Printer } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { sendEmail, sendFormEmail } from "@/lib/emailjs";
+import { sendEmail, sendParentCopy } from "@/lib/emailjs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 
 const Career = () => {
@@ -60,15 +60,8 @@ const Career = () => {
         subject: `Career Application: ${formData.positionApplying || "General"}`,
         message: buildEmailMessage("Career Inquiry Form", fieldGroups),
       }).catch(console.error);
-      // Rich HTML email to school + thank-you copy to applicant
-      await sendFormEmail({
-        formType: "career",
-        title: "Career Inquiry Form",
-        subtitle: formData.positionApplying || "General Application",
-        fieldGroups,
-        senderName: formData.name,
-        senderEmail: formData.email,
-      });
+      // Send thank-you copy to applicant
+      sendParentCopy(formData.email, formData.name, "Career Application", buildEmailMessage("Career Inquiry Form", fieldGroups)).catch(console.error);
       setSubmitted(true);
       toast({ title: "Application Received!", description: "A confirmation copy has been sent to your email." });
     } catch (err: any) {
