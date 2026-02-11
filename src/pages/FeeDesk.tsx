@@ -45,6 +45,7 @@ const FeeDesk = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
+      setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
@@ -52,18 +53,17 @@ const FeeDesk = () => {
       }
       setLoading(false);
     };
-    checkAuth();
+    void checkAuth();
+
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        setUser(session.user);
-        await fetchRole(session.user.id);
-      } else {
-        setUser(null);
-        setRole(null);
-      }
+      setLoading(true);
+      if (session?.user) { setUser(session.user); await fetchRole(session.user.id); }
+      else { setUser(null); setRole(null); }
+      setLoading(false);
     });
     return () => subscription.unsubscribe();
+
   }, []);
 
   const fetchRole = async (userId: string) => {
@@ -110,7 +110,7 @@ const FeeDesk = () => {
   };
 
   const fetchPayments = async () => {
-    const { data, error } = await supabase.from("fee_payments").select("*, students(student_name, standard, section)").order("created_at", { ascending: false }).limit(100);
+    const { data, error } = await supabase.from("fee_payments").select("*, students(student_name, standard, section)").order("created_at", { ascending: false }).limit(1000);
     if (!error && data) setPayments(data);
   };
 
@@ -130,7 +130,7 @@ const FeeDesk = () => {
       toast({ title: "Missing Fields", description: "Fill required fields.", variant: "destructive" });
       return;
     }
-    const { error } = await supabase.from("students").insert([newStudent]);
+    const { error } = await supabase.from("students").insert([{ ...newStudent, date_of_birth: newStudent.date_of_birth || null, gender: newStudent.gender || null }]);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -179,7 +179,7 @@ const FeeDesk = () => {
             { label: "Amount", value: `₹${paymentForm.amount}` },
             { label: "Method", value: paymentForm.payment_method },
             { label: "Reference ID", value: paymentForm.reference_id || "N/A" },
-            { label: "Date", value: new Date().toLocaleDateString("en-IN") },
+            { label: "Collected At", value: data?.created_at ? new Date(data.created_at).toLocaleString("en-IN") : new Date().toLocaleString("en-IN") },
           ]},
         ],
         receiptMode: true,
@@ -360,8 +360,8 @@ const FeeDesk = () => {
           {/* Collect Fee Tab */}
           <TabsContent value="collect-fee">
             <div className="bg-background rounded-2xl shadow-lg p-6 max-w-2xl mx-auto">
-              <h2 className="font-serif text-2xl font-bold text-primary mb-6">Collect Fee Payment</h2>
-
+              <h2 className="font-serif text-2xl font-bold text-primary mb-2">Collect Fee Payment</h2>
+              <p className="text-sm text-muted-foreground mb-6">Collected At: {new Date().toLocaleString("en-IN")}</p>
               {/* Student selector */}
               <div className="space-y-2 mb-6">
                 <Label className="font-semibold">Select Student</Label>
@@ -445,7 +445,7 @@ const FeeDesk = () => {
                       <th className="p-3 font-semibold">Term</th>
                       <th className="p-3 font-semibold">Amount</th>
                       <th className="p-3 font-semibold">Method</th>
-                      <th className="p-3 font-semibold">Date</th>
+                      <th className="p-3 font-semibold">Date & Time</th>
                       <th className="p-3 font-semibold">Actions</th>
                     </tr>
                   </thead>
@@ -460,7 +460,7 @@ const FeeDesk = () => {
                         <td className="p-3">{p.term}</td>
                         <td className="p-3 font-semibold text-accent">₹{p.amount}</td>
                         <td className="p-3">{p.payment_method}</td>
-                        <td className="p-3">{new Date(p.payment_date).toLocaleDateString("en-IN")}</td>
+                        <td className="p-3">{p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : new Date(p.payment_date).toLocaleDateString("en-IN")}</td>
                         <td className="p-3">
                           <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => {
                             openPrintableTemplate({
@@ -472,7 +472,7 @@ const FeeDesk = () => {
                                   { label: "Term", value: p.term },
                                   { label: "Amount", value: `₹${p.amount}` },
                                   { label: "Method", value: p.payment_method },
-                                  { label: "Date", value: new Date(p.payment_date).toLocaleDateString("en-IN") },
+                                  { label: "Collected At", value: p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : new Date(p.payment_date).toLocaleDateString("en-IN") },
                                 ]},
                               ],
                               receiptMode: true,
@@ -495,6 +495,7 @@ const FeeDesk = () => {
             <TabsContent value="reports">
               <div className="bg-background rounded-2xl shadow-lg p-6">
                 <h2 className="font-serif text-2xl font-bold text-primary mb-6">Reports & Analytics</h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="bg-secondary rounded-xl p-6 text-center">
                     <Users className="h-8 w-8 text-accent mx-auto mb-3" />
@@ -504,15 +505,120 @@ const FeeDesk = () => {
                   <div className="bg-secondary rounded-xl p-6 text-center">
                     <CreditCard className="h-8 w-8 text-accent mx-auto mb-3" />
                     <p className="text-3xl font-bold text-primary">{payments.length}</p>
-                    <p className="text-muted-foreground">Total Payments</p>
+                    <p className="text-muted-foreground">Total Payments (loaded)</p>
                   </div>
                   <div className="bg-secondary rounded-xl p-6 text-center">
                     <DollarSign className="h-8 w-8 text-accent mx-auto mb-3" />
                     <p className="text-3xl font-bold text-primary">₹{payments.reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</p>
-                    <p className="text-muted-foreground">Total Collected</p>
+                    <p className="text-muted-foreground">Total Collected (loaded)</p>
                   </div>
                 </div>
-                <p className="text-sm text-muted-foreground mt-6">More detailed reports (income, expense, cash flow, daily reports, student summary, staff summary) will be available in upcoming updates.</p>
+
+                <div className="mt-8">
+                  {(() => {
+                    const rows = payments;
+
+                    const startOfWeekMonday = (d: Date) => {
+                      const date = new Date(d);
+                      const day = (date.getDay() + 6) % 7; // Monday = 0
+                      date.setDate(date.getDate() - day);
+                      date.setHours(0, 0, 0, 0);
+                      return date;
+                    };
+
+                    const keyFor = (mode: "daily" | "weekly" | "monthly" | "yearly", createdAt: string, paymentDate: string) => {
+                      const base = createdAt ? new Date(createdAt) : new Date(paymentDate);
+                      if (mode === "daily") {
+                        const d = new Date(base);
+                        d.setHours(0, 0, 0, 0);
+                        return d.toISOString().slice(0, 10);
+                      }
+                      if (mode === "weekly") {
+                        const w = startOfWeekMonday(base);
+                        return w.toISOString().slice(0, 10);
+                      }
+                      if (mode === "monthly") {
+                        return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}`;
+                      }
+                      return String(base.getFullYear());
+                    };
+
+                    const labelFor = (mode: "daily" | "weekly" | "monthly" | "yearly", key: string) => {
+                      if (mode === "daily") return new Date(key).toLocaleDateString("en-IN");
+                      if (mode === "weekly") return `Week of ${new Date(key).toLocaleDateString("en-IN")}`;
+                      if (mode === "monthly") {
+                        const [y, m] = key.split("-").map(Number);
+                        return new Date(y, (m || 1) - 1, 1).toLocaleDateString("en-IN", { month: "short", year: "numeric" });
+                      }
+                      return key;
+                    };
+
+                    const build = (mode: "daily" | "weekly" | "monthly" | "yearly") => {
+                      const map = new Map<string, { key: string; label: string; count: number; total: number; lastAt: string }>();
+                      for (const p of rows) {
+                        const k = keyFor(mode, p.created_at, p.payment_date);
+                        const current = map.get(k) || { key: k, label: labelFor(mode, k), count: 0, total: 0, lastAt: "" };
+                        current.count += 1;
+                        current.total += Number(p.amount) || 0;
+                        const at = p.created_at || "";
+                        if (at && (!current.lastAt || at > current.lastAt)) current.lastAt = at;
+                        map.set(k, current);
+                      }
+                      return Array.from(map.values()).sort((a, b) => (a.key < b.key ? 1 : -1));
+                    };
+
+                    const ReportTable = ({ mode }: { mode: "daily" | "weekly" | "monthly" | "yearly" }) => {
+                      const report = build(mode);
+                      if (report.length === 0) {
+                        return <div className="p-8 text-center text-muted-foreground">No payment data to report yet.</div>;
+                      }
+                      return (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b text-left">
+                                <th className="p-3 font-semibold">Period</th>
+                                <th className="p-3 font-semibold">Payments</th>
+                                <th className="p-3 font-semibold">Total Collected</th>
+                                <th className="p-3 font-semibold">Last Entry</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {report.map((r) => (
+                                <tr key={r.key} className="border-b hover:bg-secondary/50 transition-colors">
+                                  <td className="p-3 font-semibold">{r.label}</td>
+                                  <td className="p-3">{r.count}</td>
+                                  <td className="p-3 font-semibold text-accent">₹{r.total.toLocaleString("en-IN")}</td>
+                                  <td className="p-3">{r.lastAt ? new Date(r.lastAt).toLocaleString("en-IN") : "—"}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      );
+                    };
+
+                    return (
+                      <Tabs defaultValue="daily" className="space-y-4">
+                        <TabsList className="bg-secondary rounded-xl p-1 flex-wrap h-auto">
+                          <TabsTrigger value="daily">Day wise</TabsTrigger>
+                          <TabsTrigger value="weekly">Weekly</TabsTrigger>
+                          <TabsTrigger value="monthly">Monthly</TabsTrigger>
+                          <TabsTrigger value="yearly">Yearly</TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="daily"><ReportTable mode="daily" /></TabsContent>
+                        <TabsContent value="weekly"><ReportTable mode="weekly" /></TabsContent>
+                        <TabsContent value="monthly"><ReportTable mode="monthly" /></TabsContent>
+                        <TabsContent value="yearly"><ReportTable mode="yearly" /></TabsContent>
+
+                        <p className="text-xs text-muted-foreground">
+                          Showing reports for the latest {payments.length} payments loaded in this portal (up to 1000).
+                        </p>
+                      </Tabs>
+                    );
+                  })()}
+                </div>
               </div>
             </TabsContent>
           )}
