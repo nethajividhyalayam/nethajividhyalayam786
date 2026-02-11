@@ -1,33 +1,86 @@
-import { Facebook, Twitter, Youtube, Instagram } from "lucide-react";
+import { Facebook, Youtube, Instagram } from "lucide-react";
+import { useState, useEffect } from "react";
+
+const XIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
 
 const socials = [
-  { icon: Facebook, href: "https://www.facebook.com/", label: "Facebook", bg: "bg-[#1877F2]" },
-  { icon: Twitter, href: "https://x.com/home", label: "X / Twitter", bg: "bg-[#000000]" },
-  { icon: Youtube, href: "https://www.youtube.com/", label: "YouTube", bg: "bg-[#FF0000]" },
-  { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]" },
+  { icon: Facebook, href: "https://www.facebook.com/", label: "Facebook", bg: "bg-[#1877F2]", hoverBg: "hover:shadow-[0_0_20px_rgba(24,119,242,0.5)]" },
+  { icon: XIcon, href: "https://x.com/home", label: "X", bg: "bg-[#000000]", hoverBg: "hover:shadow-[0_0_20px_rgba(0,0,0,0.5)]", isCustom: true },
+  { icon: Youtube, href: "https://www.youtube.com/", label: "YouTube", bg: "bg-[#FF0000]", hoverBg: "hover:shadow-[0_0_20px_rgba(255,0,0,0.4)]" },
+  { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", hoverBg: "hover:shadow-[0_0_20px_rgba(225,48,108,0.4)]" },
 ];
 
+const getAcademicYear = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const startYear = month >= 2 ? year : year - 1;
+  return `${startYear}-${String(startYear + 1).slice(-2)}`;
+};
+
 const SocialSidebar = () => {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const dayName = now.toLocaleDateString("en-US", { weekday: "short" });
+  const dateStr = now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
+  const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+
   return (
-    <div className="fixed right-0 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-0.5">
-      {socials.map(({ icon: Icon, href, label, bg }) => (
-        <a
-          key={label}
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={label}
-          className={`group flex items-center ${bg} text-white w-10 hover:w-36 transition-all duration-300 overflow-hidden rounded-l-lg shadow-lg`}
-        >
-          <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center">
-            <Icon className="h-5 w-5" />
+    <>
+      {/* Floating Date/Time - Left Side */}
+      <div className="fixed left-0 top-1/3 -translate-y-1/2 z-50 hidden md:flex flex-col">
+        <div className="group bg-primary/90 backdrop-blur-md border border-white/10 rounded-r-2xl px-3 py-4 text-white text-center shadow-2xl w-14 hover:w-44 transition-all duration-500 overflow-hidden cursor-default">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0 w-8 flex flex-col items-center">
+              <span className="text-[10px] uppercase tracking-widest text-accent font-bold">{dayName}</span>
+              <span className="text-lg font-bold font-serif leading-tight">{now.getDate()}</span>
+              <span className="text-[9px] text-white/60 uppercase">{now.toLocaleDateString("en-US", { month: "short" })}</span>
+            </div>
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500 whitespace-nowrap text-left">
+              <div className="text-lg font-bold font-serif tabular-nums">{timeStr}</div>
+              <div className="text-[10px] text-white/60">{dateStr}</div>
+              <div className="mt-1.5 text-[9px] bg-accent/20 border border-accent/30 rounded-full px-2 py-0.5 text-accent font-semibold">
+                {getAcademicYear()}
+              </div>
+            </div>
           </div>
-          <span className="whitespace-nowrap text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 pr-3">
-            {label}
-          </span>
-        </a>
-      ))}
-    </div>
+        </div>
+      </div>
+
+      {/* Floating Social - Right Side */}
+      <div className="fixed right-0 top-1/3 -translate-y-1/2 z-50 flex flex-col gap-1">
+        {socials.map(({ icon: Icon, href, label, bg, hoverBg, isCustom }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            className={`group flex items-center ${bg} ${hoverBg} text-white w-11 hover:w-36 transition-all duration-300 overflow-hidden rounded-l-xl shadow-lg hover:scale-105`}
+          >
+            <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
+              {isCustom ? (
+                <Icon className="h-5 w-5" />
+              ) : (
+                <Icon className="h-5 w-5" />
+              )}
+            </div>
+            <span className="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 pr-3">
+              {label}
+            </span>
+          </a>
+        ))}
+      </div>
+    </>
   );
 };
 
