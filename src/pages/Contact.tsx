@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MapPin, Send, ExternalLink, Loader2, Printer } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { sendEmail } from "@/lib/emailjs";
+import { sendEmail, sendFormEmail } from "@/lib/emailjs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 
 const Contact = () => {
@@ -41,15 +41,25 @@ const Contact = () => {
     setLoading(true);
     try {
       const fieldGroups = getFieldGroups();
-      await sendEmail({
+      // Send via EmailJS (school)
+      sendEmail({
         from_name: formData.name,
         from_email: formData.email,
         phone: formData.phone || "Not provided",
         subject: `Contact Enquiry: ${formData.subject}`,
         message: buildEmailMessage("Contact Us — Send Us a Message", fieldGroups),
+      }).catch(console.error);
+      // Send rich HTML email to school + thank-you copy to parent
+      await sendFormEmail({
+        formType: "contact",
+        title: "Contact Enquiry",
+        subtitle: formData.subject,
+        fieldGroups,
+        senderName: formData.name,
+        senderEmail: formData.email,
       });
       setSubmitted(true);
-      toast({ title: "Message Sent!", description: "We will get back to you soon." });
+      toast({ title: "Message Sent!", description: "A confirmation copy has been sent to your email." });
     } catch (err: any) {
       console.error(err);
       toast({ title: "Failed to send", description: err?.text || "Please try again later.", variant: "destructive" });
