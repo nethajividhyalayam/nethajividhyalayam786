@@ -27,18 +27,22 @@ const SocialSidebar = () => {
   const [expanded, setExpanded] = useState(false);
   const [activeSocial, setActiveSocial] = useState<string | null>(null);
   const [mouseY, setMouseY] = useState<number | null>(null);
+  const [dateHover, setDateHover] = useState(false);
   const socialRef = useRef<HTMLDivElement>(null);
+  const dateRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // Auto-collapse date/time after 3s (only if not hovered by cursor)
   useEffect(() => {
     if (!expanded) return;
+    if (dateHover) return;
     const t = setTimeout(() => setExpanded(false), 3000);
     return () => clearTimeout(t);
-  }, [expanded]);
+  }, [expanded, dateHover]);
 
   useEffect(() => {
     if (!activeSocial) return;
@@ -47,10 +51,24 @@ const SocialSidebar = () => {
   }, [activeSocial]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
+    // Right side proximity for social icons
     if (window.innerWidth - e.clientX < 120) {
       setMouseY(e.clientY);
     } else {
       setMouseY(null);
+    }
+    // Left side proximity for date/time widget
+    if (e.clientX < 120 && dateRef.current) {
+      const rect = dateRef.current.getBoundingClientRect();
+      const dist = Math.abs(e.clientY - (rect.top + rect.height / 2));
+      if (dist < 100) {
+        setDateHover(true);
+        setExpanded(true);
+      } else {
+        setDateHover(false);
+      }
+    } else {
+      setDateHover(false);
     }
   }, []);
 
@@ -92,10 +110,11 @@ const SocialSidebar = () => {
   return (
     <>
       {/* Floating Date/Time - Left Side */}
-      <div className="fixed left-0 top-1/3 -translate-y-1/2 z-50 hidden md:flex flex-col">
+      <div ref={dateRef} className="fixed left-0 top-1/3 -translate-y-1/2 z-50 hidden md:flex flex-col">
         <div
           onClick={() => setExpanded(!expanded)}
-          className={`bg-primary/90 backdrop-blur-md border border-white/10 rounded-r-2xl px-3 py-4 text-white text-center shadow-2xl cursor-pointer transition-all duration-500 overflow-hidden ${expanded ? "w-44" : "w-14"}`}
+          style={dateHover && !expanded ? { transform: `translateX(6px) scale(1.08) rotate(${Math.sin(Date.now() / 200) * 3}deg)`, transition: "transform 0.15s ease-out" } : undefined}
+          className={`bg-primary/90 backdrop-blur-md border border-white/10 rounded-r-2xl px-3 py-4 text-white text-center shadow-2xl cursor-pointer transition-all duration-500 overflow-hidden ${expanded ? "w-44" : "w-14"} ${dateHover && !expanded ? "shadow-[0_0_25px_rgba(var(--primary),0.4)]" : ""}`}
         >
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 w-8 flex flex-col items-center">
