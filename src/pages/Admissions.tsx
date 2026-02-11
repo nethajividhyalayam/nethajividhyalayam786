@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { sendEmail } from "@/lib/emailjs";
+import { sendEmail, sendFormEmail } from "@/lib/emailjs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 import { QRCodeSVG } from "qrcode.react";
 import { CheckCircle, FileText, CreditCard, ClipboardList, Printer, Loader2 } from "lucide-react";
@@ -106,16 +106,26 @@ const Admissions = () => {
       if (error) throw error;
 
       const fieldGroups = getApplyFieldGroups();
-      await sendEmail({
+      // EmailJS to school
+      sendEmail({
         from_name: applyForm.parent_name,
         from_email: applyForm.parent_email || "Not provided",
         phone: applyForm.parent_phone,
         subject: `Admission Application: ${applyForm.student_name} - ${applyForm.standard_applying}`,
         message: buildEmailMessage("Apply Now — Admission Application", fieldGroups),
+      }).catch(console.error);
+      // Rich HTML email to school + thank-you copy to parent
+      await sendFormEmail({
+        formType: "admission",
+        title: "Admission Application",
+        subtitle: `${applyForm.student_name} — ${applyForm.standard_applying}`,
+        fieldGroups,
+        senderName: applyForm.parent_name,
+        senderEmail: applyForm.parent_email || undefined,
       });
 
       setSubmitted(true);
-      toast({ title: "Application Submitted!", description: "We will contact you soon." });
+      toast({ title: "Application Submitted!", description: "A confirmation copy has been sent to the parent's email." });
     } catch (err: any) {
       console.error(err);
       toast({ title: "Submission Failed", description: "Please try again later.", variant: "destructive" });
@@ -131,25 +141,37 @@ const Admissions = () => {
     setFeeLoading(true);
     try {
       const fieldGroups = getFeeFieldGroups();
-      await sendEmail({
+      const paymentFields = {
+        heading: "Payment Details",
+        fields: [
+          { label: "Reference / Transaction ID", value: feeForm.referenceId },
+          { label: "Payment Method", value: feeForm.paymentMethod },
+          { label: "Amount Paid", value: feeForm.amount ? `₹${feeForm.amount}` : "N/A" },
+        ],
+      };
+      // EmailJS to school
+      sendEmail({
         from_name: feeForm.childName,
         from_email: "Fee Payment",
         phone: "N/A",
         subject: `Fee Payment: ${feeForm.childName} - ${feeForm.standard} ${feeForm.section}`,
-        message: buildEmailMessage("Fee Payment Receipt", [
-          ...fieldGroups,
-          {
-            heading: "Payment Details",
-            fields: [
-              { label: "Reference / Transaction ID", value: feeForm.referenceId },
-              { label: "Payment Method", value: feeForm.paymentMethod },
-              { label: "Amount Paid", value: feeForm.amount ? `₹${feeForm.amount}` : "N/A" },
-            ],
-          },
-        ]),
+        message: buildEmailMessage("Fee Payment Receipt", [...fieldGroups, paymentFields]),
+      }).catch(console.error);
+      // Rich HTML email to school (no parent email for fee payment)
+      await sendFormEmail({
+        formType: "fee_payment",
+        title: "Fee Payment Receipt",
+        subtitle: `${feeForm.childName} — Class ${feeForm.standard} ${feeForm.section}`,
+        fieldGroups: [...fieldGroups, paymentFields],
+        senderName: feeForm.childName,
+        receiptDetails: {
+          referenceId: feeForm.referenceId,
+          paymentMethod: feeForm.paymentMethod,
+          amount: feeForm.amount,
+        },
       });
       setFeeSubmitted(true);
-      toast({ title: "Receipt Generated!", description: "Payment details sent to school." });
+      toast({ title: "Receipt Generated!", description: "Payment receipt sent to school." });
     } catch (err: any) {
       console.error(err);
       toast({ title: "Failed", description: "Please try again.", variant: "destructive" });
