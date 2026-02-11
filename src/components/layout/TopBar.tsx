@@ -34,9 +34,7 @@ const TopBar = () => {
           </a>
           <span className="text-primary-foreground/50">|</span>
           <a 
-            href="https://feedesk.nethajividhyalayam.com" 
-            target="_blank" 
-            rel="noopener noreferrer"
+            href="https://nethajividhyalayam.org/feedesk"
             className="flex items-center gap-1 bg-accent text-accent-foreground px-3 py-1 rounded font-bold hover:bg-accent/90 transition-colors"
           >
             <span>FeeDesk</span>
