@@ -86,9 +86,12 @@ const SocialSidebar = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              onMouseEnter={() => setActiveSocial(label)}
-              onMouseLeave={() => setActiveSocial(null)}
-              onTouchStart={() => setActiveSocial(prev => prev === label ? null : label)}
+              onClick={(e) => {
+                if (activeSocial !== label) {
+                  e.preventDefault();
+                  setActiveSocial(label);
+                }
+              }}
               className={`flex items-center ${bg} ${hoverBg} text-white transition-all duration-300 overflow-hidden rounded-l-xl shadow-lg ${isActive ? "w-36 scale-105" : "w-11"}`}
             >
               <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
