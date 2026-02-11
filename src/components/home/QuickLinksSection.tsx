@@ -13,7 +13,7 @@ const quickLinks = [
     icon: CreditCard,
     title: "Pay Fees",
     description: "Online fee payment",
-    path: "/feedesk",
+    path: "/admissions#fees",
     color: "bg-school-green",
   },
   {
