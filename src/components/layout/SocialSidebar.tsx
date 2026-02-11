@@ -8,10 +8,10 @@ const XIcon = ({ className }: { className?: string }) => (
 );
 
 const socials = [
-  { icon: Facebook, href: "https://www.facebook.com/", label: "Facebook", bg: "bg-[#1877F2]", hoverBg: "hover:shadow-[0_0_20px_rgba(24,119,242,0.5)]" },
-  { icon: XIcon, href: "https://x.com/home", label: "X", bg: "bg-[#000000]", hoverBg: "hover:shadow-[0_0_20px_rgba(0,0,0,0.5)]", isCustom: true },
-  { icon: Youtube, href: "https://www.youtube.com/", label: "YouTube", bg: "bg-[#FF0000]", hoverBg: "hover:shadow-[0_0_20px_rgba(255,0,0,0.4)]" },
-  { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", hoverBg: "hover:shadow-[0_0_20px_rgba(225,48,108,0.4)]" },
+  { icon: Facebook, href: "https://www.facebook.com/", label: "Facebook", bg: "bg-[#1877F2]", activeShadow: "shadow-[0_0_20px_rgba(24,119,242,0.5)]" },
+  { icon: XIcon, href: "https://x.com/home", label: "X", bg: "bg-[#000000]", activeShadow: "shadow-[0_0_20px_rgba(0,0,0,0.5)]", isCustom: true },
+  { icon: Youtube, href: "https://www.youtube.com/", label: "YouTube", bg: "bg-[#FF0000]", activeShadow: "shadow-[0_0_20px_rgba(255,0,0,0.4)]" },
+  { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", activeShadow: "shadow-[0_0_20px_rgba(225,48,108,0.4)]" },
 ];
 
 const getAcademicYear = () => {
@@ -77,7 +77,7 @@ const SocialSidebar = () => {
 
       {/* Floating Social - Right Side */}
       <div className="fixed right-0 top-1/3 -translate-y-1/2 z-50 flex flex-col gap-1">
-        {socials.map(({ icon: Icon, href, label, bg, hoverBg, isCustom }) => {
+        {socials.map(({ icon: Icon, href, label, bg, activeShadow, isCustom }) => {
           const isActive = activeSocial === label;
           return (
             <a
@@ -87,7 +87,7 @@ const SocialSidebar = () => {
               rel="noopener noreferrer"
               aria-label={label}
               onClick={() => setActiveSocial(label)}
-              className={`flex items-center ${bg} ${hoverBg} text-white transition-all duration-300 overflow-hidden rounded-l-xl shadow-lg ${isActive ? "w-36 scale-105" : "w-11"}`}
+              className={`flex items-center ${bg} text-white transition-all duration-300 overflow-hidden rounded-l-xl ${isActive ? `w-36 scale-105 ${activeShadow}` : "w-11 shadow-lg"}`}
             >
               <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
                 <Icon className="h-5 w-5" />
