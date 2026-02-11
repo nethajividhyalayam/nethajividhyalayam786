@@ -68,6 +68,77 @@ function buildReceiptHTML(details: FormEmailRequest["receiptDetails"]): string {
     </div>`;
 }
 
+// Generate the printable/downloadable HTML attachment
+function buildAttachmentHTML(req: FormEmailRequest, dateStr: string, timeStr: string): string {
+  const receiptHTML = req.receiptDetails
+    ? `<div style="margin-bottom:20px;padding:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;">
+        <h3 style="font-size:15px;font-weight:bold;color:#166534;margin-bottom:8px;">Payment Details</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:4px 10px;font-weight:600;width:40%;font-size:13px;">Reference / Transaction ID</td><td style="padding:4px 10px;font-size:13px;">${req.receiptDetails.referenceId}</td></tr>
+          <tr><td style="padding:4px 10px;font-weight:600;font-size:13px;">Payment Method</td><td style="padding:4px 10px;font-size:13px;">${req.receiptDetails.paymentMethod}</td></tr>
+          ${req.receiptDetails.amount ? `<tr><td style="padding:4px 10px;font-weight:600;font-size:13px;">Amount Paid</td><td style="padding:4px 10px;font-size:13px;">₹${req.receiptDetails.amount}</td></tr>` : ""}
+        </table>
+      </div>`
+    : "";
+
+  const fieldGroupsHTML = req.fieldGroups
+    .map(
+      (group) => `
+      <div style="margin-bottom:20px;">
+        <h3 style="font-size:15px;font-weight:bold;color:#1a3a5c;border-bottom:2px solid #d4a843;padding-bottom:6px;margin-bottom:12px;">${group.heading}</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          ${group.fields
+            .map(
+              (f) => `
+            <tr>
+              <td style="padding:6px 10px;font-weight:600;color:#333;width:40%;border-bottom:1px solid #eee;font-size:13px;">${f.label}</td>
+              <td style="padding:6px 10px;color:#555;border-bottom:1px solid #eee;font-size:13px;">${f.value || "—"}</td>
+            </tr>`
+            )
+            .join("")}
+        </table>
+      </div>`
+    )
+    .join("");
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>${req.title} - ${SCHOOL_NAME}</title>
+  <style>
+    @media print { body { margin: 0; } .no-print { display: none !important; } }
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #333; }
+  </style>
+</head>
+<body>
+  <div style="max-width:700px;margin:0 auto;border:2px solid #1a3a5c;border-radius:12px;overflow:hidden;">
+    <div style="background:#1a3a5c;color:#fff;padding:20px;text-align:center;">
+      <h1 style="margin:0;font-size:22px;letter-spacing:1px;">${SCHOOL_NAME}</h1>
+      <p style="margin:4px 0 0;font-size:12px;opacity:0.85;">${SCHOOL_ADDRESS}</p>
+      <p style="margin:4px 0 0;font-size:12px;opacity:0.85;">Phone: ${SCHOOL_PHONE} | Email: ${SCHOOL_EMAIL}</p>
+    </div>
+    <div style="background:#d4a843;padding:10px 20px;text-align:center;">
+      <h2 style="margin:0;font-size:17px;color:#1a3a5c;text-transform:uppercase;letter-spacing:1px;">${req.title}</h2>
+      ${req.subtitle ? `<p style="margin:4px 0 0;font-size:12px;color:#1a3a5c;">${req.subtitle}</p>` : ""}
+    </div>
+    <div style="padding:12px 24px;display:flex;justify-content:space-between;font-size:12px;color:#666;border-bottom:1px solid #eee;">
+      <span><strong>Date:</strong> ${dateStr}</span>
+      <span><strong>Time:</strong> ${timeStr}</span>
+    </div>
+    <div style="padding:20px 24px;">
+      ${receiptHTML}
+      ${fieldGroupsHTML}
+    </div>
+    <div style="background:#f5f5f5;padding:12px 24px;text-align:center;font-size:11px;color:#888;border-top:1px solid #eee;">
+      <p style="margin:0;">This is a computer-generated document from ${SCHOOL_NAME}.</p>
+      <p style="margin:4px 0 0;">Generated on ${dateStr} at ${timeStr}</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
 function buildSchoolEmail(req: FormEmailRequest, dateStr: string, timeStr: string): string {
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body style="font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:0;background:#f4f4f4;">
   <div style="max-width:650px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden;border:2px solid #1a3a5c;">
@@ -80,7 +151,7 @@ function buildSchoolEmail(req: FormEmailRequest, dateStr: string, timeStr: strin
       <span style="margin-left:auto;"><strong>Time:</strong> ${timeStr}</span>
     </div>
     <div style="padding:24px;">
-      <p style="font-size:14px;color:#333;margin:0 0 20px;">New submission received from the website.</p>
+      <p style="font-size:14px;color:#333;margin:0 0 20px;">New submission received from the website. A printable copy is attached.</p>
       ${buildReceiptHTML(req.receiptDetails)}
       ${buildFieldGroupsHTML(req.fieldGroups)}
     </div>
@@ -97,25 +168,25 @@ function getThankYouMessage(formType: string): { heading: string; body: string }
     case "contact":
       return {
         heading: "Thank You for Contacting Us!",
-        body: "We have received your message and our team will get back to you within 24 hours. Below is a copy of the details you submitted for your records.",
+        body: "We have received your message and our team will get back to you within 24 hours. A copy of your submission is attached for your records.",
       };
     case "admission":
       return {
         heading: "Admission Application Received!",
-        body: "Thank you for applying to Nethaji Vidhyalayam. We have received your child's admission application. Our admissions team will review it and contact you shortly. Below is a copy of the application for your records.",
+        body: "Thank you for applying to Nethaji Vidhyalayam. Our admissions team will review it and contact you shortly. A copy of the application is attached for your records.",
       };
     case "fee_payment":
       return {
         heading: "Fee Payment Confirmation",
-        body: "Thank you for your fee payment. We have recorded your transaction details. Please keep this email as your payment receipt. Our accounts team will verify and confirm the payment.",
+        body: "Thank you for your fee payment. Please keep the attached receipt for your records. Our accounts team will verify and confirm the payment.",
       };
     case "career":
       return {
         heading: "Application Received — Career Inquiry",
-        body: "Thank you for your interest in joining Nethaji Vidhyalayam. We have received your career application and our HR team will review it and contact you soon. Below is a copy of your submission.",
+        body: "Thank you for your interest in joining Nethaji Vidhyalayam. Our HR team will review your application and contact you soon. A copy is attached for your records.",
       };
     default:
-      return { heading: "Thank You!", body: "We have received your submission." };
+      return { heading: "Thank You!", body: "We have received your submission. A copy is attached." };
   }
 }
 
@@ -137,7 +208,7 @@ function buildParentEmail(req: FormEmailRequest, dateStr: string, timeStr: strin
       <p style="font-size:13px;color:#555;line-height:1.6;margin:0 0 20px;">${thankYou.body}</p>
       
       <div style="background:#f8f9fa;border-radius:8px;padding:20px;border:1px solid #e9ecef;">
-        <h3 style="font-size:14px;color:#1a3a5c;margin:0 0 4px;">📄 Your Submission Copy</h3>
+        <h3 style="font-size:14px;color:#1a3a5c;margin:0 0 4px;">📄 Your Submission Summary</h3>
         <p style="font-size:11px;color:#888;margin:0 0 16px;">Date: ${dateStr} | Time: ${timeStr}</p>
         ${buildReceiptHTML(req.receiptDetails)}
         ${buildFieldGroupsHTML(req.fieldGroups)}
@@ -177,6 +248,22 @@ function getParentSubject(req: FormEmailRequest): string {
   }
 }
 
+function getAttachmentFilename(req: FormEmailRequest): string {
+  const safeName = req.senderName.replace(/[^a-zA-Z0-9]/g, "_");
+  switch (req.formType) {
+    case "contact": return `Contact_Enquiry_${safeName}.html`;
+    case "admission": return `Admission_Application_${safeName}.html`;
+    case "fee_payment": return `Fee_Payment_Receipt_${safeName}.html`;
+    case "career": return `Career_Application_${safeName}.html`;
+    default: return `${req.title.replace(/\s+/g, "_")}_${safeName}.html`;
+  }
+}
+
+// Encode string to base64
+function toBase64(str: string): string {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -197,20 +284,32 @@ const handler = async (req: Request): Promise<Response> => {
     const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
     const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
+    // Generate the printable HTML attachment
+    const attachmentHTML = buildAttachmentHTML(body, dateStr, timeStr);
+    const attachmentFilename = getAttachmentFilename(body);
+    const attachmentBase64 = toBase64(attachmentHTML);
+
+    const attachment = {
+      filename: attachmentFilename,
+      content: attachmentBase64,
+      content_type: "text/html",
+    };
+
     const subject = getSubjectLine(body);
     const schoolHTML = buildSchoolEmail(body, dateStr, timeStr);
 
-    // Send to school
+    // Send to school with attachment
     const schoolResult = await resend.emails.send({
       from: `${SCHOOL_NAME} Website <onboarding@resend.dev>`,
       to: [SCHOOL_EMAIL],
       subject,
       html: schoolHTML,
       reply_to: senderEmail || undefined,
+      attachments: [attachment],
     });
     console.log("School email sent:", schoolResult);
 
-    // Send thank-you copy to parent/enquirer if email provided
+    // Send thank-you copy to parent/enquirer with attachment
     if (senderEmail && senderEmail.includes("@")) {
       const parentHTML = buildParentEmail(body, dateStr, timeStr);
       const parentSubject = getParentSubject(body);
@@ -220,6 +319,7 @@ const handler = async (req: Request): Promise<Response> => {
         to: [senderEmail],
         subject: parentSubject,
         html: parentHTML,
+        attachments: [attachment],
       });
       console.log("Parent copy sent:", parentResult);
     }

@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { sendEmail, sendParentCopy } from "@/lib/emailjs";
+import { sendEmail, sendParentCopy, sendFormEmail } from "@/lib/emailjs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 import { QRCodeSVG } from "qrcode.react";
 import { CheckCircle, FileText, CreditCard, ClipboardList, Printer, Loader2 } from "lucide-react";
@@ -114,10 +114,19 @@ const Admissions = () => {
         subject: `Admission Application: ${applyForm.student_name} - ${applyForm.standard_applying}`,
         message: buildEmailMessage("Apply Now — Admission Application", fieldGroups),
       }).catch(console.error);
-      // Send thank-you copy to parent
+      // Send thank-you copy to parent via EmailJS
       if (applyForm.parent_email) {
         sendParentCopy(applyForm.parent_email, applyForm.parent_name, "Admission Application", buildEmailMessage("Apply Now — Admission Application", fieldGroups)).catch(console.error);
       }
+      // Send rich HTML email with attachment via backend
+      sendFormEmail({
+        formType: "admission",
+        title: "Admission Application",
+        subtitle: `${applyForm.student_name} — ${applyForm.standard_applying}`,
+        fieldGroups,
+        senderName: applyForm.parent_name,
+        senderEmail: applyForm.parent_email || undefined,
+      }).catch(console.error);
 
       setSubmitted(true);
       toast({ title: "Application Submitted!", description: "A confirmation copy has been sent to the parent's email." });
@@ -151,6 +160,19 @@ const Admissions = () => {
         phone: "N/A",
         subject: `Fee Payment: ${feeForm.childName} - ${feeForm.standard} ${feeForm.section}`,
         message: buildEmailMessage("Fee Payment Receipt", [...fieldGroups, paymentFields]),
+      }).catch(console.error);
+      // Send rich HTML receipt with attachment via backend
+      sendFormEmail({
+        formType: "fee_payment",
+        title: "Fee Payment Receipt",
+        subtitle: `${feeForm.childName} — Class ${feeForm.standard} ${feeForm.section}`,
+        fieldGroups: [...fieldGroups, paymentFields],
+        senderName: feeForm.childName,
+        receiptDetails: {
+          referenceId: feeForm.referenceId,
+          paymentMethod: feeForm.paymentMethod,
+          amount: feeForm.amount,
+        },
       }).catch(console.error);
       setFeeSubmitted(true);
       toast({ title: "Receipt Generated!", description: "Payment receipt sent to school." });
