@@ -144,7 +144,10 @@ const Footer = () => {
               const form = e.target as HTMLFormElement;
               const emailInput = form.querySelector('input[type="email"]') as HTMLInputElement;
               if (emailInput?.value) {
-                window.location.href = `mailto:nethajividhyalayam@gmail.com?subject=Newsletter Subscription&body=Please subscribe me to the newsletter. My email: ${encodeURIComponent(emailInput.value)}`;
+                const subject = encodeURIComponent('Newsletter Subscription');
+                const body = encodeURIComponent(`Please subscribe me to the newsletter.\n\nMy email: ${emailInput.value}`);
+                window.open(`https://mail.google.com/mail/?view=cm&to=nethajividhyalayam@gmail.com&su=${subject}&body=${body}`, '_blank');
+                emailInput.value = '';
               }
             }}>
               <div className="relative">
