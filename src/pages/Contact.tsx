@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MapPin, Clock, Send, ExternalLink, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { sendEmail } from "@/lib/emailjs";
 
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -21,15 +21,18 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("send-contact-email", {
-        body: formData,
+      await sendEmail({
+        from_name: formData.name,
+        from_email: formData.email,
+        phone: formData.phone || "Not provided",
+        subject: `Contact Enquiry: ${formData.subject}`,
+        message: formData.message,
       });
-      if (error) throw error;
       setSubmitted(true);
       toast({ title: "Message Sent!", description: "We will get back to you soon." });
     } catch (err: any) {
       console.error(err);
-      toast({ title: "Failed to send", description: err.message || "Please try again later.", variant: "destructive" });
+      toast({ title: "Failed to send", description: err?.text || "Please try again later.", variant: "destructive" });
     } finally {
       setLoading(false);
     }

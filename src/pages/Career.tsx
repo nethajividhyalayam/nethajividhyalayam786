@@ -7,14 +7,40 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Briefcase, Users, Award, Heart, Send, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { sendEmail } from "@/lib/emailjs";
 
 const Career = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "", dob: "", gender: "", email: "", phone: "", address: "",
+    qualification: "", professionalDegree: "", currentPosition: "",
+    positionApplying: "", experience: "",
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    toast({ title: "Application Received!", description: "We will review your application and contact you soon." });
+    setLoading(true);
+    try {
+      await sendEmail({
+        from_name: formData.name,
+        from_email: formData.email,
+        phone: formData.phone || "Not provided",
+        subject: `Career Application: ${formData.positionApplying || "General"}`,
+        message: `Name: ${formData.name}\nDOB: ${formData.dob}\nGender: ${formData.gender || "N/A"}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nAddress: ${formData.address || "N/A"}\nQualification: ${formData.qualification}\nProfessional Degree: ${formData.professionalDegree}\nCurrent Position: ${formData.currentPosition || "N/A"}\nApplying For: ${formData.positionApplying || "N/A"}\nExperience: ${formData.experience || "N/A"}`,
+      });
+      setSubmitted(true);
+      toast({ title: "Application Received!", description: "We will review your application and contact you soon." });
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Failed to send", description: err?.text || "Please try again later.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -65,15 +91,15 @@ const Career = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="font-semibold">Name of the Applicant *</Label>
-                  <Input required placeholder="Full name" />
+                  <Input required name="name" value={formData.name} onChange={handleChange} placeholder="Full name" />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Date of Birth *</Label>
-                  <Input required type="date" />
+                  <Input required type="date" name="dob" value={formData.dob} onChange={handleChange} />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Gender</Label>
-                  <Select>
+                  <Select value={formData.gender} onValueChange={(v) => setFormData((prev) => ({ ...prev, gender: v }))}>
                     <SelectTrigger><SelectValue placeholder="Select Gender" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="female">Female</SelectItem>
@@ -85,15 +111,15 @@ const Career = () => {
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Email ID *</Label>
-                  <Input required type="email" placeholder="email@example.com" />
+                  <Input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Contact Number *</Label>
-                  <Input required placeholder="10-digit mobile" />
+                  <Input required name="phone" value={formData.phone} onChange={handleChange} placeholder="10-digit mobile" />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label className="font-semibold">Address</Label>
-                  <Textarea placeholder="Full address" rows={2} />
+                  <Textarea name="address" value={formData.address} onChange={handleChange} placeholder="Full address" rows={2} />
                 </div>
               </div>
 
@@ -101,19 +127,19 @@ const Career = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="font-semibold">Academic Qualification *</Label>
-                  <Input required placeholder="Highest qualification" />
+                  <Input required name="qualification" value={formData.qualification} onChange={handleChange} placeholder="Highest qualification" />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Professional Degree *</Label>
-                  <Input required placeholder="e.g. B.Ed, M.Ed" />
+                  <Input required name="professionalDegree" value={formData.professionalDegree} onChange={handleChange} placeholder="e.g. B.Ed, M.Ed" />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Current Position (If any)</Label>
-                  <Input placeholder="Current role" />
+                  <Input name="currentPosition" value={formData.currentPosition} onChange={handleChange} placeholder="Current role" />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Position Applying For</Label>
-                  <Select>
+                  <Select value={formData.positionApplying} onValueChange={(v) => setFormData((prev) => ({ ...prev, positionApplying: v }))}>
                     <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="teaching">Teaching</SelectItem>
@@ -124,7 +150,7 @@ const Career = () => {
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Experience</Label>
-                  <Select>
+                  <Select value={formData.experience} onValueChange={(v) => setFormData((prev) => ({ ...prev, experience: v }))}>
                     <SelectTrigger><SelectValue placeholder="Select Experience Level" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="fresher">Fresher</SelectItem>
@@ -136,8 +162,8 @@ const Career = () => {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg py-6">
-                Submit Application
+              <Button type="submit" disabled={loading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg py-6">
+                {loading ? "Sending..." : "Submit Application"}
               </Button>
             </form>
           )}
