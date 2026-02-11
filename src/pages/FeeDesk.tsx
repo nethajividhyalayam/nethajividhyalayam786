@@ -51,12 +51,12 @@ const FeeDesk = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
-        await fetchRole(session.user.id);
+        setRoleLoading(true);
+        fetchRole(session.user.id).finally(() => setRoleLoading(false));
       }
       setLoading(false);
     };
     void checkAuth();
-
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
@@ -70,7 +70,6 @@ const FeeDesk = () => {
       }
     });
     return () => subscription.unsubscribe();
-
   }, []);
 
   const fetchRole = async (userId: string) => {
