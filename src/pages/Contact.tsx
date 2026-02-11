@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Phone, Mail, MapPin, Send, ExternalLink, Loader2, Printer } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
-import { sendEmail, sendFormEmail } from "@/lib/emailjs";
+import { sendEmail, sendParentCopy } from "@/lib/emailjs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 
 const Contact = () => {
@@ -49,15 +49,8 @@ const Contact = () => {
         subject: `Contact Enquiry: ${formData.subject}`,
         message: buildEmailMessage("Contact Us — Send Us a Message", fieldGroups),
       }).catch(console.error);
-      // Send rich HTML email to school + thank-you copy to parent
-      await sendFormEmail({
-        formType: "contact",
-        title: "Contact Enquiry",
-        subtitle: formData.subject,
-        fieldGroups,
-        senderName: formData.name,
-        senderEmail: formData.email,
-      });
+      // Send thank-you copy to parent/enquirer
+      sendParentCopy(formData.email, formData.name, "Contact Enquiry", buildEmailMessage("Contact Us — Send Us a Message", fieldGroups)).catch(console.error);
       setSubmitted(true);
       toast({ title: "Message Sent!", description: "A confirmation copy has been sent to your email." });
     } catch (err: any) {
