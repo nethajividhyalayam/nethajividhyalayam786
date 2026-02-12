@@ -10,16 +10,16 @@ const getAcademicYear = () => {
 };
 
 const schoolVideos = [
-  { title: "School Campus Tour", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Annual Day Celebrations", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Sports Day Highlights", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Science Exhibition", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Cultural Program", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Classroom Activities", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Library & Labs", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Parent-Teacher Meet", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Republic Day Parade", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
-  { title: "Graduation Ceremony", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+  { title: "School Campus Tour", url: "https://www.youtube.com/embed/V1bFr2SWP1I" },
+  { title: "Annual Day Celebrations", url: "https://www.youtube.com/embed/LXb3EKWsInQ" },
+  { title: "Sports Day Highlights", url: "https://www.youtube.com/embed/2lAe1cqCOXo" },
+  { title: "Science Exhibition", url: "https://www.youtube.com/embed/GD0x33mENRg" },
+  { title: "Cultural Program", url: "https://www.youtube.com/embed/RK1K2bCg4J8" },
+  { title: "Classroom Activities", url: "https://www.youtube.com/embed/WmVLcj-XKnM" },
+  { title: "Library & Labs", url: "https://www.youtube.com/embed/daSRTfnp3Qo" },
+  { title: "Parent-Teacher Meet", url: "https://www.youtube.com/embed/Sagg08DrO5U" },
+  { title: "Republic Day Parade", url: "https://www.youtube.com/embed/6ZfuNTqbHE8" },
+  { title: "Graduation Ceremony", url: "https://www.youtube.com/embed/9bZkp7q19f0" },
 ];
 
 const HeroSection = () => {
