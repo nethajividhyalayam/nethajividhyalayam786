@@ -137,6 +137,12 @@ const FeeDesk = () => {
     } else {
       setResetSent(true);
       toast({ title: "Reset Link Sent", description: "Check your email for the password reset link." });
+      // Notify admins about password reset
+      try {
+        await supabase.functions.invoke("notify-admin-signup", { body: { email, type: "reset" } });
+      } catch (e) {
+        console.error("Admin reset notification failed:", e);
+      }
     }
     setLoginLoading(false);
   };
