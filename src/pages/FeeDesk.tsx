@@ -447,7 +447,7 @@ const FeeDesk = () => {
               </div>
               {resetSent ? (
                 <p className="text-center text-sm text-green-600 bg-green-50 p-3 rounded-lg">
-                  ✅ Reset link sent! Check your email inbox and click the link to reset your password.
+                  ✅ Reset link sent! Check your email inbox (including Spam/Junk folder) for an email from <strong>noreply@mail.app.supabase.io</strong> and click the link to reset your password.
                 </p>
               ) : (
                 <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loginLoading}>
