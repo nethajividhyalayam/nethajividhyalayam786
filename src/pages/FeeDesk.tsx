@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { openPrintableTemplate } from "@/lib/printTemplate";
 import {
   LogOut, Users, CreditCard, FileText, PlusCircle, Search,
-  Printer, DollarSign, BarChart3, BookOpen, Loader2
+  Printer, DollarSign, BarChart3, BookOpen, Loader2, X
 } from "lucide-react";
 
 const standards = ["Pre-KG", "LKG", "UKG", "I", "II", "III", "IV", "V"];
@@ -203,7 +203,10 @@ const FeeDesk = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
-        <div className="bg-background rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        <div className="bg-background rounded-2xl shadow-2xl p-8 w-full max-w-md relative">
+          <a href="/" className="absolute top-4 right-4 text-muted-foreground hover:text-destructive transition-colors" aria-label="Close">
+            <X className="h-5 w-5" />
+          </a>
           <div className="text-center mb-8">
             <h1 className="font-serif text-3xl font-bold text-primary">FeeDesk</h1>
             <p className="text-muted-foreground mt-2">Nethaji Vidhyalayam — {isSignUp ? "Create Account" : "Staff Login"}</p>
@@ -228,6 +231,9 @@ const FeeDesk = () => {
               {isSignUp ? "Sign In" : "Sign Up"}
             </button>
           </p>
+          <a href="/" className="block text-center mt-4 text-sm text-muted-foreground hover:text-primary font-medium transition-colors">
+            Cancel
+          </a>
         </div>
       </div>
     );
