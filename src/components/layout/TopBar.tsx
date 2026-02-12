@@ -1,5 +1,6 @@
 import { Phone, Mail, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
+import AnimatedEmailScroller from "@/components/ui/AnimatedEmailScroller";
 
 const TopBar = () => {
   return (
@@ -14,13 +15,10 @@ const TopBar = () => {
             <Phone className="h-4 w-4" />
             <span>+91 9841594945 / 6380967675</span>
           </a>
-          <a 
-            href="mailto:nethajividhyalayam@gmail.com" 
-            className="flex items-center gap-2 hover:text-accent transition-colors"
-          >
+          <div className="flex items-center gap-2 hover:text-accent transition-colors">
             <Mail className="h-4 w-4" />
-            <span>nethajividhyalayam@gmail.com</span>
-          </a>
+            <AnimatedEmailScroller />
+          </div>
         </div>
 
         {/* Quick Links */}

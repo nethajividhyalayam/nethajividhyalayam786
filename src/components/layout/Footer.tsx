@@ -13,6 +13,7 @@ import {
 import logo from "@/assets/nethaji_logo.svg";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import AnimatedEmailScroller from "@/components/ui/AnimatedEmailScroller";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -111,12 +112,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-accent flex-shrink-0" />
-                <a 
-                  href="mailto:nethajividhyalayam@gmail.com" 
-                  className="text-sm text-primary-foreground/80 hover:text-accent transition-colors"
-                >
-                  nethajividhyalayam@gmail.com
-                </a>
+                <AnimatedEmailScroller className="text-sm text-primary-foreground/80 hover:text-accent transition-colors" />
               </li>
               <li className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-accent flex-shrink-0" />
@@ -135,9 +131,7 @@ const Footer = () => {
             </p>
             <p className="text-xs text-primary-foreground/60 mb-2 flex items-center gap-1">
               <Mail className="h-3 w-3" />
-              <a href="mailto:nethajividhyalayam@gmail.com" className="hover:text-accent transition-colors underline">
-                nethajividhyalayam@gmail.com
-              </a>
+              <AnimatedEmailScroller className="hover:text-accent transition-colors underline" />
             </p>
             <form className="space-y-3" onSubmit={(e) => {
               e.preventDefault();

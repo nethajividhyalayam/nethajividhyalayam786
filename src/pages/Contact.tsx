@@ -96,7 +96,7 @@ const Contact = () => {
           <div className="grid md:grid-cols-3 gap-6 mb-16">
             {[
               { icon: Phone, title: "Call Us Directly", content: "9841594945 / 6380967675", sub: "Mon-Sat, 8:50 AM - 3:30 PM", href: "tel:+919841594945", cta: "Call Now" },
-              { icon: Mail, title: "Send an Email", content: "nethajividhyalayam@gmail.com", sub: "24-hour response time", href: "mailto:nethajividhyalayam@gmail.com", cta: "Email Us" },
+              { icon: Mail, title: "Send an Email", content: "nethajividhyalayam@gmail.com / info@nethajividhyalayam.org", sub: "24-hour response time", href: "mailto:nethajividhyalayam@gmail.com", cta: "Email Us" },
               { icon: MapPin, title: "Visit Campus", content: "5/325, Rajiv Nagar, S.Kolathur Main Road", sub: "S.Kolathur, Kovilambakkam Post, Chennai - 600129", href: "https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai", cta: "Get Directions" },
             ].map((item, i) => (
               <div key={i} className="bg-card p-8 rounded-2xl shadow-lg text-center card-hover">
