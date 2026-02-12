@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 import {
   LogOut, Users, CreditCard, FileText, PlusCircle, Search,
-  Printer, DollarSign, BarChart3, BookOpen, Loader2, X, Upload, Trash2, Download, Calendar
+  Printer, DollarSign, BarChart3, BookOpen, Loader2, X, Upload, Trash2, Download, Calendar, Pencil, Check
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
@@ -18,7 +18,7 @@ const sections = ["A", "B", "C", "D"];
 
 // Column mapping: try to match uploaded columns to student fields
 const STUDENT_FIELD_MAP: Record<string, string[]> = {
-  admission_number: ["admission_number", "adm no", "adm. no", "admission no", "admno", "admission", "roll no", "roll number", "rollno"],
+  admission_number: ["admission_number", "adm no", "adm. no", "admission no", "admno", "admission", "roll no", "roll number", "rollno", "s no", "sno", "sl no", "slno", "serial no", "serial number", "reg no", "registration no", "registration number", "id", "student id", "emis no", "emisno", "emis"],
   student_name: ["student_name", "student name", "name", "student", "pupil name", "pupil"],
   standard: ["standard", "class", "std", "grade"],
   section: ["section", "sec", "div", "division"],
@@ -33,9 +33,9 @@ const STUDENT_FIELD_MAP: Record<string, string[]> = {
 };
 
 const matchColumn = (header: string): string | null => {
-  const h = header.trim().toLowerCase().replace(/[^a-z0-9 ]/g, "");
+  const h = header.trim().toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
   for (const [field, aliases] of Object.entries(STUDENT_FIELD_MAP)) {
-    if (aliases.some((a) => h === a || h.includes(a))) return field;
+    if (aliases.some((a) => h === a || h.includes(a) || a.includes(h))) return field;
   }
   return null;
 };
@@ -85,6 +85,11 @@ const FeeDesk = () => {
   // Bulk delete students
   const [selectedStudentIds, setSelectedStudentIds] = useState<Set<string>>(new Set());
   const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
+
+  // Edit student
+  const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ admission_number: "", student_name: "", standard: "", section: "", parent_phone: "" });
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -308,6 +313,42 @@ const FeeDesk = () => {
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
+  };
+
+  // Edit student (admin only)
+  const startEditStudent = (s: any) => {
+    setEditingStudentId(s.id);
+    setEditForm({
+      admission_number: s.admission_number || "",
+      student_name: s.student_name || "",
+      standard: s.standard || "",
+      section: s.section || "A",
+      parent_phone: s.parent_phone || "",
+    });
+  };
+
+  const handleSaveEditStudent = async () => {
+    if (!editingStudentId) return;
+    if (!editForm.admission_number || !editForm.student_name || !editForm.standard) {
+      toast({ title: "Missing Fields", description: "Adm. No, Name and Standard are required.", variant: "destructive" });
+      return;
+    }
+    setEditLoading(true);
+    const { error } = await supabase.from("students").update({
+      admission_number: editForm.admission_number,
+      student_name: editForm.student_name,
+      standard: editForm.standard,
+      section: editForm.section,
+      parent_phone: editForm.parent_phone || null,
+    }).eq("id", editingStudentId);
+    if (error) {
+      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Student Updated!" });
+      setEditingStudentId(null);
+      fetchStudents();
+    }
+    setEditLoading(false);
   };
 
   const toggleSelectAll = () => {
@@ -629,18 +670,55 @@ const FeeDesk = () => {
                             <input type="checkbox" checked={selectedStudentIds.has(s.id)} onChange={() => toggleStudentSelection(s.id)} className="accent-accent h-4 w-4" />
                           </td>
                         )}
-                        <td className="p-3 font-mono text-xs">{s.admission_number}</td>
-                        <td className="p-3 font-semibold">{s.student_name}</td>
-                        <td className="p-3">{s.standard}</td>
-                        <td className="p-3">{s.section}</td>
-                        <td className="p-3">{s.parent_name || "—"}</td>
-                        <td className="p-3">{s.parent_phone || "—"}</td>
-                        <td className="p-3 font-semibold text-accent">₹{payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</td>
-                        <td className="p-3">
-                          <Button size="sm" className="gap-1 text-xs bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-md" onClick={() => { setSelectedStudent(s); setActiveTab("collect-fee"); }}>
-                            <DollarSign className="h-3 w-3" /> Pay Fee
-                          </Button>
-                        </td>
+                        {editingStudentId === s.id ? (
+                          <>
+                            <td className="p-2"><Input className="h-8 text-xs w-20" value={editForm.admission_number} onChange={(e) => setEditForm({ ...editForm, admission_number: e.target.value })} /></td>
+                            <td className="p-2"><Input className="h-8 text-xs w-28" value={editForm.student_name} onChange={(e) => setEditForm({ ...editForm, student_name: e.target.value })} /></td>
+                            <td className="p-2">
+                              <Select value={editForm.standard} onValueChange={(v) => setEditForm({ ...editForm, standard: v })}>
+                                <SelectTrigger className="h-8 text-xs w-20"><SelectValue /></SelectTrigger>
+                                <SelectContent>{standards.map((st) => <SelectItem key={st} value={st}>{st}</SelectItem>)}</SelectContent>
+                              </Select>
+                            </td>
+                            <td className="p-2">
+                              <Select value={editForm.section} onValueChange={(v) => setEditForm({ ...editForm, section: v })}>
+                                <SelectTrigger className="h-8 text-xs w-16"><SelectValue /></SelectTrigger>
+                                <SelectContent>{sections.map((sc) => <SelectItem key={sc} value={sc}>{sc}</SelectItem>)}</SelectContent>
+                              </Select>
+                            </td>
+                            <td className="p-3">{s.parent_name || "—"}</td>
+                            <td className="p-2"><Input className="h-8 text-xs w-28" value={editForm.parent_phone} onChange={(e) => setEditForm({ ...editForm, parent_phone: e.target.value })} /></td>
+                            <td className="p-3 font-semibold text-accent">₹{payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</td>
+                            <td className="p-3 flex gap-1">
+                              <Button size="sm" className="gap-1 text-xs bg-accent hover:bg-accent/90 text-accent-foreground" onClick={handleSaveEditStudent} disabled={editLoading}>
+                                {editLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Save
+                              </Button>
+                              <Button size="sm" variant="outline" className="text-xs" onClick={() => setEditingStudentId(null)}>
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="p-3 font-mono text-xs">{s.admission_number}</td>
+                            <td className="p-3 font-semibold">{s.student_name}</td>
+                            <td className="p-3">{s.standard}</td>
+                            <td className="p-3">{s.section}</td>
+                            <td className="p-3">{s.parent_name || "—"}</td>
+                            <td className="p-3">{s.parent_phone || "—"}</td>
+                            <td className="p-3 font-semibold text-accent">₹{payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</td>
+                            <td className="p-3 flex gap-1">
+                              {role === "admin" && (
+                                <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => startEditStudent(s)}>
+                                  <Pencil className="h-3 w-3" /> Edit
+                                </Button>
+                              )}
+                              <Button size="sm" className="gap-1 text-xs bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-md" onClick={() => { setSelectedStudent(s); setActiveTab("collect-fee"); }}>
+                                <DollarSign className="h-3 w-3" /> Pay Fee
+                              </Button>
+                            </td>
+                          </>
+                        )}
                       </tr>
                     ))}
                   </tbody>
