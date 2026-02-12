@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 
+const ALLOWED_EMAILS = ["nethajividhyalayam@gmail.com", "nareshkumar.jayachandran@gmail.com", "info@nethajividhyalayam.org", "staff@nethajividhyalayam.org"];
 const standards = ["Pre-KG", "LKG", "UKG", "I", "II", "III", "IV", "V"];
 const sections = ["A", "B", "C", "D"];
 
@@ -147,10 +148,17 @@ const FeeDesk = () => {
     setLoginLoading(false);
   };
 
+  const isAllowedEmail = ALLOWED_EMAILS.includes(email.trim().toLowerCase());
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginLoading(true);
     if (isSignUp) {
+      if (!isAllowedEmail) {
+        toast({ title: "Access Restricted", description: "This email is not authorized for FeeDesk. Contact the administrator.", variant: "destructive" });
+        setLoginLoading(false);
+        return;
+      }
       const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/feedesk" } });
       if (error) {
         toast({ title: "Sign Up Failed", description: error.message, variant: "destructive" });
@@ -504,12 +512,19 @@ const FeeDesk = () => {
                   📧 After signing up, contact admin at <strong>nethajividhyalayam@gmail.com</strong> or <strong>nareshkumar.jayachandran@gmail.com</strong> to get your role assigned.
                 </p>
               )}
-              <p className="text-center text-sm text-muted-foreground mt-4">
-                {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
-                <button onClick={() => setIsSignUp(!isSignUp)} className="text-accent font-semibold hover:underline">
-                  {isSignUp ? "Sign In" : "Sign Up"}
-                </button>
-              </p>
+              {!isSignUp && email && !isAllowedEmail && (
+                <p className="text-center text-xs text-destructive mt-3 bg-destructive/10 p-2 rounded-lg">
+                  ⚠️ This email is not authorized for FeeDesk access. Only authorized staff emails can sign in.
+                </p>
+              )}
+              {isAllowedEmail && (
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
+                  <button onClick={() => setIsSignUp(!isSignUp)} className="text-accent font-semibold hover:underline">
+                    {isSignUp ? "Sign In" : "Sign Up"}
+                  </button>
+                </p>
+              )}
             </>
           )}
           <a href="/" className="block text-center mt-4 text-sm text-muted-foreground hover:text-primary font-medium transition-colors">
