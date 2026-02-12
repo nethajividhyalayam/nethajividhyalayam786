@@ -41,6 +41,7 @@ const navItems = [
     path: "/gallery",
     children: [
       { label: "Photo Gallery", path: "/gallery" },
+      { label: "Video Gallery", path: "/video-gallery" },
       { label: "Events", path: "/events" },
       { label: "School Calendar", path: "/calendar" },
     ],
