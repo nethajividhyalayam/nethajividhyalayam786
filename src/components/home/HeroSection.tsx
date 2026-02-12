@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Play, X, ChevronLeft, ChevronRight as ChevronRightIcon, Pause } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -25,9 +25,27 @@ const schoolVideos = [
 const HeroSection = () => {
   const [showGallery, setShowGallery] = useState(false);
   const [currentVideo, setCurrentVideo] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const nextVideo = () => setCurrentVideo((prev) => (prev + 1) % schoolVideos.length);
+  const nextVideo = useCallback(() => setCurrentVideo((prev) => (prev + 1) % schoolVideos.length), []);
   const prevVideo = () => setCurrentVideo((prev) => (prev - 1 + schoolVideos.length) % schoolVideos.length);
+
+  // Listen for YouTube video end via postMessage
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const data = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+        if (data.event === "onStateChange" && data.info === 0 && isAutoPlay && showGallery) {
+          nextVideo();
+        }
+      } catch {
+        // ignore non-JSON messages
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [isAutoPlay, showGallery, nextVideo]);
 
   return (
     <>
@@ -104,14 +122,23 @@ const HeroSection = () => {
       {/* Interactive Video Gallery Modal */}
       {showGallery && (
         <div className="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center animate-fade-up">
-          {/* Close */}
-          <button
-            onClick={() => setShowGallery(false)}
-            className="absolute top-4 right-4 text-white/80 hover:text-white z-10 bg-white/10 rounded-full p-2 backdrop-blur-sm transition-colors"
-            aria-label="Close video gallery"
-          >
-            <X className="h-6 w-6" />
-          </button>
+          {/* Close & Auto-play toggle */}
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+            <button
+              onClick={() => setIsAutoPlay(!isAutoPlay)}
+              className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full backdrop-blur-sm transition-colors ${isAutoPlay ? "bg-accent text-accent-foreground" : "bg-white/10 text-white/80 hover:text-white"}`}
+            >
+              {isAutoPlay ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
+              {isAutoPlay ? "Auto-play ON" : "Auto-play OFF"}
+            </button>
+            <button
+              onClick={() => setShowGallery(false)}
+              className="text-white/80 hover:text-white bg-white/10 rounded-full p-2 backdrop-blur-sm transition-colors"
+              aria-label="Close video gallery"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
 
           {/* Title */}
           <h2 className="text-white font-serif text-xl md:text-2xl font-bold mb-4">
@@ -121,11 +148,12 @@ const HeroSection = () => {
           {/* Video Player */}
           <div className="relative w-full max-w-4xl aspect-video mx-4">
             <iframe
+              ref={iframeRef}
               key={currentVideo}
-              src={`${schoolVideos[currentVideo].url}?autoplay=0&rel=0`}
+              src={`${schoolVideos[currentVideo].url}?autoplay=1&rel=0&enablejsapi=1&origin=${window.location.origin}`}
               title={schoolVideos[currentVideo].title}
               className="w-full h-full rounded-xl shadow-2xl"
-              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
             />
 
