@@ -22,7 +22,7 @@ const AnimatedEmailScroller = ({ className = "" }: AnimatedEmailScrollerProps) =
         setActiveIndex((prev) => (prev + 1) % emails.length);
         setPhase("stable");
       }, 2000);
-    }, 6000);
+    }, 9000);
 
     return () => {
       clearInterval(interval);
