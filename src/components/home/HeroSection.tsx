@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Play } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
-
 
 const getAcademicYear = () => {
   const now = new Date();
@@ -12,21 +11,8 @@ const getAcademicYear = () => {
 const HeroSection = () => {
   return (
     <section className="relative h-[90vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-      {/* Video Background */}
-      <div className="absolute inset-0 z-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="w-full h-full object-cover"
-          poster="/placeholder.svg"
-        >
-          <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4" type="video/mp4" />
-        </video>
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/60 to-primary/80" />
-      </div>
+      {/* Static Background */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
 
       {/* Content */}
       <div className="relative z-10 container-custom text-center text-white">
@@ -67,19 +53,6 @@ const HeroSection = () => {
                 Apply Now
               </Button>
             </Link>
-          </div>
-
-          {/* Video Play Button (Optional) */}
-          <div className="pt-8">
-            <button 
-              className="group inline-flex items-center gap-3 text-white/80 hover:text-white transition-colors"
-              aria-label="Watch school tour video"
-            >
-              <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-accent transition-colors">
-                <Play className="h-6 w-6 fill-current" />
-              </div>
-              <span className="text-sm font-medium">Watch Our School Tour</span>
-            </button>
           </div>
         </div>
       </div>
