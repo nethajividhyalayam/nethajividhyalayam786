@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -6,14 +6,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { openPrintableTemplate } from "@/lib/printTemplate";
+import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 import {
   LogOut, Users, CreditCard, FileText, PlusCircle, Search,
-  Printer, DollarSign, BarChart3, BookOpen, Loader2, X
+  Printer, DollarSign, BarChart3, BookOpen, Loader2, X, Upload, Trash2, Download, Calendar
 } from "lucide-react";
+import * as XLSX from "xlsx";
 
 const standards = ["Pre-KG", "LKG", "UKG", "I", "II", "III", "IV", "V"];
 const sections = ["A", "B", "C", "D"];
+
+// Column mapping: try to match uploaded columns to student fields
+const STUDENT_FIELD_MAP: Record<string, string[]> = {
+  admission_number: ["admission_number", "adm no", "adm. no", "admission no", "admno", "admission", "roll no", "roll number", "rollno"],
+  student_name: ["student_name", "student name", "name", "student", "pupil name", "pupil"],
+  standard: ["standard", "class", "std", "grade"],
+  section: ["section", "sec", "div", "division"],
+  parent_name: ["parent_name", "parent name", "father name", "mother name", "guardian", "guardian name", "parent"],
+  parent_phone: ["parent_phone", "parent phone", "phone", "mobile", "contact", "father phone", "mother phone", "ph no", "phone number", "mobile number"],
+  parent_email: ["parent_email", "parent email", "email", "mail"],
+  date_of_birth: ["date_of_birth", "dob", "date of birth", "birth date", "birthdate"],
+  gender: ["gender", "sex"],
+  blood_group: ["blood_group", "blood group", "blood"],
+  aadhaar_number: ["aadhaar_number", "aadhaar", "aadhaar number", "aadhaar no", "aadhar", "aadhar number"],
+  address: ["address", "addr", "residence"],
+};
+
+const matchColumn = (header: string): string | null => {
+  const h = header.trim().toLowerCase().replace(/[^a-z0-9 ]/g, "");
+  for (const [field, aliases] of Object.entries(STUDENT_FIELD_MAP)) {
+    if (aliases.some((a) => h === a || h.includes(a))) return field;
+  }
+  return null;
+};
 
 const FeeDesk = () => {
   const [user, setUser] = useState<any>(null);
@@ -44,6 +69,18 @@ const FeeDesk = () => {
   // Payments history
   const [payments, setPayments] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("students");
+
+  // Upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadLoading, setUploadLoading] = useState(false);
+
+  // Delete payment
+  const [deletePaymentId, setDeletePaymentId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // Reports date range
+  const [reportDateFrom, setReportDateFrom] = useState("");
+  const [reportDateTo, setReportDateTo] = useState("");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -146,6 +183,105 @@ const FeeDesk = () => {
     }
   };
 
+  // ===== FEATURE 1: Upload students from Excel/CSV =====
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadLoading(true);
+
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data, { type: "array" });
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+      if (rows.length === 0) {
+        toast({ title: "Empty File", description: "No data found in the uploaded file.", variant: "destructive" });
+        setUploadLoading(false);
+        return;
+      }
+
+      // Map columns
+      const headers = Object.keys(rows[0]);
+      const columnMap: Record<string, string> = {};
+      for (const h of headers) {
+        const mapped = matchColumn(h);
+        if (mapped) columnMap[h] = mapped;
+      }
+
+      if (!Object.values(columnMap).includes("admission_number") || !Object.values(columnMap).includes("student_name") || !Object.values(columnMap).includes("standard")) {
+        toast({
+          title: "Missing Required Columns",
+          description: "File must have columns for Admission Number, Student Name, and Standard/Class. Unrecognized columns will be skipped.",
+          variant: "destructive",
+        });
+        setUploadLoading(false);
+        return;
+      }
+
+      // Build student records
+      const studentsToInsert: any[] = [];
+      const skippedRows: number[] = [];
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const student: any = { section: "A", status: "active" };
+        for (const [origCol, field] of Object.entries(columnMap)) {
+          let val = String(row[origCol] || "").trim();
+          if (field === "date_of_birth" && val) {
+            // Try to parse date
+            const parsed = new Date(val);
+            if (!isNaN(parsed.getTime())) {
+              val = parsed.toISOString().slice(0, 10);
+            } else {
+              val = "";
+            }
+          }
+          if (val) student[field] = val;
+        }
+        if (student.admission_number && student.student_name && student.standard) {
+          studentsToInsert.push(student);
+        } else {
+          skippedRows.push(i + 2); // +2 for header row + 1-indexed
+        }
+      }
+
+      if (studentsToInsert.length === 0) {
+        toast({ title: "No Valid Rows", description: "No rows had the required fields (Admission Number, Student Name, Standard).", variant: "destructive" });
+        setUploadLoading(false);
+        return;
+      }
+
+      const { error } = await supabase.from("students").insert(studentsToInsert);
+      if (error) {
+        toast({ title: "Upload Error", description: error.message, variant: "destructive" });
+      } else {
+        toast({
+          title: "Upload Successful!",
+          description: `${studentsToInsert.length} students imported.${skippedRows.length > 0 ? ` ${skippedRows.length} rows skipped (missing required fields).` : ""}`,
+        });
+        fetchStudents();
+      }
+    } catch (err: any) {
+      toast({ title: "File Error", description: err.message || "Could not read the file.", variant: "destructive" });
+    }
+    setUploadLoading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  // ===== FEATURE 2: Delete fee payment (admin only) =====
+  const handleDeletePayment = async (paymentId: string) => {
+    setDeleteLoading(true);
+    const { error } = await supabase.from("fee_payments").delete().eq("id", paymentId);
+    if (error) {
+      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Payment Deleted", description: "The fee entry has been removed." });
+      fetchPayments();
+    }
+    setDeletePaymentId(null);
+    setDeleteLoading(false);
+  };
+
   const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedStudent || !paymentForm.amount || !paymentForm.term) {
@@ -167,7 +303,6 @@ const FeeDesk = () => {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "Payment Recorded!", description: `Receipt: ${data.receipt_number}` });
-      // Print receipt
       openPrintableTemplate({
         title: "Fee Payment Receipt",
         subtitle: `${selectedStudent.student_name} — Class ${selectedStudent.standard} ${selectedStudent.section}`,
@@ -225,6 +360,11 @@ const FeeDesk = () => {
               {isSignUp ? "Sign Up" : "Sign In"}
             </Button>
           </form>
+          {isSignUp && (
+            <p className="text-center text-xs text-muted-foreground mt-3 bg-secondary/50 p-2 rounded-lg">
+              📧 After signing up, contact admin at <strong>nethajividhyalayam@gmail.com</strong> to get your role assigned.
+            </p>
+          )}
           <p className="text-center text-sm text-muted-foreground mt-4">
             {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
             <button onClick={() => setIsSignUp(!isSignUp)} className="text-accent font-semibold hover:underline">
@@ -239,7 +379,7 @@ const FeeDesk = () => {
     );
   }
 
-  // No role assigned (wait for role fetch to complete)
+  // No role assigned
   if (!role) {
     if (roleLoading) {
       return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-accent" /></div>;
@@ -248,12 +388,69 @@ const FeeDesk = () => {
       <div className="min-h-screen bg-secondary flex items-center justify-center p-4">
         <div className="bg-background rounded-2xl shadow-2xl p-8 w-full max-w-md text-center">
           <h2 className="font-serif text-2xl font-bold text-primary mb-4">Access Denied</h2>
-          <p className="text-muted-foreground mb-6">Your account does not have a role assigned. Contact the administrator.</p>
+          <p className="text-muted-foreground mb-4">Your account does not have a role assigned.</p>
+          <p className="text-sm text-muted-foreground mb-6 bg-secondary/50 p-3 rounded-lg">
+            📧 Contact the administrator at <strong>nethajividhyalayam@gmail.com</strong> to get your credentials and role assigned.
+          </p>
           <Button onClick={handleLogout} variant="outline">Log Out</Button>
         </div>
       </div>
     );
   }
+
+  // ===== FEATURE 3: Reports helpers =====
+  const getFilteredPaymentsForReport = () => {
+    let filtered = [...payments];
+    if (reportDateFrom) {
+      filtered = filtered.filter((p) => {
+        const d = p.created_at ? new Date(p.created_at) : new Date(p.payment_date);
+        return d >= new Date(reportDateFrom);
+      });
+    }
+    if (reportDateTo) {
+      const toDate = new Date(reportDateTo);
+      toDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((p) => {
+        const d = p.created_at ? new Date(p.created_at) : new Date(p.payment_date);
+        return d <= toDate;
+      });
+    }
+    return filtered;
+  };
+
+  const handlePrintReport = (mode: string, reportData: any[]) => {
+    const fields = reportData.map((r) => ({ label: r.label, value: `${r.count} payments — ₹${r.total.toLocaleString("en-IN")}` }));
+    const grandTotal = reportData.reduce((s, r) => s + r.total, 0);
+    fields.push({ label: "GRAND TOTAL", value: `₹${grandTotal.toLocaleString("en-IN")}` });
+    const dateRange = reportDateFrom || reportDateTo
+      ? `${reportDateFrom || "Start"} to ${reportDateTo || "Today"}`
+      : "All Time";
+    openPrintableTemplate({
+      title: `${mode.charAt(0).toUpperCase() + mode.slice(1)} Fee Statement`,
+      subtitle: `Date Range: ${dateRange}`,
+      fieldGroups: [{ heading: `${mode.charAt(0).toUpperCase() + mode.slice(1)} Breakdown`, fields }],
+    });
+  };
+
+  const handleDownloadReport = (mode: string, reportData: any[]) => {
+    const grandTotal = reportData.reduce((s, r) => s + r.total, 0);
+    const dateRange = reportDateFrom || reportDateTo
+      ? `${reportDateFrom || "Start"} to ${reportDateTo || "Today"}`
+      : "All Time";
+    const wsData = [
+      [`${mode.charAt(0).toUpperCase() + mode.slice(1)} Fee Statement — Nethaji Vidhyalayam`],
+      [`Date Range: ${dateRange}`],
+      [],
+      ["Period", "No. of Payments", "Total Collected (₹)"],
+      ...reportData.map((r) => [r.label, r.count, r.total]),
+      [],
+      ["GRAND TOTAL", reportData.reduce((s, r) => s + r.count, 0), grandTotal],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Report");
+    XLSX.writeFile(wb, `FeeStatement_${mode}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -297,11 +494,33 @@ const FeeDesk = () => {
                       {standards.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  {/* Upload button */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx,.xls,.csv"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                  />
+                  <Button
+                    variant="outline"
+                    className="gap-2"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploadLoading}
+                  >
+                    {uploadLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    Upload List
+                  </Button>
                   <Button onClick={() => setShowAddStudent(true)} className="bg-accent hover:bg-accent/90 text-accent-foreground gap-2">
                     <PlusCircle className="h-4 w-4" /> Add Student
                   </Button>
                 </div>
               </div>
+
+              {/* Upload hint */}
+              <p className="text-xs text-muted-foreground mb-4">
+                📤 Upload Excel (.xlsx/.xls) or CSV with columns: <strong>Admission No, Student Name, Standard</strong> (required). Optional: Section, Parent Name, Phone, Email, DOB, Gender, Blood Group, Aadhaar, Address. Unrecognized columns are skipped.
+              </p>
 
               {/* Add student form */}
               {showAddStudent && (
@@ -378,7 +597,6 @@ const FeeDesk = () => {
             <div className="bg-background rounded-2xl shadow-lg p-6 max-w-2xl mx-auto">
               <h2 className="font-serif text-2xl font-bold text-primary mb-2">Collect Fee Payment</h2>
               <p className="text-sm text-muted-foreground mb-6">Collected At: {new Date().toLocaleString("en-IN")}</p>
-              {/* Student selector */}
               <div className="space-y-2 mb-6">
                 <Label className="font-semibold">Select Student</Label>
                 <Select value={selectedStudent?.id || ""} onValueChange={(v) => setSelectedStudent(students.find((s) => s.id === v) || null)}>
@@ -477,7 +695,7 @@ const FeeDesk = () => {
                         <td className="p-3 font-semibold text-accent">₹{p.amount}</td>
                         <td className="p-3">{p.payment_method}</td>
                         <td className="p-3">{p.created_at ? new Date(p.created_at).toLocaleString("en-IN") : new Date(p.payment_date).toLocaleDateString("en-IN")}</td>
-                        <td className="p-3">
+                        <td className="p-3 flex gap-2">
                           <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => {
                             openPrintableTemplate({
                               title: "Fee Payment Receipt",
@@ -497,6 +715,37 @@ const FeeDesk = () => {
                           }}>
                             <Printer className="h-3 w-3" /> Print
                           </Button>
+                          {/* Admin-only delete */}
+                          {role === "admin" && (
+                            <>
+                              {deletePaymentId === p.id ? (
+                                <div className="flex gap-1 items-center">
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="gap-1 text-xs"
+                                    disabled={deleteLoading}
+                                    onClick={() => handleDeletePayment(p.id)}
+                                  >
+                                    {deleteLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                                    Confirm
+                                  </Button>
+                                  <Button size="sm" variant="ghost" className="text-xs" onClick={() => setDeletePaymentId(null)}>
+                                    Cancel
+                                  </Button>
+                                </div>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="gap-1 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  onClick={() => setDeletePaymentId(p.id)}
+                                >
+                                  <Trash2 className="h-3 w-3" /> Delete
+                                </Button>
+                              )}
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -530,13 +779,30 @@ const FeeDesk = () => {
                   </div>
                 </div>
 
+                {/* Custom date range filter */}
+                <div className="mt-6 flex flex-wrap items-end gap-4 bg-secondary p-4 rounded-xl">
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold flex items-center gap-1"><Calendar className="h-3 w-3" /> From Date</Label>
+                    <Input type="date" value={reportDateFrom} onChange={(e) => setReportDateFrom(e.target.value)} className="w-44" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold flex items-center gap-1"><Calendar className="h-3 w-3" /> To Date</Label>
+                    <Input type="date" value={reportDateTo} onChange={(e) => setReportDateTo(e.target.value)} className="w-44" />
+                  </div>
+                  {(reportDateFrom || reportDateTo) && (
+                    <Button variant="ghost" size="sm" onClick={() => { setReportDateFrom(""); setReportDateTo(""); }}>
+                      Clear Filter
+                    </Button>
+                  )}
+                </div>
+
                 <div className="mt-8">
                   {(() => {
-                    const rows = payments;
+                    const rows = getFilteredPaymentsForReport();
 
                     const startOfWeekMonday = (d: Date) => {
                       const date = new Date(d);
-                      const day = (date.getDay() + 6) % 7; // Monday = 0
+                      const day = (date.getDay() + 6) % 7;
                       date.setDate(date.getDate() - day);
                       date.setHours(0, 0, 0, 0);
                       return date;
@@ -586,31 +852,48 @@ const FeeDesk = () => {
                     const ReportTable = ({ mode }: { mode: "daily" | "weekly" | "monthly" | "yearly" }) => {
                       const report = build(mode);
                       if (report.length === 0) {
-                        return <div className="p-8 text-center text-muted-foreground">No payment data to report yet.</div>;
+                        return <div className="p-8 text-center text-muted-foreground">No payment data to report for the selected period.</div>;
                       }
                       return (
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-sm">
-                            <thead>
-                              <tr className="border-b text-left">
-                                <th className="p-3 font-semibold">Period</th>
-                                <th className="p-3 font-semibold">Payments</th>
-                                <th className="p-3 font-semibold">Total Collected</th>
-                                <th className="p-3 font-semibold">Last Entry</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {report.map((r) => (
-                                <tr key={r.key} className="border-b hover:bg-secondary/50 transition-colors">
-                                  <td className="p-3 font-semibold">{r.label}</td>
-                                  <td className="p-3">{r.count}</td>
-                                  <td className="p-3 font-semibold text-accent">₹{r.total.toLocaleString("en-IN")}</td>
-                                  <td className="p-3">{r.lastAt ? new Date(r.lastAt).toLocaleString("en-IN") : "—"}</td>
+                        <>
+                          {/* Print / Download buttons */}
+                          <div className="flex gap-3 mb-4 justify-end">
+                            <Button variant="outline" size="sm" className="gap-2" onClick={() => handlePrintReport(mode, report)}>
+                              <Printer className="h-4 w-4" /> Print Statement
+                            </Button>
+                            <Button variant="outline" size="sm" className="gap-2" onClick={() => handleDownloadReport(mode, report)}>
+                              <Download className="h-4 w-4" /> Download Excel
+                            </Button>
+                          </div>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="border-b text-left">
+                                  <th className="p-3 font-semibold">Period</th>
+                                  <th className="p-3 font-semibold">Payments</th>
+                                  <th className="p-3 font-semibold">Total Collected</th>
+                                  <th className="p-3 font-semibold">Last Entry</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                              </thead>
+                              <tbody>
+                                {report.map((r) => (
+                                  <tr key={r.key} className="border-b hover:bg-secondary/50 transition-colors">
+                                    <td className="p-3 font-semibold">{r.label}</td>
+                                    <td className="p-3">{r.count}</td>
+                                    <td className="p-3 font-semibold text-accent">₹{r.total.toLocaleString("en-IN")}</td>
+                                    <td className="p-3">{r.lastAt ? new Date(r.lastAt).toLocaleString("en-IN") : "—"}</td>
+                                  </tr>
+                                ))}
+                                <tr className="border-t-2 border-primary/20 font-bold">
+                                  <td className="p-3">TOTAL</td>
+                                  <td className="p-3">{report.reduce((s, r) => s + r.count, 0)}</td>
+                                  <td className="p-3 text-accent">₹{report.reduce((s, r) => s + r.total, 0).toLocaleString("en-IN")}</td>
+                                  <td className="p-3"></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </>
                       );
                     };
 
@@ -629,7 +912,7 @@ const FeeDesk = () => {
                         <TabsContent value="yearly"><ReportTable mode="yearly" /></TabsContent>
 
                         <p className="text-xs text-muted-foreground">
-                          Showing reports for the latest {payments.length} payments loaded in this portal (up to 1000).
+                          Showing reports for {rows.length} payments{reportDateFrom || reportDateTo ? " (filtered)" : ""} loaded in this portal (up to 1000).
                         </p>
                       </Tabs>
                     );
