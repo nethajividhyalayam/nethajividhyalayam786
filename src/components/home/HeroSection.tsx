@@ -6,9 +6,7 @@ import { Link } from "react-router-dom";
 const getAcademicYear = () => {
   const now = new Date();
   const year = now.getFullYear();
-  const month = now.getMonth();
-  const startYear = month >= 2 ? year : year - 1;
-  return `${startYear}-${String(startYear + 1).slice(-2)}`;
+  return `${year}-${String(year + 1).slice(-2)}`;
 };
 
 const HeroSection = () => {

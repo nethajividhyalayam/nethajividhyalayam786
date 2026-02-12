@@ -17,9 +17,7 @@ const socials = [
 const getAcademicYear = () => {
   const now = new Date();
   const year = now.getFullYear();
-  const month = now.getMonth();
-  const startYear = month >= 2 ? year : year - 1;
-  return `${startYear}-${String(startYear + 1).slice(-2)}`;
+  return `${year}-${String(year + 1).slice(-2)}`;
 };
 
 const SocialSidebar = () => {
@@ -57,16 +55,11 @@ const SocialSidebar = () => {
     } else {
       setMouseY(null);
     }
-    // Left side proximity for date/time widget
+    // Left side proximity for date/time widget (hover tracking only, no auto-expand)
     if (e.clientX < 120 && dateRef.current) {
       const rect = dateRef.current.getBoundingClientRect();
       const dist = Math.abs(e.clientY - (rect.top + rect.height / 2));
-      if (dist < 100) {
-        setDateHover(true);
-        setExpanded(true);
-      } else {
-        setDateHover(false);
-      }
+      setDateHover(dist < 100);
     } else {
       setDateHover(false);
     }
