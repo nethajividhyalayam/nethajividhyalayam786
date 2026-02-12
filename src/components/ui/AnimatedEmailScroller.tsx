@@ -19,31 +19,30 @@ const AnimatedEmailScroller = ({ className = "" }: AnimatedEmailScrollerProps) =
       setTimeout(() => {
         setActiveIndex((prev) => (prev + 1) % emails.length);
         setPhase("enter");
-      }, 600);
+      }, 1500);
       setTimeout(() => {
         setPhase("visible");
-      }, 1200);
-    }, 4000);
+      }, 3000);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
 
   const email = emails[activeIndex];
 
-  const animClass =
+  const style: React.CSSProperties =
     phase === "exit"
-      ? "opacity-0 -translate-y-5"
+      ? { opacity: 0, transform: "translateY(-8px) rotateX(40deg)", transition: "all 1.5s ease-in-out" }
       : phase === "enter"
-      ? "opacity-0 translate-y-5"
-      : "opacity-100 translate-y-0";
+      ? { opacity: 0, transform: "translateY(8px) rotateX(-40deg)", transition: "none" }
+      : { opacity: 1, transform: "translateY(0) rotateX(0deg)", transition: "all 1.5s ease-in-out" };
 
   return (
     <a
       href={email.href}
-      className={`inline-flex items-center transition-none ${className}`}
+      className={`inline-flex items-center ${className}`}
+      style={{ perspective: "200px" }}
     >
-      <span
-        className={`inline-block transition-all duration-[600ms] ease-in-out ${animClass}`}
-      >
+      <span className="inline-block" style={style}>
         {email.label}
       </span>
     </a>
