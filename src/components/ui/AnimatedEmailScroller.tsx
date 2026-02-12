@@ -38,13 +38,14 @@ const AnimatedEmailScroller = ({ className = "" }: AnimatedEmailScrollerProps) =
     >
       {/* Current email - exits upward */}
       <span
-        className="inline-block absolute left-0"
+        className="inline-block absolute left-0 will-change-transform"
         style={{
-          transition: "all 2s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "transform 2s ease-in-out, opacity 2s ease-in-out",
           transform: phase === "rolling"
             ? "translateY(-100%) rotateX(90deg)"
             : "translateY(0) rotateX(0deg)",
           opacity: phase === "rolling" ? 0 : 1,
+          backfaceVisibility: "hidden",
         }}
       >
         {emails[activeIndex].label}
@@ -52,13 +53,14 @@ const AnimatedEmailScroller = ({ className = "" }: AnimatedEmailScrollerProps) =
 
       {/* Next email - enters from below */}
       <span
-        className="inline-block absolute left-0"
+        className="inline-block absolute left-0 will-change-transform"
         style={{
-          transition: "all 2s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "transform 2s ease-in-out, opacity 2s ease-in-out",
           transform: phase === "rolling"
             ? "translateY(0) rotateX(0deg)"
             : "translateY(100%) rotateX(-90deg)",
           opacity: phase === "rolling" ? 1 : 0,
+          backfaceVisibility: "hidden",
         }}
       >
         {emails[nextIndex].label}
