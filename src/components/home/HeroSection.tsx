@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Play, X, ChevronLeft, ChevronRight as ChevronRightIcon, Pause } from "lucide-react";
 import { Link } from "react-router-dom";
+import { heroVideos } from "@/data/schoolVideos";
 
 const getAcademicYear = () => {
   const now = new Date();
@@ -9,27 +10,14 @@ const getAcademicYear = () => {
   return `${year}-${String(year + 1).slice(-2)}`;
 };
 
-const schoolVideos = [
-  { title: "School Campus Tour", url: "https://www.youtube.com/embed/V1bFr2SWP1I" },
-  { title: "Annual Day Celebrations", url: "https://www.youtube.com/embed/LXb3EKWsInQ" },
-  { title: "Sports Day Highlights", url: "https://www.youtube.com/embed/2lAe1cqCOXo" },
-  { title: "Science Exhibition", url: "https://www.youtube.com/embed/GD0x33mENRg" },
-  { title: "Cultural Program", url: "https://www.youtube.com/embed/RK1K2bCg4J8" },
-  { title: "Classroom Activities", url: "https://www.youtube.com/embed/WmVLcj-XKnM" },
-  { title: "Library & Labs", url: "https://www.youtube.com/embed/daSRTfnp3Qo" },
-  { title: "Parent-Teacher Meet", url: "https://www.youtube.com/embed/Sagg08DrO5U" },
-  { title: "Republic Day Parade", url: "https://www.youtube.com/embed/6ZfuNTqbHE8" },
-  { title: "Graduation Ceremony", url: "https://www.youtube.com/embed/9bZkp7q19f0" },
-];
-
 const HeroSection = () => {
   const [showGallery, setShowGallery] = useState(false);
   const [currentVideo, setCurrentVideo] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const nextVideo = useCallback(() => setCurrentVideo((prev) => (prev + 1) % schoolVideos.length), []);
-  const prevVideo = () => setCurrentVideo((prev) => (prev - 1 + schoolVideos.length) % schoolVideos.length);
+  const nextVideo = useCallback(() => setCurrentVideo((prev) => (prev + 1) % heroVideos.length), []);
+  const prevVideo = () => setCurrentVideo((prev) => (prev - 1 + heroVideos.length) % heroVideos.length);
 
   // Listen for YouTube video end via postMessage
   useEffect(() => {
@@ -105,7 +93,7 @@ const HeroSection = () => {
                 <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-accent transition-colors">
                   <Play className="h-6 w-6 fill-current" />
                 </div>
-                <span className="text-sm font-medium">Watch Our School Tour ({schoolVideos.length} Videos)</span>
+                <span className="text-sm font-medium">Watch Our School Tour ({heroVideos.length} Videos)</span>
               </button>
             </div>
           </div>
@@ -142,7 +130,7 @@ const HeroSection = () => {
 
           {/* Title */}
           <h2 className="text-white font-serif text-xl md:text-2xl font-bold mb-4">
-            {schoolVideos[currentVideo].title}
+            {heroVideos[currentVideo].title}
           </h2>
 
           {/* Video Player */}
@@ -150,8 +138,8 @@ const HeroSection = () => {
             <iframe
               ref={iframeRef}
               key={currentVideo}
-              src={`${schoolVideos[currentVideo].url}?autoplay=1&rel=0&enablejsapi=1&origin=${window.location.origin}`}
-              title={schoolVideos[currentVideo].title}
+              src={`${heroVideos[currentVideo].url}?autoplay=1&rel=0&enablejsapi=1&origin=${window.location.origin}`}
+              title={heroVideos[currentVideo].title}
               className="w-full h-full rounded-xl shadow-2xl"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -176,12 +164,12 @@ const HeroSection = () => {
 
           {/* Counter */}
           <p className="text-white/70 text-sm mt-3">
-            {currentVideo + 1} / {schoolVideos.length}
+            {currentVideo + 1} / {heroVideos.length}
           </p>
 
           {/* Thumbnail Strip */}
           <div className="flex gap-2 mt-4 px-4 overflow-x-auto max-w-full pb-2">
-            {schoolVideos.map((video, idx) => (
+            {heroVideos.map((video, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentVideo(idx)}
