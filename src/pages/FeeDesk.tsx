@@ -52,6 +52,8 @@ const FeeDesk = () => {
   const [password, setPassword] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   // Students
   const [students, setStudents] = useState<any[]>([]);
@@ -124,6 +126,21 @@ const FeeDesk = () => {
     setRole(data?.role || null);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/feedesk",
+    });
+    if (error) {
+      toast({ title: "Reset Failed", description: error.message, variant: "destructive" });
+    } else {
+      setResetSent(true);
+      toast({ title: "Reset Link Sent", description: "Check your email for the password reset link." });
+    }
+    setLoginLoading(false);
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginLoading(true);
@@ -139,8 +156,6 @@ const FeeDesk = () => {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast({ title: "Login Failed", description: error.message, variant: "destructive" });
-      } else {
-        toast({ title: "Welcome!", description: "Logged in successfully." });
       }
     }
     setLoginLoading(false);
@@ -422,33 +437,66 @@ const FeeDesk = () => {
           </a>
           <div className="text-center mb-8">
             <h1 className="font-serif text-3xl font-bold text-primary">FeeDesk</h1>
-            <p className="text-muted-foreground mt-2">Nethaji Vidhyalayam — {isSignUp ? "Create Account" : "Staff Login"}</p>
+            <p className="text-muted-foreground mt-2">Nethaji Vidhyalayam — {isForgotPassword ? "Reset Password" : isSignUp ? "Create Account" : "Staff Login"}</p>
           </div>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@example.com" required />
-            </div>
-            <div className="space-y-2">
-              <Label>Password</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
-            </div>
-            <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loginLoading}>
-              {loginLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              {isSignUp ? "Sign Up" : "Sign In"}
-            </Button>
-          </form>
-          {isSignUp && (
-            <p className="text-center text-xs text-muted-foreground mt-3 bg-secondary/50 p-2 rounded-lg">
-              📧 After signing up, contact admin at <strong>nethajividhyalayam@gmail.com</strong> to get your role assigned.
-            </p>
+          {isForgotPassword ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@example.com" required />
+              </div>
+              {resetSent ? (
+                <p className="text-center text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+                  ✅ Reset link sent! Check your email inbox and click the link to reset your password.
+                </p>
+              ) : (
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loginLoading}>
+                  {loginLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Send Reset Link
+                </Button>
+              )}
+              <p className="text-center text-sm text-muted-foreground mt-4">
+                <button onClick={() => { setIsForgotPassword(false); setResetSent(false); }} className="text-accent font-semibold hover:underline">
+                  Back to Sign In
+                </button>
+              </p>
+            </form>
+          ) : (
+            <>
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@example.com" required />
+                </div>
+                <div className="space-y-2">
+                  <Label>Password</Label>
+                  <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+                </div>
+                {!isSignUp && (
+                  <div className="text-right">
+                    <button type="button" onClick={() => setIsForgotPassword(true)} className="text-xs text-accent hover:underline">
+                      Forgot Password?
+                    </button>
+                  </div>
+                )}
+                <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loginLoading}>
+                  {loginLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  {isSignUp ? "Sign Up" : "Sign In"}
+                </Button>
+              </form>
+              {isSignUp && (
+                <p className="text-center text-xs text-muted-foreground mt-3 bg-secondary/50 p-2 rounded-lg">
+                  📧 After signing up, contact admin at <strong>nethajividhyalayam@gmail.com</strong> to get your role assigned.
+                </p>
+              )}
+              <p className="text-center text-sm text-muted-foreground mt-4">
+                {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
+                <button onClick={() => setIsSignUp(!isSignUp)} className="text-accent font-semibold hover:underline">
+                  {isSignUp ? "Sign In" : "Sign Up"}
+                </button>
+              </p>
+            </>
           )}
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            {isSignUp ? "Already have an account?" : "Need an account?"}{" "}
-            <button onClick={() => setIsSignUp(!isSignUp)} className="text-accent font-semibold hover:underline">
-              {isSignUp ? "Sign In" : "Sign Up"}
-            </button>
-          </p>
           <a href="/" className="block text-center mt-4 text-sm text-muted-foreground hover:text-primary font-medium transition-colors">
             Cancel
           </a>
