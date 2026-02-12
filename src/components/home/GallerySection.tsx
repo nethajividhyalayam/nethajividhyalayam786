@@ -2,17 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
-
-const galleryImages = [
-  { id: 1, src: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&h=400&fit=crop", alt: "Classroom activities", category: "Academics" },
-  { id: 2, src: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=600&h=400&fit=crop", alt: "Sports activities", category: "Sports" },
-  { id: 3, src: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=600&h=400&fit=crop", alt: "Library", category: "Facilities" },
-  { id: 4, src: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=600&h=400&fit=crop", alt: "Cultural events", category: "Events" },
-  { id: 5, src: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=600&h=400&fit=crop", alt: "Science lab", category: "Academics" },
-  { id: 6, src: "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=600&h=400&fit=crop", alt: "Art class", category: "Activities" },
-];
+import { getHomepageGallery } from "@/data/galleryData";
 
 const GallerySection = () => {
+  const galleryImages = getHomepageGallery(6);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
 
@@ -47,6 +40,9 @@ const GallerySection = () => {
                 src={image.src}
                 alt={image.alt}
                 className="w-full h-48 md:h-64 object-cover group-hover:scale-110 transition-transform duration-700"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/placeholder.svg";
+                }}
               />
               <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/60 transition-colors duration-300" />
               <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100">
@@ -71,9 +67,12 @@ const GallerySection = () => {
           </button>
           <div className="max-w-5xl w-full animate-scale-in" onClick={(e) => e.stopPropagation()}>
             <img
-              src={galleryImages[currentImage].src.replace("w=600&h=400", "w=1200&h=800")}
+              src={galleryImages[currentImage].src}
               alt={galleryImages[currentImage].alt}
               className="w-full max-h-[80vh] object-contain rounded-lg"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "/placeholder.svg";
+              }}
             />
             <div className="text-center mt-4">
               <span className="bg-accent/90 text-accent-foreground px-4 py-2 rounded-full text-sm font-medium">
