@@ -1,23 +1,7 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-
-const galleryImages = [
-  { id: 1, src: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800&h=600&fit=crop", alt: "Classroom learning", category: "Academics" },
-  { id: 2, src: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=800&h=600&fit=crop", alt: "Sports day", category: "Sports" },
-  { id: 3, src: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&h=600&fit=crop", alt: "Library", category: "Facilities" },
-  { id: 4, src: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&h=600&fit=crop", alt: "Cultural event", category: "Events" },
-  { id: 5, src: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=800&h=600&fit=crop", alt: "Science lab", category: "Academics" },
-  { id: 6, src: "https://images.unsplash.com/photo-1497486751825-1233686d5d80?w=800&h=600&fit=crop", alt: "Art class", category: "Activities" },
-  { id: 7, src: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&h=600&fit=crop", alt: "School bus", category: "Transport" },
-  { id: 8, src: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&h=600&fit=crop", alt: "Reading corner", category: "Library" },
-  { id: 9, src: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=800&h=600&fit=crop", alt: "Annual day", category: "Events" },
-  { id: 10, src: "https://images.unsplash.com/photo-1588072432836-e10032774350?w=800&h=600&fit=crop", alt: "Computer lab", category: "Facilities" },
-  { id: 11, src: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&h=600&fit=crop", alt: "Outdoor activities", category: "Sports" },
-  { id: 12, src: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop", alt: "Teacher interaction", category: "Academics" },
-];
-
-const categories = ["All", ...Array.from(new Set(galleryImages.map((img) => img.category)))];
+import { galleryImages, galleryCategories } from "@/data/galleryData";
 
 const Gallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -44,7 +28,7 @@ const Gallery = () => {
         <div className="container-custom">
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2 justify-center mb-12">
-            {categories.map((cat) => (
+            {galleryCategories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
@@ -55,7 +39,7 @@ const Gallery = () => {
             ))}
           </div>
 
-          {/* Masonry-like Grid with animations */}
+          {/* Masonry-like Grid */}
           <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
             {filtered.map((image, index) => (
               <div
@@ -69,6 +53,9 @@ const Gallery = () => {
                   alt={image.alt}
                   loading="lazy"
                   className="w-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-all duration-700 ease-out"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/placeholder.svg";
+                  }}
                 />
                 <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/50 transition-all duration-500" />
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 scale-90 group-hover:scale-100">
@@ -96,6 +83,9 @@ const Gallery = () => {
             alt={filtered[currentImage]?.alt}
             className="max-w-full max-h-[85vh] object-contain rounded-lg animate-scale-in"
             onClick={(e) => e.stopPropagation()}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/placeholder.svg";
+            }}
           />
           <button onClick={(e) => { e.stopPropagation(); setCurrentImage((p) => (p + 1) % filtered.length); }} className="absolute right-4 text-white hover:text-accent transition-colors" aria-label="Next">
             <ChevronRight className="h-8 w-8" />
