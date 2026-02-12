@@ -151,6 +151,12 @@ const FeeDesk = () => {
       } else {
         toast({ title: "Account Created!", description: "Please check your email to verify your account, then sign in." });
         setIsSignUp(false);
+        // Notify admins about new signup
+        try {
+          await supabase.functions.invoke("notify-admin-signup", { body: { email } });
+        } catch (e) {
+          console.error("Admin notification failed:", e);
+        }
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
