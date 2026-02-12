@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const emails = [
   { label: "nethajividhyalayam@gmail.com", href: "mailto:nethajividhyalayam@gmail.com" },
@@ -11,40 +11,61 @@ interface AnimatedEmailScrollerProps {
 
 const AnimatedEmailScroller = ({ className = "" }: AnimatedEmailScrollerProps) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [phase, setPhase] = useState<"visible" | "exit" | "enter">("visible");
+  const nextIndex = (activeIndex + 1) % emails.length;
+  const [phase, setPhase] = useState<"stable" | "rolling">("stable");
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPhase("exit");
-      setTimeout(() => {
+      setPhase("rolling");
+      timerRef.current = setTimeout(() => {
         setActiveIndex((prev) => (prev + 1) % emails.length);
-        setPhase("enter");
-      }, 1500);
-      setTimeout(() => {
-        setPhase("visible");
-      }, 3000);
+        setPhase("stable");
+      }, 2000);
     }, 6000);
-    return () => clearInterval(interval);
+
+    return () => {
+      clearInterval(interval);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, []);
-
-  const email = emails[activeIndex];
-
-  const style: React.CSSProperties =
-    phase === "exit"
-      ? { opacity: 0, transform: "translateY(-8px) rotateX(40deg)", transition: "all 1.5s ease-in-out" }
-      : phase === "enter"
-      ? { opacity: 0, transform: "translateY(8px) rotateX(-40deg)", transition: "none" }
-      : { opacity: 1, transform: "translateY(0) rotateX(0deg)", transition: "all 1.5s ease-in-out" };
 
   return (
     <a
-      href={email.href}
-      className={`inline-flex items-center ${className}`}
-      style={{ perspective: "200px" }}
+      href={emails[phase === "rolling" ? nextIndex : activeIndex].href}
+      className={`inline-flex items-center overflow-hidden ${className}`}
+      style={{ perspective: "300px", height: "1.5em", position: "relative" }}
     >
-      <span className="inline-block" style={style}>
-        {email.label}
+      {/* Current email - exits upward */}
+      <span
+        className="inline-block absolute left-0"
+        style={{
+          transition: "all 2s cubic-bezier(0.4, 0, 0.2, 1)",
+          transform: phase === "rolling"
+            ? "translateY(-100%) rotateX(90deg)"
+            : "translateY(0) rotateX(0deg)",
+          opacity: phase === "rolling" ? 0 : 1,
+        }}
+      >
+        {emails[activeIndex].label}
       </span>
+
+      {/* Next email - enters from below */}
+      <span
+        className="inline-block absolute left-0"
+        style={{
+          transition: "all 2s cubic-bezier(0.4, 0, 0.2, 1)",
+          transform: phase === "rolling"
+            ? "translateY(0) rotateX(0deg)"
+            : "translateY(100%) rotateX(-90deg)",
+          opacity: phase === "rolling" ? 1 : 0,
+        }}
+      >
+        {emails[nextIndex].label}
+      </span>
+
+      {/* Invisible spacer for width */}
+      <span className="invisible whitespace-nowrap">nethajividhyalayam@gmail.com</span>
     </a>
   );
 };
