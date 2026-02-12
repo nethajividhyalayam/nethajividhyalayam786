@@ -15,6 +15,7 @@ import Career from "./pages/Career";
 import Contact from "./pages/Contact";
 import Academics from "./pages/Academics";
 import FeeDesk from "./pages/FeeDesk";
+import VideoGallery from "./pages/VideoGallery";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/career" element={<Career />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/feedesk" element={<FeeDesk />} />
+          <Route path="/video-gallery" element={<VideoGallery />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
