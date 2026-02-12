@@ -21,7 +21,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { email } = await req.json();
+    const { email, type } = await req.json();
 
     if (!email) {
       return new Response(JSON.stringify({ error: "Missing email" }), {
@@ -30,15 +30,27 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    const isReset = type === "reset";
     const now = new Date();
     const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
     const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+    const title = isReset ? "🔑 Password Reset Requested" : "🔔 New Staff Signup";
+    const statusText = isReset ? "Password Reset Sent" : "Pending Role Assignment";
+    const statusBg = isReset ? "#dbeafe" : "#fef3c7";
+    const statusColor = isReset ? "#1e40af" : "#92400e";
+    const actionText = isReset
+      ? "A password reset link has been sent to this user. No action is required unless this was unexpected."
+      : "Please log in to FeeDesk and assign the appropriate role (admin/staff) to this user.";
+    const subjectLine = isReset
+      ? `🔑 Password Reset: ${email}`
+      : `🔔 New Staff Signup: ${email} — Role Assignment Needed`;
 
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head>
 <body style="font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:0;background:#f4f4f4;">
   <div style="max-width:550px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden;border:2px solid #1a3a5c;">
     <div style="background:#1a3a5c;color:#fff;padding:24px;text-align:center;">
-      <h1 style="margin:0;font-size:22px;">🔔 New Staff Signup</h1>
+      <h1 style="margin:0;font-size:22px;">${title}</h1>
       <p style="margin:6px 0 0;font-size:13px;opacity:0.85;">${SCHOOL_NAME} — FeeDesk Management</p>
     </div>
     <div style="background:#d4a843;padding:10px 20px;display:flex;justify-content:space-between;font-size:12px;color:#1a3a5c;">
@@ -46,7 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
       <span style="margin-left:auto;"><strong>Time:</strong> ${timeStr}</span>
     </div>
     <div style="padding:24px;">
-      <p style="font-size:14px;color:#333;margin:0 0 16px;">A new user has registered on the FeeDesk system and is awaiting role assignment.</p>
+      <p style="font-size:14px;color:#333;margin:0 0 16px;">${isReset ? "A user has requested a password reset on the FeeDesk system." : "A new user has registered on the FeeDesk system and is awaiting role assignment."}</p>
       <div style="background:#f8f9fa;border-radius:8px;padding:16px;border:1px solid #e9ecef;">
         <table style="width:100%;border-collapse:collapse;">
           <tr>
@@ -55,13 +67,13 @@ const handler = async (req: Request): Promise<Response> => {
           </tr>
           <tr>
             <td style="padding:8px 12px;font-weight:600;color:#333;font-size:13px;">Status</td>
-            <td style="padding:8px 12px;font-size:13px;"><span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;font-weight:600;">Pending Role Assignment</span></td>
+            <td style="padding:8px 12px;font-size:13px;"><span style="background:${statusBg};color:${statusColor};padding:2px 8px;border-radius:4px;font-weight:600;">${statusText}</span></td>
           </tr>
         </table>
       </div>
       <div style="margin-top:20px;padding:14px;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe;">
-        <p style="font-size:13px;color:#1e40af;margin:0;"><strong>⚡ Action Required</strong></p>
-        <p style="font-size:12px;color:#1e40af;margin:4px 0 0;">Please log in to FeeDesk and assign the appropriate role (admin/staff) to this user.</p>
+        <p style="font-size:13px;color:#1e40af;margin:0;"><strong>⚡ ${isReset ? "Info" : "Action Required"}</strong></p>
+        <p style="font-size:12px;color:#1e40af;margin:4px 0 0;">${actionText}</p>
       </div>
     </div>
     <div style="background:#f5f5f5;padding:12px 24px;text-align:center;font-size:11px;color:#888;border-top:1px solid #eee;">
@@ -73,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
     const result = await resend.emails.send({
       from: `${SCHOOL_NAME} FeeDesk <onboarding@resend.dev>`,
       to: ADMIN_EMAILS,
-      subject: `🔔 New Staff Signup: ${email} — Role Assignment Needed`,
+      subject: subjectLine,
       html,
     });
 
