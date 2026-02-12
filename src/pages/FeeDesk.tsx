@@ -82,6 +82,10 @@ const FeeDesk = () => {
   const [reportDateFrom, setReportDateFrom] = useState("");
   const [reportDateTo, setReportDateTo] = useState("");
 
+  // Bulk delete students
+  const [selectedStudentIds, setSelectedStudentIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteLoading, setBulkDeleteLoading] = useState(false);
+
   useEffect(() => {
     const checkAuth = async () => {
       setLoading(true);
@@ -280,6 +284,38 @@ const FeeDesk = () => {
     }
     setDeletePaymentId(null);
     setDeleteLoading(false);
+  };
+
+  // ===== Bulk delete students (admin only) =====
+  const handleBulkDeleteStudents = async () => {
+    if (selectedStudentIds.size === 0) return;
+    setBulkDeleteLoading(true);
+    const ids = Array.from(selectedStudentIds);
+    const { error } = await supabase.from("students").update({ status: "inactive" }).in("id", ids);
+    if (error) {
+      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Students Removed", description: `${ids.length} student(s) removed from active list.` });
+      setSelectedStudentIds(new Set());
+      fetchStudents();
+    }
+    setBulkDeleteLoading(false);
+  };
+
+  const toggleStudentSelection = (id: string) => {
+    setSelectedStudentIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedStudentIds.size === filteredStudents.length) {
+      setSelectedStudentIds(new Set());
+    } else {
+      setSelectedStudentIds(new Set(filteredStudents.map((s) => s.id)));
+    }
   };
 
   const handlePayment = async (e: React.FormEvent) => {
@@ -551,11 +587,28 @@ const FeeDesk = () => {
                 </form>
               )}
 
+              {/* Bulk delete bar (admin only) */}
+              {role === "admin" && selectedStudentIds.size > 0 && (
+                <div className="flex items-center gap-3 mb-4 p-3 bg-destructive/10 rounded-xl">
+                  <span className="text-sm font-semibold text-destructive">{selectedStudentIds.size} student(s) selected</span>
+                  <Button size="sm" variant="destructive" className="gap-1" onClick={handleBulkDeleteStudents} disabled={bulkDeleteLoading}>
+                    {bulkDeleteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                    Delete Selected
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => setSelectedStudentIds(new Set())}>Clear</Button>
+                </div>
+              )}
+
               {/* Students table */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b text-left">
+                      {role === "admin" && (
+                        <th className="p-3 w-10">
+                          <input type="checkbox" checked={filteredStudents.length > 0 && selectedStudentIds.size === filteredStudents.length} onChange={toggleSelectAll} className="accent-accent h-4 w-4" />
+                        </th>
+                      )}
                       <th className="p-3 font-semibold">Adm. No</th>
                       <th className="p-3 font-semibold">Name</th>
                       <th className="p-3 font-semibold">Standard</th>
@@ -568,16 +621,21 @@ const FeeDesk = () => {
                   </thead>
                   <tbody>
                     {filteredStudents.length === 0 ? (
-                      <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">No students found. Add students to get started.</td></tr>
+                      <tr><td colSpan={role === "admin" ? 9 : 8} className="p-8 text-center text-muted-foreground">No students found. Add students to get started.</td></tr>
                     ) : filteredStudents.map((s) => (
-                      <tr key={s.id} className="border-b hover:bg-secondary/50 transition-colors">
+                      <tr key={s.id} className={`border-b hover:bg-secondary/50 transition-colors ${selectedStudentIds.has(s.id) ? "bg-destructive/5" : ""}`}>
+                        {role === "admin" && (
+                          <td className="p-3">
+                            <input type="checkbox" checked={selectedStudentIds.has(s.id)} onChange={() => toggleStudentSelection(s.id)} className="accent-accent h-4 w-4" />
+                          </td>
+                        )}
                         <td className="p-3 font-mono text-xs">{s.admission_number}</td>
                         <td className="p-3 font-semibold">{s.student_name}</td>
                         <td className="p-3">{s.standard}</td>
                         <td className="p-3">{s.section}</td>
                         <td className="p-3">{s.parent_name || "—"}</td>
                         <td className="p-3">{s.parent_phone || "—"}</td>
-                        <td className="p-3 font-semibold text-green-700">₹{payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</td>
+                        <td className="p-3 font-semibold text-accent">₹{payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</td>
                         <td className="p-3">
                           <Button size="sm" className="gap-1 text-xs bg-accent hover:bg-accent/90 text-accent-foreground font-bold shadow-md" onClick={() => { setSelectedStudent(s); setActiveTab("collect-fee"); }}>
                             <DollarSign className="h-3 w-3" /> Pay Fee
