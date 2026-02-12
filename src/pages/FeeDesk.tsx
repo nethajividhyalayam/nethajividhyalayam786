@@ -489,7 +489,7 @@ const FeeDesk = () => {
               </form>
               {isSignUp && (
                 <p className="text-center text-xs text-muted-foreground mt-3 bg-secondary/50 p-2 rounded-lg">
-                  📧 After signing up, contact admin at <strong>nethajividhyalayam@gmail.com</strong> to get your role assigned.
+                  📧 After signing up, contact admin at <strong>nethajividhyalayam@gmail.com</strong> or <strong>nareshkumar.jayachandran@gmail.com</strong> to get your role assigned.
                 </p>
               )}
               <p className="text-center text-sm text-muted-foreground mt-4">
@@ -519,7 +519,7 @@ const FeeDesk = () => {
           <h2 className="font-serif text-2xl font-bold text-primary mb-4">Access Denied</h2>
           <p className="text-muted-foreground mb-4">Your account does not have a role assigned.</p>
           <p className="text-sm text-muted-foreground mb-6 bg-secondary/50 p-3 rounded-lg">
-            📧 Contact the administrator at <strong>nethajividhyalayam@gmail.com</strong> to get your credentials and role assigned.
+            📧 Contact the administrator at <strong>nethajividhyalayam@gmail.com</strong> or <strong>nareshkumar.jayachandran@gmail.com</strong> to get your credentials and role assigned.
           </p>
           <Button onClick={handleLogout} variant="outline">Log Out</Button>
         </div>
