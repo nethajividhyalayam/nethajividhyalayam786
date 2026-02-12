@@ -1,14 +1,19 @@
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { galleryImages, galleryCategories } from "@/data/galleryData";
 
 const Gallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
 
-  const filtered = selectedCategory === "All" ? galleryImages : galleryImages.filter((img) => img.category === selectedCategory);
+  const filtered = galleryImages.filter((img) => {
+    const matchesCategory = selectedCategory === "All" || img.category === selectedCategory;
+    const matchesSearch = searchQuery === "" || img.alt.toLowerCase().includes(searchQuery.toLowerCase()) || img.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const openLightbox = (index: number) => {
     setCurrentImage(index);
@@ -26,12 +31,24 @@ const Gallery = () => {
 
       <section className="section-padding bg-background">
         <div className="container-custom">
+          {/* Search */}
+          <div className="max-w-md mx-auto mb-8 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search photos by keyword or category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-full border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent text-sm"
+            />
+          </div>
+
           {/* Category Filter */}
           <div className="flex flex-wrap gap-2 justify-center mb-12">
             {galleryCategories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => { setSelectedCategory(cat); setSearchQuery(""); }}
                 className={`px-5 py-2 rounded-full font-semibold text-sm transition-colors ${selectedCategory === cat ? "bg-accent text-accent-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
               >
                 {cat}
