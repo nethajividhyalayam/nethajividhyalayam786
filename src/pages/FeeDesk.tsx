@@ -18,7 +18,7 @@ const sections = ["A", "B", "C", "D"];
 
 // Column mapping: try to match uploaded columns to student fields
 const STUDENT_FIELD_MAP: Record<string, string[]> = {
-  admission_number: ["admission_number", "adm no", "adm. no", "admission no", "admno", "admission", "roll no", "roll number", "rollno", "s no", "sno", "sl no", "slno", "serial no", "serial number", "reg no", "registration no", "registration number", "id", "student id", "emis no", "emisno", "emis"],
+  admission_number: ["admission number", "admission_number", "adm no", "adm no", "admission no", "admno", "admission", "roll no", "roll number", "rollno", "s no", "sno", "sl no", "slno", "serial no", "serial number", "reg no", "registration no", "registration number", "student id", "emis no", "emisno"],
   student_name: ["student_name", "student name", "name", "student", "pupil name", "pupil"],
   standard: ["standard", "class", "std", "grade"],
   section: ["section", "sec", "div", "division"],
@@ -34,8 +34,9 @@ const STUDENT_FIELD_MAP: Record<string, string[]> = {
 
 const matchColumn = (header: string): string | null => {
   const h = header.trim().toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+  // Exact match only — no substring matching to avoid wrong column picks
   for (const [field, aliases] of Object.entries(STUDENT_FIELD_MAP)) {
-    if (aliases.some((a) => h === a || h.includes(a) || a.includes(h))) return field;
+    if (aliases.some((a) => h === a)) return field;
   }
   return null;
 };
