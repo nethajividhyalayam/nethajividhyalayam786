@@ -99,7 +99,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1 ml-6">
             {navItems.map((item) => (
               <div
                 key={item.label}
@@ -110,7 +110,7 @@ const Header = () => {
                 <Link
                   to={item.path}
                   className={cn(
-                    "nav-link-animated flex items-center gap-1 px-3 py-2 text-sm font-bold rounded-md transition-all duration-300",
+                    "nav-link-animated flex items-center gap-1 px-2 py-2 text-xs font-bold rounded-md transition-all duration-300",
                     isActive(item.path)
                       ? "text-accent"
                       : "text-foreground hover:text-accent hover:scale-105"
