@@ -260,7 +260,7 @@ const FeeDesk = () => {
         return;
       }
 
-      const { error } = await supabase.from("students").insert(studentsToInsert);
+      const { error } = await supabase.from("students").upsert(studentsToInsert, { onConflict: "admission_number" });
       if (error) {
         toast({ title: "Upload Error", description: error.message, variant: "destructive" });
       } else {
