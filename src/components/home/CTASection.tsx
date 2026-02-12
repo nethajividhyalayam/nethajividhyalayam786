@@ -40,7 +40,7 @@ const CTASection = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-primary font-medium px-8"
+                className="border-2 border-accent text-white bg-accent/20 hover:bg-accent hover:text-accent-foreground font-medium px-8"
               >
                 <Phone className="mr-2 h-5 w-5" />
                 Call Us Now
