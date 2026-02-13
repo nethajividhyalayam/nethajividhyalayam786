@@ -83,73 +83,75 @@ const Header = () => {
           : "bg-background"
       )}
     >
-      <div className="container-custom">
+      <div className="w-full px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-14 h-14 object-contain" />
+            <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-12 h-12 object-contain" />
             <div className="hidden sm:block">
-              <h1 className="font-serif font-extrabold text-xl text-primary leading-tight tracking-tight">
+              <h1 className="font-serif font-extrabold text-lg text-primary leading-tight tracking-tight">
                 NETHAJI
               </h1>
-              <p className="font-sans font-bold text-accent text-xs tracking-widest">
+              <p className="font-sans font-bold text-accent text-[10px] tracking-widest">
                 VIDHYALAYAM
               </p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-0 ml-2">
-            {navItems.map((item) => (
-              <div
-                key={item.label}
-                className="relative group"
-                onMouseEnter={() => item.children && setOpenDropdown(item.label)}
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
-                <Link
-                  to={item.path}
-                  className={cn(
-                    "nav-link-animated flex items-center gap-0.5 px-1.5 py-1.5 text-xs font-extrabold rounded-md transition-all duration-300 whitespace-nowrap",
-                    isActive(item.path)
-                      ? "text-accent"
-                      : "text-foreground hover:text-accent hover:scale-105"
-                  )}
+          <nav className="hidden lg:flex items-center justify-center flex-1 mx-3">
+            <div className="flex items-center gap-1">
+              {navItems.map((item) => (
+                <div
+                  key={item.label}
+                  className="relative group"
+                  onMouseEnter={() => item.children && setOpenDropdown(item.label)}
+                  onMouseLeave={() => setOpenDropdown(null)}
                 >
-                  {item.label}
-                  {item.children && (
-                    <ChevronDown
-                      className={cn(
-                        "h-4 w-4 transition-transform",
-                        openDropdown === item.label && "rotate-180"
-                      )}
-                    />
-                  )}
-                </Link>
-
-                {/* Dropdown */}
-                {item.children && (
-                  <div
+                  <Link
+                    to={item.path}
                     className={cn(
-                      "absolute top-full left-0 w-56 bg-background rounded-lg shadow-lg border py-2 transition-all duration-200",
-                      openDropdown === item.label
-                        ? "opacity-100 visible translate-y-0"
-                        : "opacity-0 invisible -translate-y-2"
+                      "nav-link-animated flex items-center gap-0.5 px-2 py-1.5 text-[13px] font-extrabold rounded-md transition-all duration-300 whitespace-nowrap",
+                      isActive(item.path)
+                        ? "text-accent"
+                        : "text-foreground hover:text-accent hover:scale-105"
                     )}
                   >
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.label}
-                        to={child.path}
-                        className="block px-4 py-2 text-sm font-semibold text-foreground hover:bg-secondary hover:text-accent transition-colors"
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+                    {item.label}
+                    {item.children && (
+                      <ChevronDown
+                        className={cn(
+                          "h-3 w-3 transition-transform",
+                          openDropdown === item.label && "rotate-180"
+                        )}
+                      />
+                    )}
+                  </Link>
+
+                  {/* Dropdown */}
+                  {item.children && (
+                    <div
+                      className={cn(
+                        "absolute top-full left-0 w-56 bg-background rounded-lg shadow-lg border py-2 transition-all duration-200",
+                        openDropdown === item.label
+                          ? "opacity-100 visible translate-y-0"
+                          : "opacity-0 invisible -translate-y-2"
+                      )}
+                    >
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.label}
+                          to={child.path}
+                          className="block px-4 py-2 text-sm font-semibold text-foreground hover:bg-secondary hover:text-accent transition-colors"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </nav>
 
           {/* CTA Button & Mobile Menu Toggle */}
