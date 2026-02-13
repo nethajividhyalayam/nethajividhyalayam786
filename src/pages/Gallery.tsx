@@ -8,6 +8,8 @@ const Gallery = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
 
+  const [selectedImageId, setSelectedImageId] = useState<number>(galleryImages[0]?.id ?? 0);
+
   const filtered = galleryImages.filter(
     (img) => selectedCategory === "All" || img.category === selectedCategory
   );
@@ -17,8 +19,8 @@ const Gallery = () => {
     setLightboxOpen(true);
   };
 
-  // Featured image is always the first in the filtered list
-  const featured = filtered[0];
+  // Featured image is the selected one, falling back to first filtered
+  const featured = filtered.find((img) => img.id === selectedImageId) || filtered[0];
 
   return (
     <Layout>
@@ -99,8 +101,12 @@ const Gallery = () => {
             {filtered.map((image, index) => (
               <div
                 key={image.id}
-                className="group relative overflow-hidden rounded-xl cursor-pointer bg-card border border-border shadow-sm hover:shadow-lg transition-shadow duration-300"
-                onClick={() => openLightbox(index)}
+                className={`group relative overflow-hidden rounded-xl cursor-pointer bg-card border-2 shadow-sm hover:shadow-lg transition-all duration-300 ${
+                  selectedImageId === image.id
+                    ? "border-accent ring-2 ring-accent/30"
+                    : "border-border"
+                }`}
+                onClick={() => setSelectedImageId(image.id)}
               >
                 <div className="relative overflow-hidden">
                   <img
@@ -112,14 +118,19 @@ const Gallery = () => {
                       (e.target as HTMLImageElement).src = "/placeholder.svg";
                     }}
                   />
-                  {/* Hover overlay with zoom icon */}
-                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/50 transition-all duration-500 flex items-center justify-center">
-                    <ZoomIn className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-all duration-500 scale-75 group-hover:scale-100" />
-                  </div>
-                  {/* Category badge - top right */}
-                  <span className="absolute top-3 right-3 bg-accent text-accent-foreground px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {image.category}
-                  </span>
+                  {/* Zoom icon - opens lightbox */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openLightbox(index);
+                    }}
+                    className="absolute top-3 right-3 bg-white/80 hover:bg-white text-primary rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all duration-300 z-10"
+                    aria-label="Zoom image"
+                  >
+                    <ZoomIn className="h-4 w-4" />
+                  </button>
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/20 transition-all duration-500" />
                 </div>
                 {/* Title below image */}
                 <div className="p-3">
