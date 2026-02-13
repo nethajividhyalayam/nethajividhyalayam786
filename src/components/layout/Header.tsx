@@ -77,19 +77,19 @@ const Header = () => {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
+        "sticky top-0 z-50 w-full transition-all duration-500",
         isScrolled
-          ? "bg-background/95 backdrop-blur-md shadow-md"
-          : "bg-background"
+          ? "bg-primary/95 backdrop-blur-md shadow-lg"
+          : "bg-primary"
       )}
     >
-      <div className="w-full px-4">
-        <div className="flex items-center justify-between h-16">
+      <div className="w-full px-6">
+        <div className="flex items-center justify-between h-[60px]">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-12 h-12 object-contain" />
+          <Link to="/" className="flex items-center gap-2.5 shrink-0">
+            <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-11 h-11 object-contain drop-shadow-md" />
             <div className="hidden sm:block">
-              <h1 className="font-serif font-extrabold text-lg text-primary leading-tight tracking-tight">
+              <h1 className="font-serif font-extrabold text-lg text-primary-foreground leading-tight tracking-tight">
                 NETHAJI
               </h1>
               <p className="font-sans font-bold text-accent text-[10px] tracking-widest">
@@ -99,8 +99,8 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center justify-center flex-1 mx-3">
-            <div className="flex items-center gap-1">
+          <nav className="hidden lg:flex items-center justify-center flex-1 mx-4">
+            <div className="flex items-center gap-0.5">
               {navItems.map((item) => (
                 <div
                   key={item.label}
@@ -111,17 +111,17 @@ const Header = () => {
                   <Link
                     to={item.path}
                     className={cn(
-                      "nav-link-animated flex items-center gap-0.5 px-2 py-1.5 text-[13px] font-extrabold rounded-md transition-all duration-300 whitespace-nowrap",
+                      "nav-link-animated flex items-center gap-0.5 px-3 py-2 text-sm font-bold rounded-md transition-all duration-300 whitespace-nowrap",
                       isActive(item.path)
-                        ? "text-accent"
-                        : "text-foreground hover:text-accent hover:scale-105"
+                        ? "text-accent bg-primary-foreground/10"
+                        : "text-primary-foreground/90 hover:text-accent hover:bg-primary-foreground/10 hover:scale-105"
                     )}
                   >
                     {item.label}
                     {item.children && (
                       <ChevronDown
                         className={cn(
-                          "h-3 w-3 transition-transform",
+                          "h-3.5 w-3.5 transition-transform",
                           openDropdown === item.label && "rotate-180"
                         )}
                       />
@@ -132,7 +132,7 @@ const Header = () => {
                   {item.children && (
                     <div
                       className={cn(
-                        "absolute top-full left-0 w-56 bg-background rounded-lg shadow-lg border py-2 transition-all duration-200",
+                        "absolute top-full left-0 w-56 bg-background rounded-lg shadow-xl border py-2 transition-all duration-200",
                         openDropdown === item.label
                           ? "opacity-100 visible translate-y-0"
                           : "opacity-0 invisible -translate-y-2"
@@ -142,7 +142,7 @@ const Header = () => {
                         <Link
                           key={child.label}
                           to={child.path}
-                          className="block px-4 py-2 text-sm font-semibold text-foreground hover:bg-secondary hover:text-accent transition-colors"
+                          className="block px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-secondary hover:text-accent transition-colors"
                         >
                           {child.label}
                         </Link>
@@ -155,10 +155,10 @@ const Header = () => {
           </nav>
 
           {/* CTA Button & Mobile Menu Toggle */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
              <a
               href="tel:+919841594945"
-              className="hidden md:flex items-center gap-1.5 bg-accent text-accent-foreground px-3 py-1.5 rounded-md text-xs font-bold hover:bg-accent/90 transition-colors"
+              className="hidden md:flex items-center gap-1.5 bg-accent text-accent-foreground px-4 py-2 rounded-md text-sm font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
             >
               <Phone className="h-3.5 w-3.5" />
               <span>Call Us</span>
@@ -166,7 +166,7 @@ const Header = () => {
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-foreground hover:text-accent transition-colors"
+              className="lg:hidden p-2 text-primary-foreground hover:text-accent transition-colors"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
