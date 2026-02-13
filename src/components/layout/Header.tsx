@@ -99,7 +99,7 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1 ml-6">
+          <nav className="hidden xl:flex items-center gap-0.5 ml-4">
             {navItems.map((item) => (
               <div
                 key={item.label}
@@ -110,7 +110,7 @@ const Header = () => {
                 <Link
                   to={item.path}
                   className={cn(
-                    "nav-link-animated flex items-center gap-1 px-2 py-2 text-sm font-bold rounded-md transition-all duration-300",
+                    "nav-link-animated flex items-center gap-1 px-2 py-2 text-base font-extrabold rounded-md transition-all duration-300",
                     isActive(item.path)
                       ? "text-accent"
                       : "text-foreground hover:text-accent hover:scale-105"
@@ -164,7 +164,7 @@ const Header = () => {
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-foreground hover:text-accent transition-colors"
+              className="xl:hidden p-2 text-foreground hover:text-accent transition-colors"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
@@ -180,7 +180,7 @@ const Header = () => {
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "lg:hidden fixed inset-x-0 top-20 bg-background border-t shadow-lg transition-all duration-300 overflow-hidden",
+          "xl:hidden fixed inset-x-0 top-20 bg-background border-t shadow-lg transition-all duration-300 overflow-hidden",
           isMobileMenuOpen ? "max-h-screen" : "max-h-0"
         )}
       >
