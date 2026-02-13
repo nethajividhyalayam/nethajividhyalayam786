@@ -84,22 +84,22 @@ const Header = () => {
       )}
     >
       <div className="container-custom">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-20 h-20 object-contain" />
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-14 h-14 object-contain" />
             <div className="hidden sm:block">
-              <h1 className="font-serif font-extrabold text-3xl text-primary leading-tight tracking-tight">
+              <h1 className="font-serif font-extrabold text-xl text-primary leading-tight tracking-tight">
                 NETHAJI
               </h1>
-              <p className="font-sans font-bold text-accent text-base tracking-widest">
+              <p className="font-sans font-bold text-accent text-xs tracking-widest">
                 VIDHYALAYAM
               </p>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden xl:flex items-center gap-0.5 ml-4">
+          <nav className="hidden lg:flex items-center gap-0 ml-2">
             {navItems.map((item) => (
               <div
                 key={item.label}
@@ -110,7 +110,7 @@ const Header = () => {
                 <Link
                   to={item.path}
                   className={cn(
-                    "nav-link-animated flex items-center gap-1 px-2 py-2 text-base font-extrabold rounded-md transition-all duration-300",
+                    "nav-link-animated flex items-center gap-0.5 px-1.5 py-1.5 text-xs font-extrabold rounded-md transition-all duration-300 whitespace-nowrap",
                     isActive(item.path)
                       ? "text-accent"
                       : "text-foreground hover:text-accent hover:scale-105"
@@ -154,17 +154,17 @@ const Header = () => {
 
           {/* CTA Button & Mobile Menu Toggle */}
           <div className="flex items-center gap-4">
-            <a
+             <a
               href="tel:+919841594945"
-              className="hidden md:flex items-center gap-2 bg-accent text-accent-foreground px-4 py-2 rounded-md font-bold hover:bg-accent/90 transition-colors"
+              className="hidden md:flex items-center gap-1.5 bg-accent text-accent-foreground px-3 py-1.5 rounded-md text-xs font-bold hover:bg-accent/90 transition-colors"
             >
-              <Phone className="h-4 w-4" />
+              <Phone className="h-3.5 w-3.5" />
               <span>Call Us</span>
             </a>
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="xl:hidden p-2 text-foreground hover:text-accent transition-colors"
+              className="lg:hidden p-2 text-foreground hover:text-accent transition-colors"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
@@ -180,7 +180,7 @@ const Header = () => {
       {/* Mobile Navigation */}
       <div
         className={cn(
-          "xl:hidden fixed inset-x-0 top-20 bg-background border-t shadow-lg transition-all duration-300 overflow-hidden",
+          "lg:hidden fixed inset-x-0 top-16 bg-background border-t shadow-lg transition-all duration-300 overflow-hidden",
           isMobileMenuOpen ? "max-h-screen" : "max-h-0"
         )}
       >
