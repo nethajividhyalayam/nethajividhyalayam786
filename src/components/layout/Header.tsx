@@ -78,9 +78,7 @@ const Header = () => {
     <header
       className={cn(
         "sticky top-0 z-50 w-full transition-all duration-500",
-        isScrolled
-          ? "bg-primary/95 backdrop-blur-md shadow-lg"
-          : "bg-primary"
+        isScrolled ? "bg-primary/95 backdrop-blur-md shadow-lg" : "bg-primary",
       )}
     >
       <div className="w-full px-6">
@@ -90,11 +88,9 @@ const Header = () => {
             <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-11 h-11 object-contain drop-shadow-md" />
             <div className="hidden sm:block">
               <h1 className="font-serif font-extrabold text-lg text-primary-foreground leading-tight tracking-tight">
-                NETHAJI
+                NETHAJI VIDHYALAYAM
               </h1>
-              <p className="font-sans font-bold text-accent text-[10px] tracking-widest">
-                VIDHYALAYAM
-              </p>
+              <p className="font-sans font-bold text-accent text-[10px] tracking-widest">{/*VIDHYALAYAM*/}</p>
             </div>
           </Link>
 
@@ -114,16 +110,13 @@ const Header = () => {
                       "nav-link-animated flex items-center gap-0.5 px-3 py-2 text-sm font-bold rounded-md transition-all duration-300 whitespace-nowrap",
                       isActive(item.path)
                         ? "text-accent bg-primary-foreground/10"
-                        : "text-primary-foreground/90 hover:text-accent hover:bg-primary-foreground/10 hover:scale-105"
+                        : "text-primary-foreground/90 hover:text-accent hover:bg-primary-foreground/10 hover:scale-105",
                     )}
                   >
                     {item.label}
                     {item.children && (
                       <ChevronDown
-                        className={cn(
-                          "h-3.5 w-3.5 transition-transform",
-                          openDropdown === item.label && "rotate-180"
-                        )}
+                        className={cn("h-3.5 w-3.5 transition-transform", openDropdown === item.label && "rotate-180")}
                       />
                     )}
                   </Link>
@@ -135,7 +128,7 @@ const Header = () => {
                         "absolute top-full left-0 w-56 bg-background rounded-lg shadow-xl border py-2 transition-all duration-200",
                         openDropdown === item.label
                           ? "opacity-100 visible translate-y-0"
-                          : "opacity-0 invisible -translate-y-2"
+                          : "opacity-0 invisible -translate-y-2",
                       )}
                     >
                       {item.children.map((child) => (
@@ -156,7 +149,7 @@ const Header = () => {
 
           {/* CTA Button & Mobile Menu Toggle */}
           <div className="flex items-center gap-3">
-             <a
+            <a
               href="tel:+919841594945"
               className="hidden md:flex items-center gap-1.5 bg-accent text-accent-foreground px-4 py-2 rounded-md text-sm font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
             >
@@ -169,11 +162,7 @@ const Header = () => {
               className="lg:hidden p-2 text-primary-foreground hover:text-accent transition-colors"
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
@@ -183,7 +172,7 @@ const Header = () => {
       <div
         className={cn(
           "lg:hidden fixed inset-x-0 top-16 bg-background border-t shadow-lg transition-all duration-300 overflow-hidden",
-          isMobileMenuOpen ? "max-h-screen" : "max-h-0"
+          isMobileMenuOpen ? "max-h-screen" : "max-h-0",
         )}
       >
         <nav className="container-custom py-4 space-y-2">
@@ -192,30 +181,21 @@ const Header = () => {
               {item.children ? (
                 <>
                   <button
-                    onClick={() =>
-                      setOpenDropdown(
-                        openDropdown === item.label ? null : item.label
-                      )
-                    }
+                    onClick={() => setOpenDropdown(openDropdown === item.label ? null : item.label)}
                     className={cn(
                       "flex items-center justify-between w-full px-4 py-3 text-sm font-bold rounded-md transition-colors",
-                      isActive(item.path)
-                        ? "text-accent bg-secondary"
-                        : "text-foreground hover:bg-secondary"
+                      isActive(item.path) ? "text-accent bg-secondary" : "text-foreground hover:bg-secondary",
                     )}
                   >
                     {item.label}
                     <ChevronDown
-                      className={cn(
-                        "h-4 w-4 transition-transform",
-                        openDropdown === item.label && "rotate-180"
-                      )}
+                      className={cn("h-4 w-4 transition-transform", openDropdown === item.label && "rotate-180")}
                     />
                   </button>
                   <div
                     className={cn(
                       "overflow-hidden transition-all duration-200",
-                      openDropdown === item.label ? "max-h-64" : "max-h-0"
+                      openDropdown === item.label ? "max-h-64" : "max-h-0",
                     )}
                   >
                     <div className="pl-4 py-2 space-y-1">
@@ -236,9 +216,7 @@ const Header = () => {
                   to={item.path}
                   className={cn(
                     "block px-4 py-3 text-sm font-bold rounded-md transition-colors",
-                    isActive(item.path)
-                      ? "text-accent bg-secondary"
-                      : "text-foreground hover:bg-secondary"
+                    isActive(item.path) ? "text-accent bg-secondary" : "text-foreground hover:bg-secondary",
                   )}
                 >
                   {item.label}
