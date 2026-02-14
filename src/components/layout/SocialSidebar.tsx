@@ -34,7 +34,7 @@ const socials = [
   },
   {
     icon: Instagram,
-    href: "https://www.instagram.com/nethajividhyalayam",
+    href: "https://www.instagram.com/nethajividhyalayam2002",
     label: "Instagram",
     bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]",
     activeShadow: "shadow-[0_0_20px_rgba(225,48,108,0.4)]",
