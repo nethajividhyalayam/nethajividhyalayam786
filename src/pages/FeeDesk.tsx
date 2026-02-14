@@ -49,6 +49,7 @@ const FeeDesk = () => {
   const isOnline = useOnlineStatus();
   const [syncing, setSyncing] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingSyncIds, setPendingSyncIds] = useState<Set<string>>(new Set());
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
   const syncInProgress = useRef(false);
   const [user, setUser] = useState<any>(null);
@@ -118,6 +119,13 @@ const FeeDesk = () => {
   const refreshPendingCount = useCallback(async () => {
     const mutations = await offlineDb.getPendingMutations();
     setPendingCount(mutations.length);
+    // Build a set of record IDs that have pending mutations
+    const ids = new Set<string>();
+    for (const m of mutations) {
+      if (m.data?.id) ids.add(m.data.id);
+      if (m.data?.student_id) ids.add(m.data.student_id);
+    }
+    setPendingSyncIds(ids);
   }, []);
 
   const syncPendingMutations = useCallback(async () => {
@@ -1109,7 +1117,7 @@ const FeeDesk = () => {
                     {filteredStudents.length === 0 ? (
                       <tr><td colSpan={role === "admin" ? 9 : 8} className="p-8 text-center text-muted-foreground">No students found. Add students to get started.</td></tr>
                     ) : filteredStudents.map((s) => (
-                      <tr key={s.id} className={`border-b hover:bg-secondary/50 transition-colors ${selectedStudentIds.has(s.id) ? "bg-destructive/5" : ""}`}>
+                      <tr key={s.id} className={`border-b hover:bg-secondary/50 transition-colors ${selectedStudentIds.has(s.id) ? "bg-destructive/5" : ""} ${pendingSyncIds.has(s.id) ? "bg-amber-50 dark:bg-amber-950/20" : ""}`}>
                         {role === "admin" && (
                           <td className="p-3">
                             <input type="checkbox" checked={selectedStudentIds.has(s.id)} onChange={() => toggleStudentSelection(s.id)} className="accent-accent h-4 w-4" />
@@ -1151,7 +1159,7 @@ const FeeDesk = () => {
                         ) : (
                           <>
                             <td className="p-3 font-mono text-xs">{s.admission_number}</td>
-                            <td className="p-3 font-semibold">{s.student_name}</td>
+                            <td className="p-3 font-semibold">{s.student_name}{pendingSyncIds.has(s.id) && <span className="ml-1.5 inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded-full"><RefreshCw className="h-2.5 w-2.5" />Pending</span>}</td>
                             <td className="p-3">{s.standard}</td>
                             <td className="p-3">{s.section}</td>
                             <td className="p-3">{s.parent_name || "—"}</td>
@@ -1314,7 +1322,7 @@ const FeeDesk = () => {
                         {historyPayments.length === 0 ? (
                           <tr><td colSpan={role === "admin" ? 10 : 9} className="p-8 text-center text-muted-foreground">No payments found for the selected period.</td></tr>
                         ) : historyPayments.map((p) => (
-                          <tr key={p.id} className={`border-b hover:bg-secondary/50 transition-colors ${selectedPaymentIds.has(p.id) ? "bg-accent/5" : ""}`}>
+                          <tr key={p.id} className={`border-b hover:bg-secondary/50 transition-colors ${selectedPaymentIds.has(p.id) ? "bg-accent/5" : ""} ${pendingSyncIds.has(p.id) ? "bg-amber-50 dark:bg-amber-950/20" : ""}`}>
                             {role === "admin" && (
                               <td className="p-3">
                                 <input type="checkbox" checked={selectedPaymentIds.has(p.id)} onChange={() => togglePaymentSelection(p.id)} className="accent-accent h-4 w-4" />
@@ -1360,7 +1368,7 @@ const FeeDesk = () => {
                               </>
                             ) : (
                               <>
-                                <td className="p-3 font-mono text-xs">{p.receipt_number}</td>
+                                <td className="p-3 font-mono text-xs">{p.receipt_number}{pendingSyncIds.has(p.id) && <span className="ml-1 inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-600 bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 px-1.5 py-0.5 rounded-full"><RefreshCw className="h-2.5 w-2.5" />Pending</span>}</td>
                                 <td className="p-3 font-semibold">{p.students?.student_name || "—"}</td>
                                 <td className="p-3">{p.students?.standard} {p.students?.section}</td>
                                 <td className="p-3">{p.term}</td>
