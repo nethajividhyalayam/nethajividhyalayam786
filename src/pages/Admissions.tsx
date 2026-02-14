@@ -305,22 +305,14 @@ const Admissions = () => {
                   </div>
 
                   {/* QR Code */}
-                  <div className={`text-center p-8 rounded-xl border-2 border-dashed transition-all ${isQrEnabled ? "border-accent bg-accent/5" : "border-muted bg-muted/30"}`}>
-                    {isQrEnabled ? (
-                      <div className="space-y-4">
-                        <p className="font-semibold text-primary">Scan QR Code to Pay</p>
-                        <div className="inline-block bg-white p-4 rounded-xl shadow-md">
-                          <QRCodeSVG value={upiPaymentString} size={200} />
-                        </div>
-                        <p className="text-sm text-muted-foreground">{feeForm.childName} — Class {feeForm.standard} {feeForm.section}</p>
-                        <p className="text-xs text-muted-foreground">Use any UPI app (GPay, PhonePe, Paytm) to scan and pay</p>
+                  <div className="text-center p-8 rounded-xl border-2 border-dashed border-accent bg-accent/5 transition-all">
+                    <div className="space-y-4">
+                      <p className="font-semibold text-primary">Scan QR Code to Pay</p>
+                      <div className="inline-block bg-white p-4 rounded-xl shadow-md">
+                        <img src="/photos/qr-payment.jpg" alt="UPI QR Code for Fee Payment" className="w-[200px] h-[200px] object-contain" />
                       </div>
-                    ) : (
-                      <div className="space-y-2 py-4">
-                        <CreditCard className="h-12 w-12 text-muted-foreground/50 mx-auto" />
-                        <p className="text-muted-foreground">Fill all fields above to generate QR code</p>
-                      </div>
-                    )}
+                      <p className="text-sm text-muted-foreground">Nethaji Vidhyalayam — CUB UPI Payment</p>
+                    </div>
                   </div>
 
                   {/* After payment section */}
