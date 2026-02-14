@@ -6,21 +6,21 @@ const teamMembers = [
   {
     name: "Mr. J.J. NARESHKUMAR",
     role: "Chairman",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&fit=crop&crop=face",
+    image: "/photos/leadership/chairman.jpg",
     message:
       "Our commitment to providing world-class education remains unwavering. We believe every child deserves the opportunity to learn, grow, and excel.",
   },
   {
     name: "Mrs. V. JANANI",
     role: "Principal",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop&crop=face",
+    image: "/photos/leadership/principal.jpg",
     message:
       "Education is the most powerful weapon which you can use to change the world. At Nethaji, we don't just teach; we inspire.",
   },
   {
     name: "Mrs. M. DEVIKALA",
     role: "Vice Principal",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face",
+    image: "/photos/leadership/vice-principal.jpg",
     message:
       "We are committed to ensuring smooth administration and upholding the values of our institution with dedication and integrity.",
   },
