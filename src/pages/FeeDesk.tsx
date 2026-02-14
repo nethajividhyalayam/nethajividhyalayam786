@@ -10,7 +10,7 @@ import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 import {
   LogOut, Users, CreditCard, FileText, PlusCircle, Search,
   Printer, DollarSign, BarChart3, BookOpen, Loader2, X, Upload, Trash2, Download, Calendar, Pencil, Check,
-  Wifi, WifiOff, RefreshCw
+  Wifi, WifiOff, RefreshCw, Clock, CheckCircle, XCircle
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { offlineDb } from "@/lib/offlineDb";
@@ -114,6 +114,12 @@ const FeeDesk = () => {
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ admission_number: "", student_name: "", standard: "", section: "", parent_phone: "" });
   const [editLoading, setEditLoading] = useState(false);
+
+  // Pending approvals
+  const [pendingApprovals, setPendingApprovals] = useState<any[]>([]);
+  const [pendingApprovalsLoading, setPendingApprovalsLoading] = useState(false);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
 
   // ===== OFFLINE SYNC LOGIC =====
   const refreshPendingCount = useCallback(async () => {
@@ -379,6 +385,61 @@ const FeeDesk = () => {
   useEffect(() => {
     if (user && role) fetchPayments();
   }, [user, role]);
+
+  // Fetch pending approvals
+  const fetchPendingApprovals = async () => {
+    if (!navigator.onLine) return;
+    setPendingApprovalsLoading(true);
+    const { data, error } = await supabase.from("pending_fee_payments" as any).select("*").eq("status", "pending").order("created_at", { ascending: false });
+    if (!error && data) setPendingApprovals(data as any[]);
+    setPendingApprovalsLoading(false);
+  };
+
+  useEffect(() => {
+    if (user && role) fetchPendingApprovals();
+  }, [user, role]);
+
+  const handleApprovePayment = async (pending: any) => {
+    setApprovingId(pending.id);
+    try {
+      const { data: studentData } = await supabase.from("students").select("id").ilike("student_name", pending.student_name).eq("standard", pending.standard).eq("section", pending.section).eq("status", "active").limit(1);
+      if (!studentData || studentData.length === 0) {
+        toast({ title: "Student Not Found", description: `No active student "${pending.student_name}" in Class ${pending.standard} ${pending.section}.`, variant: "destructive" });
+        setApprovingId(null);
+        return;
+      }
+      const { error: payError } = await supabase.from("fee_payments").insert([{
+        student_id: studentData[0].id,
+        amount: parseFloat(pending.amount) || 0,
+        payment_method: pending.payment_method || "UPI",
+        reference_id: pending.reference_id,
+        term: null,
+        notes: "Approved from online payment submission",
+        recorded_by: user?.id,
+      }]);
+      if (payError) throw payError;
+      await supabase.from("pending_fee_payments" as any).update({ status: "approved", reviewed_by: user?.id, reviewed_at: new Date().toISOString() } as any).eq("id", pending.id);
+      toast({ title: "✅ Payment Approved", description: `Payment by ${pending.student_name} added to payment history.` });
+      fetchPendingApprovals();
+      fetchPayments();
+    } catch (err: any) {
+      console.error(err);
+      toast({ title: "Approval Failed", description: err.message || "Please try again.", variant: "destructive" });
+    }
+    setApprovingId(null);
+  };
+
+  const handleRejectPayment = async (pending: any) => {
+    setRejectingId(pending.id);
+    try {
+      await supabase.from("pending_fee_payments" as any).update({ status: "rejected", reviewed_by: user?.id, reviewed_at: new Date().toISOString() } as any).eq("id", pending.id);
+      toast({ title: "❌ Payment Rejected", description: `Payment by ${pending.student_name} has been rejected.` });
+      fetchPendingApprovals();
+    } catch (err: any) {
+      toast({ title: "Error", description: "Failed to reject. Try again.", variant: "destructive" });
+    }
+    setRejectingId(null);
+  };
 
   const filteredStudents = students.filter((s) => {
     const matchStd = selectedStandard === "All" || s.standard === selectedStandard;
@@ -1041,6 +1102,12 @@ const FeeDesk = () => {
             <TabsTrigger value="students" className="gap-2"><Users className="h-4 w-4" /> Students</TabsTrigger>
             <TabsTrigger value="collect-fee" className="gap-2"><CreditCard className="h-4 w-4" /> Collect Fee</TabsTrigger>
             <TabsTrigger value="payments" className="gap-2"><FileText className="h-4 w-4" /> Payments</TabsTrigger>
+            <TabsTrigger value="pending-approvals" className="gap-2 relative">
+              <Clock className="h-4 w-4" /> Approvals
+              {pendingApprovals.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full h-5 w-5 flex items-center justify-center">{pendingApprovals.length}</span>
+              )}
+            </TabsTrigger>
             {role === "admin" && <TabsTrigger value="reports" className="gap-2"><BarChart3 className="h-4 w-4" /> Reports</TabsTrigger>}
           </TabsList>
 
@@ -1475,6 +1542,65 @@ const FeeDesk = () => {
                   </div>
                 );
               })()}
+            </div>
+          </TabsContent>
+
+          {/* Pending Approvals Tab */}
+          <TabsContent value="pending-approvals">
+            <div className="bg-background rounded-2xl shadow-lg p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="font-serif text-2xl font-bold text-primary">Pending Payment Approvals</h2>
+                <Button variant="outline" size="sm" onClick={fetchPendingApprovals} disabled={pendingApprovalsLoading}>
+                  <RefreshCw className={`h-4 w-4 mr-1 ${pendingApprovalsLoading ? "animate-spin" : ""}`} /> Refresh
+                </Button>
+              </div>
+              {pendingApprovalsLoading ? (
+                <div className="text-center py-12"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" /></div>
+              ) : pendingApprovals.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <CheckCircle className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                  <p className="text-lg font-medium">No pending approvals</p>
+                  <p className="text-sm">All online payment submissions have been reviewed.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b bg-secondary/50">
+                        <th className="p-3 text-left">Student</th>
+                        <th className="p-3 text-left">Class</th>
+                        <th className="p-3 text-left">Amount</th>
+                        <th className="p-3 text-left">Method</th>
+                        <th className="p-3 text-left">Reference ID</th>
+                        <th className="p-3 text-left">Submitted</th>
+                        <th className="p-3 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pendingApprovals.map((p: any) => (
+                        <tr key={p.id} className="border-b hover:bg-secondary/30 transition-colors">
+                          <td className="p-3 font-semibold">{p.student_name}</td>
+                          <td className="p-3">{p.standard} {p.section}</td>
+                          <td className="p-3 font-semibold text-accent">{p.amount ? `₹${p.amount}` : "—"}</td>
+                          <td className="p-3">{p.payment_method}</td>
+                          <td className="p-3 font-mono text-xs">{p.reference_id}</td>
+                          <td className="p-3 text-xs text-muted-foreground">{new Date(p.created_at).toLocaleString("en-IN")}</td>
+                          <td className="p-3 text-center">
+                            <div className="flex gap-2 justify-center">
+                              <Button size="sm" onClick={() => handleApprovePayment(p)} disabled={approvingId === p.id || rejectingId === p.id} className="bg-accent hover:bg-accent/90 text-accent-foreground gap-1">
+                                {approvingId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle className="h-3 w-3" />} Approve
+                              </Button>
+                              <Button size="sm" variant="destructive" onClick={() => handleRejectPayment(p)} disabled={approvingId === p.id || rejectingId === p.id} className="gap-1">
+                                {rejectingId === p.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <XCircle className="h-3 w-3" />} Reject
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </TabsContent>
 

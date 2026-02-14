@@ -203,6 +203,54 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_fee_payments: {
+        Row: {
+          amount: string | null
+          created_at: string
+          id: string
+          parent_email: string | null
+          payment_method: string
+          reference_id: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          section: string
+          standard: string
+          status: string
+          student_name: string
+        }
+        Insert: {
+          amount?: string | null
+          created_at?: string
+          id?: string
+          parent_email?: string | null
+          payment_method?: string
+          reference_id: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          section?: string
+          standard: string
+          status?: string
+          student_name: string
+        }
+        Update: {
+          amount?: string | null
+          created_at?: string
+          id?: string
+          parent_email?: string | null
+          payment_method?: string
+          reference_id?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          section?: string
+          standard?: string
+          status?: string
+          student_name?: string
+        }
+        Relationships: []
+      }
       school_expenses: {
         Row: {
           amount: number

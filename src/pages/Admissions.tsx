@@ -189,6 +189,18 @@ const Admissions = () => {
           { label: "Amount Paid", value: feeForm.amount ? `₹${feeForm.amount}` : "N/A" },
         ],
       };
+      // Save to pending_fee_payments for FeeDesk approval
+      const { error: pendingError } = await supabase.from("pending_fee_payments" as any).insert([{
+        student_name: feeForm.childName.trim(),
+        standard: feeForm.standard,
+        section: feeForm.section,
+        amount: feeForm.amount || null,
+        payment_method: feeForm.paymentMethod,
+        reference_id: feeForm.referenceId.trim(),
+        parent_email: null,
+        status: "pending",
+      }]);
+      if (pendingError) console.error("Failed to save pending payment:", pendingError);
       // EmailJS to school
       sendEmail({
         from_name: feeForm.childName,
@@ -211,7 +223,7 @@ const Admissions = () => {
         },
       }).catch(console.error);
       setFeeSubmitted(true);
-      toast({ title: "Receipt Generated!", description: "Payment receipt sent to school." });
+      toast({ title: "Receipt Generated!", description: "Payment receipt sent to school for approval." });
     } catch (err: any) {
       console.error(err);
       toast({ title: "Failed", description: "Please try again.", variant: "destructive" });
