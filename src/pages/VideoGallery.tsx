@@ -51,8 +51,9 @@ const VideoGallery = () => {
     setShowPlayer(true);
   };
 
-  const getYouTubeThumbnail = (url: string) => {
-    const match = url.match(/embed\/([^?]+)/);
+  const getThumbnail = (video: SchoolVideo) => {
+    if (video.thumbnail) return video.thumbnail;
+    const match = video.url.match(/embed\/([^?]+)/);
     return match ? `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg` : "/placeholder.svg";
   };
 
@@ -92,7 +93,7 @@ const VideoGallery = () => {
             >
               <div className="aspect-video relative">
                 <img
-                  src={isYouTube(video.url) ? getYouTubeThumbnail(video.url) : "/placeholder.svg"}
+                  src={getThumbnail(video)}
                   alt={video.title}
                   className="w-full h-full object-cover"
                   loading="lazy"
