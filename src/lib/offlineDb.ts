@@ -1,6 +1,6 @@
 // IndexedDB-based offline storage for FeeDesk
 const DB_NAME = "feedesk_offline";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 interface PendingMutation {
   id: string;
@@ -17,6 +17,9 @@ function openDB(): Promise<IDBDatabase> {
       const db = req.result;
       if (!db.objectStoreNames.contains("students")) db.createObjectStore("students", { keyPath: "id" });
       if (!db.objectStoreNames.contains("payments")) db.createObjectStore("payments", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("fee_structure")) db.createObjectStore("fee_structure", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("cash_register")) db.createObjectStore("cash_register", { keyPath: "id" });
+      if (!db.objectStoreNames.contains("school_expenses")) db.createObjectStore("school_expenses", { keyPath: "id" });
       if (!db.objectStoreNames.contains("pending_mutations")) db.createObjectStore("pending_mutations", { keyPath: "id" });
       if (!db.objectStoreNames.contains("meta")) db.createObjectStore("meta", { keyPath: "key" });
     };
@@ -95,10 +98,16 @@ export const offlineDb = {
   // Cache data locally
   cacheStudents: (students: any[]) => putAll("students", students),
   cachePayments: (payments: any[]) => putAll("payments", payments),
+  cacheFeeStructure: (items: any[]) => putAll("fee_structure", items),
+  cacheCashRegister: (items: any[]) => putAll("cash_register", items),
+  cacheSchoolExpenses: (items: any[]) => putAll("school_expenses", items),
 
   // Get cached data
   getCachedStudents: () => getAll<any>("students"),
   getCachedPayments: () => getAll<any>("payments"),
+  getCachedFeeStructure: () => getAll<any>("fee_structure"),
+  getCachedCashRegister: () => getAll<any>("cash_register"),
+  getCachedSchoolExpenses: () => getAll<any>("school_expenses"),
 
   // Pending mutations queue
   addPendingMutation: async (mutation: Omit<PendingMutation, "id" | "timestamp">) => {
