@@ -60,6 +60,7 @@ const FeeDesk = () => {
   const [students, setStudents] = useState<any[]>([]);
   const [selectedStandard, setSelectedStandard] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const [feeTermFilter, setFeeTermFilter] = useState("Total");
 
   // Fee payment
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
@@ -859,17 +860,24 @@ const FeeDesk = () => {
                       <th className="p-3 font-semibold">Section</th>
                       <th className="p-3 font-semibold">Parent</th>
                       <th className="p-3 font-semibold">Phone</th>
-                      <th className="p-3 font-semibold text-center">Term 1</th>
-                      <th className="p-3 font-semibold text-center">Term 2</th>
-                      <th className="p-3 font-semibold text-center">Term 3</th>
-                      <th className="p-3 font-semibold text-center">Annual</th>
-                      <th className="p-3 font-semibold text-center">Total</th>
+                      <th className="p-3 font-semibold text-center">
+                        <Select value={feeTermFilter} onValueChange={setFeeTermFilter}>
+                          <SelectTrigger className="h-7 text-xs w-24 mx-auto font-semibold"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Total">Total</SelectItem>
+                            <SelectItem value="Term 1">Term 1</SelectItem>
+                            <SelectItem value="Term 2">Term 2</SelectItem>
+                            <SelectItem value="Term 3">Term 3</SelectItem>
+                            <SelectItem value="Annual">Annual</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </th>
                       <th className="p-3 font-semibold">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredStudents.length === 0 ? (
-                      <tr><td colSpan={role === "admin" ? 13 : 12} className="p-8 text-center text-muted-foreground">No students found. Add students to get started.</td></tr>
+                      <tr><td colSpan={role === "admin" ? 9 : 8} className="p-8 text-center text-muted-foreground">No students found. Add students to get started.</td></tr>
                     ) : filteredStudents.map((s) => (
                       <tr key={s.id} className={`border-b hover:bg-secondary/50 transition-colors ${selectedStudentIds.has(s.id) ? "bg-destructive/5" : ""}`}>
                         {role === "admin" && (
@@ -895,11 +903,12 @@ const FeeDesk = () => {
                             </td>
                             <td className="p-3">{s.parent_name || "—"}</td>
                             <td className="p-2"><Input className="h-8 text-xs w-28" value={editForm.parent_phone} onChange={(e) => setEditForm({ ...editForm, parent_phone: e.target.value })} /></td>
-                            <td className="p-3 text-center text-xs font-semibold text-accent">₹{getTermFee(s.id, "Term 1").toLocaleString("en-IN")}</td>
-                            <td className="p-3 text-center text-xs font-semibold text-accent">₹{getTermFee(s.id, "Term 2").toLocaleString("en-IN")}</td>
-                            <td className="p-3 text-center text-xs font-semibold text-accent">₹{getTermFee(s.id, "Term 3").toLocaleString("en-IN")}</td>
-                            <td className="p-3 text-center text-xs font-semibold text-accent">₹{getTermFee(s.id, "Annual").toLocaleString("en-IN")}</td>
-                            <td className="p-3 text-center font-semibold text-accent">₹{payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</td>
+                            <td className="p-3 text-center text-xs font-semibold text-accent">
+                              ₹{(feeTermFilter === "Total"
+                                ? payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0)
+                                : getTermFee(s.id, feeTermFilter)
+                              ).toLocaleString("en-IN")}
+                            </td>
                             <td className="p-3 flex gap-1">
                               <Button size="sm" className="gap-1 text-xs bg-accent hover:bg-accent/90 text-accent-foreground" onClick={handleSaveEditStudent} disabled={editLoading}>
                                 {editLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />} Save
@@ -917,11 +926,12 @@ const FeeDesk = () => {
                             <td className="p-3">{s.section}</td>
                             <td className="p-3">{s.parent_name || "—"}</td>
                             <td className="p-3">{s.parent_phone || "—"}</td>
-                            <td className="p-3 text-center text-xs font-semibold text-accent">₹{getTermFee(s.id, "Term 1").toLocaleString("en-IN")}</td>
-                            <td className="p-3 text-center text-xs font-semibold text-accent">₹{getTermFee(s.id, "Term 2").toLocaleString("en-IN")}</td>
-                            <td className="p-3 text-center text-xs font-semibold text-accent">₹{getTermFee(s.id, "Term 3").toLocaleString("en-IN")}</td>
-                            <td className="p-3 text-center text-xs font-semibold text-accent">₹{getTermFee(s.id, "Annual").toLocaleString("en-IN")}</td>
-                            <td className="p-3 text-center font-semibold text-accent">₹{payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0).toLocaleString("en-IN")}</td>
+                            <td className="p-3 text-center text-xs font-semibold text-accent">
+                              ₹{(feeTermFilter === "Total"
+                                ? payments.filter(p => p.student_id === s.id).reduce((sum, p) => sum + Number(p.amount), 0)
+                                : getTermFee(s.id, feeTermFilter)
+                              ).toLocaleString("en-IN")}
+                            </td>
                             <td className="p-3 flex gap-1">
                               {role === "admin" && (
                                 <Button size="sm" variant="outline" className="gap-1 text-xs" onClick={() => startEditStudent(s)}>
