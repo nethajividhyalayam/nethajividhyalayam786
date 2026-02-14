@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 import {
   LogOut, Users, CreditCard, FileText, PlusCircle, Search,
-  Printer, DollarSign, BarChart3, BookOpen, Loader2, X, Upload, Trash2, Download, Calendar, Pencil, Check
+  Printer, DollarSign, BarChart3, BookOpen, Loader2, X, Upload, Trash2, Download, Calendar, Pencil, Check,
+  Wifi, WifiOff, RefreshCw
 } from "lucide-react";
 import * as XLSX from "xlsx";
+import { offlineDb } from "@/lib/offlineDb";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 const ALLOWED_EMAILS = ["nethajividhyalayam@gmail.com", "nareshkumar.jayachandran@gmail.com", "info@nethajividhyalayam.org", "staff@nethajividhyalayam.org"];
 const standards = ["Pre-KG", "LKG", "UKG", "I", "II", "III", "IV", "V"];
@@ -43,6 +46,11 @@ const matchColumn = (header: string): string | null => {
 };
 
 const FeeDesk = () => {
+  const isOnline = useOnlineStatus();
+  const [syncing, setSyncing] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
+  const syncInProgress = useRef(false);
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,6 +113,90 @@ const FeeDesk = () => {
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ admission_number: "", student_name: "", standard: "", section: "", parent_phone: "" });
   const [editLoading, setEditLoading] = useState(false);
+
+  // ===== OFFLINE SYNC LOGIC =====
+  const refreshPendingCount = useCallback(async () => {
+    const mutations = await offlineDb.getPendingMutations();
+    setPendingCount(mutations.length);
+  }, []);
+
+  const syncPendingMutations = useCallback(async () => {
+    if (syncInProgress.current || !navigator.onLine) return;
+    syncInProgress.current = true;
+    setSyncing(true);
+    const mutations = await offlineDb.getPendingMutations();
+    if (mutations.length === 0) {
+      setSyncing(false);
+      syncInProgress.current = false;
+      return;
+    }
+
+    let synced = 0;
+    let failed = 0;
+    const sorted = mutations.sort((a, b) => a.timestamp - b.timestamp);
+
+    for (const mut of sorted) {
+      try {
+        let error: any = null;
+        if (mut.type === "insert") {
+          const res = await supabase.from(mut.table as any).insert([mut.data] as any);
+          error = res.error;
+        } else if (mut.type === "update") {
+          const { id, ...rest } = mut.data;
+          const res = await supabase.from(mut.table as any).update(rest as any).eq("id", id);
+          error = res.error;
+        } else if (mut.type === "delete") {
+          if (mut.table === "students") {
+            const res = await supabase.from("students").update({ status: "inactive" } as any).eq("id", mut.data.id);
+            error = res.error;
+          } else {
+            const res = await supabase.from(mut.table as any).delete().eq("id", mut.data.id);
+            error = res.error;
+          }
+        }
+        if (!error) {
+          await offlineDb.removePendingMutation(mut.id);
+          synced++;
+        } else {
+          console.error("Sync error for mutation:", mut.id, error);
+          failed++;
+        }
+      } catch (err) {
+        console.error("Sync exception:", err);
+        failed++;
+      }
+    }
+
+    await offlineDb.setLastSync(Date.now());
+    setLastSyncTime(Date.now());
+    await refreshPendingCount();
+    setSyncing(false);
+    syncInProgress.current = false;
+
+    toast({
+      title: "🔄 Sync Complete",
+      description: `${synced} change(s) synced to cloud.${failed > 0 ? ` ${failed} failed — will retry.` : ""}`,
+    });
+
+    // Refresh data from server after sync
+    if (synced > 0) {
+      fetchStudents();
+      fetchPayments();
+    }
+  }, []);
+
+  // Auto-sync when coming back online
+  useEffect(() => {
+    if (isOnline) {
+      syncPendingMutations();
+    }
+  }, [isOnline, syncPendingMutations]);
+
+  // Load last sync time and pending count on mount
+  useEffect(() => {
+    offlineDb.getLastSync().then(setLastSyncTime);
+    refreshPendingCount();
+  }, [refreshPendingCount]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -203,13 +295,29 @@ const FeeDesk = () => {
   }, [user, role]);
 
   const fetchStudents = async () => {
-    const { data, error } = await supabase.from("students").select("*").eq("status", "active").order("standard").order("student_name");
-    if (!error && data) setStudents(data);
+    if (navigator.onLine) {
+      const { data, error } = await supabase.from("students").select("*").eq("status", "active").order("standard").order("student_name");
+      if (!error && data) {
+        setStudents(data);
+        offlineDb.cacheStudents(data);
+      }
+    } else {
+      const cached = await offlineDb.getCachedStudents();
+      if (cached.length > 0) setStudents(cached.filter((s: any) => s.status === "active"));
+    }
   };
 
   const fetchPayments = async () => {
-    const { data, error } = await supabase.from("fee_payments").select("*, students(student_name, standard, section)").order("created_at", { ascending: false }).limit(1000);
-    if (!error && data) setPayments(data);
+    if (navigator.onLine) {
+      const { data, error } = await supabase.from("fee_payments").select("*, students(student_name, standard, section)").order("created_at", { ascending: false }).limit(1000);
+      if (!error && data) {
+        setPayments(data);
+        offlineDb.cachePayments(data);
+      }
+    } else {
+      const cached = await offlineDb.getCachedPayments();
+      if (cached.length > 0) setPayments(cached);
+    }
   };
 
   useEffect(() => {
@@ -527,7 +635,8 @@ const FeeDesk = () => {
       return;
     }
     setPaymentLoading(true);
-    const { data, error } = await supabase.from("fee_payments").insert([{
+
+    const paymentData = {
       student_id: selectedStudent.id,
       amount: parseFloat(paymentForm.amount),
       term: paymentForm.term,
@@ -535,37 +644,61 @@ const FeeDesk = () => {
       reference_id: paymentForm.reference_id || null,
       notes: paymentForm.notes || null,
       recorded_by: user.id,
-    }]).select().single();
+    };
 
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Payment Recorded!", description: `Receipt: ${data.receipt_number}` });
-      openPrintableTemplate({
-        title: "Fee Payment Receipt",
-        subtitle: `${selectedStudent.student_name} — Class ${selectedStudent.standard} ${selectedStudent.section}`,
-        fieldGroups: [
-          { heading: "Student Details", fields: [
-            { label: "Name", value: selectedStudent.student_name },
-            { label: "Admission No", value: selectedStudent.admission_number },
-            { label: "Standard", value: selectedStudent.standard },
-            { label: "Section", value: selectedStudent.section },
-          ]},
-          { heading: "Payment Details", fields: [
-            { label: "Receipt No", value: data.receipt_number },
-            { label: "Term", value: paymentForm.term },
-            { label: "Amount", value: `₹${paymentForm.amount}` },
-            { label: "Method", value: paymentForm.payment_method },
-            { label: "Reference ID", value: paymentForm.reference_id || "N/A" },
-            { label: "Collected At", value: data?.created_at ? new Date(data.created_at).toLocaleString("en-IN") : new Date().toLocaleString("en-IN") },
-          ]},
-        ],
-        receiptMode: true,
-        receiptDetails: { referenceId: data.receipt_number, paymentMethod: paymentForm.payment_method, amount: paymentForm.amount },
-      });
+    if (!navigator.onLine) {
+      // Queue for later sync
+      const offlineId = `offline_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const offlinePayment = {
+        ...paymentData,
+        id: offlineId,
+        receipt_number: `OFFLINE-${Date.now()}`,
+        created_at: new Date().toISOString(),
+        payment_date: new Date().toISOString().slice(0, 10),
+        students: { student_name: selectedStudent.student_name, standard: selectedStudent.standard, section: selectedStudent.section },
+      };
+      await offlineDb.addPendingMutation({ table: "fee_payments", type: "insert", data: paymentData });
+      // Add to local state for immediate display
+      setPayments((prev) => [offlinePayment, ...prev]);
+      await refreshPendingCount();
+      toast({ title: "💾 Saved Offline", description: "Payment saved locally. Will sync when internet is available." });
       setPaymentForm({ amount: "", term: "", payment_method: "Cash", reference_id: "", notes: "" });
       setSelectedStudent(null);
-      fetchPayments();
+    } else {
+      const { data, error } = await supabase.from("fee_payments").insert([paymentData]).select().single();
+      if (error) {
+        // If online but failed, queue offline
+        await offlineDb.addPendingMutation({ table: "fee_payments", type: "insert", data: paymentData });
+        await refreshPendingCount();
+        toast({ title: "⚠️ Saved Offline", description: "Server error. Payment saved locally for sync." });
+      } else {
+        toast({ title: "Payment Recorded!", description: `Receipt: ${data.receipt_number}` });
+        openPrintableTemplate({
+          title: "Fee Payment Receipt",
+          subtitle: `${selectedStudent.student_name} — Class ${selectedStudent.standard} ${selectedStudent.section}`,
+          fieldGroups: [
+            { heading: "Student Details", fields: [
+              { label: "Name", value: selectedStudent.student_name },
+              { label: "Admission No", value: selectedStudent.admission_number },
+              { label: "Standard", value: selectedStudent.standard },
+              { label: "Section", value: selectedStudent.section },
+            ]},
+            { heading: "Payment Details", fields: [
+              { label: "Receipt No", value: data.receipt_number },
+              { label: "Term", value: paymentForm.term },
+              { label: "Amount", value: `₹${paymentForm.amount}` },
+              { label: "Method", value: paymentForm.payment_method },
+              { label: "Reference ID", value: paymentForm.reference_id || "N/A" },
+              { label: "Collected At", value: data?.created_at ? new Date(data.created_at).toLocaleString("en-IN") : new Date().toLocaleString("en-IN") },
+            ]},
+          ],
+          receiptMode: true,
+          receiptDetails: { referenceId: data.receipt_number, paymentMethod: paymentForm.payment_method, amount: paymentForm.amount },
+        });
+        fetchPayments();
+      }
+      setPaymentForm({ amount: "", term: "", payment_method: "Cash", reference_id: "", notes: "" });
+      setSelectedStudent(null);
     }
     setPaymentLoading(false);
   };
@@ -746,6 +879,33 @@ const FeeDesk = () => {
           <Button onClick={handleLogout} variant="ghost" size="sm" className="text-primary-foreground hover:text-accent">
             <LogOut className="h-4 w-4 mr-2" /> Logout
           </Button>
+        </div>
+      </div>
+
+      {/* Offline Status Bar */}
+      <div className={`px-4 py-2 flex items-center justify-between text-sm transition-all ${!isOnline ? "bg-destructive/10 text-destructive" : pendingCount > 0 ? "bg-accent/10 text-accent-foreground" : "bg-accent/5 text-muted-foreground"}`}>
+        <div className="flex items-center gap-2">
+          {isOnline ? <Wifi className="h-4 w-4 text-accent" /> : <WifiOff className="h-4 w-4" />}
+          <span className="font-medium">
+            {!isOnline ? "Offline — Changes saved locally" : syncing ? "Syncing..." : "Online"}
+          </span>
+          {pendingCount > 0 && (
+            <span className="bg-destructive/20 text-destructive px-2 py-0.5 rounded-full text-xs font-bold">
+              {pendingCount} pending
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          {lastSyncTime && (
+            <span className="text-xs text-muted-foreground">
+              Last sync: {new Date(lastSyncTime).toLocaleString("en-IN")}
+            </span>
+          )}
+          {isOnline && pendingCount > 0 && (
+            <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={syncPendingMutations} disabled={syncing}>
+              <RefreshCw className={`h-3 w-3 ${syncing ? "animate-spin" : ""}`} /> Sync Now
+            </Button>
+          )}
         </div>
       </div>
 
