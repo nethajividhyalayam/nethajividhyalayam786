@@ -336,11 +336,12 @@ const FeeDesk = () => {
   };
 
   const handleLogout = async () => {
-    // Keep cached auth session so offline login works forever
+    // Clear cached session so login page shows and user can switch accounts
+    await offlineDb.clearAuthSession();
     setUser(null);
     setRole(null);
     if (navigator.onLine) {
-      supabase.auth.signOut();
+      await supabase.auth.signOut();
     }
   };
 
