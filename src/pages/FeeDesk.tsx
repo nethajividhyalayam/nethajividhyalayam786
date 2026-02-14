@@ -209,11 +209,21 @@ const FeeDesk = () => {
   useEffect(() => {
     const checkAuth = async () => {
       setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        setRoleLoading(true);
-        fetchRole(session.user.id).finally(() => setRoleLoading(false));
+      if (navigator.onLine) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setUser(session.user);
+          setRoleLoading(true);
+          await fetchRole(session.user.id);
+          setRoleLoading(false);
+        }
+      } else {
+        // Offline: restore cached session
+        const cached = await offlineDb.getCachedAuthSession();
+        if (cached) {
+          setUser(cached.user);
+          setRole(cached.role);
+        }
       }
       setLoading(false);
     };
@@ -235,7 +245,20 @@ const FeeDesk = () => {
 
   const fetchRole = async (userId: string) => {
     const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).maybeSingle();
-    setRole(data?.role || null);
+    const fetchedRole = data?.role || null;
+    setRole(fetchedRole);
+    // Cache auth session for offline use
+    if (fetchedRole) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        await offlineDb.cacheAuthSession({
+          user: session.user,
+          role: fetchedRole,
+          email: session.user.email || "",
+          passwordHash: "", // We don't store passwords; offline login uses cached session
+        });
+      }
+    }
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -264,6 +287,23 @@ const FeeDesk = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginLoading(true);
+
+    // Offline login: check cached session
+    if (!navigator.onLine) {
+      const cached = await offlineDb.getCachedAuthSession();
+      if (cached && cached.email.toLowerCase() === email.trim().toLowerCase()) {
+        setUser(cached.user);
+        setRole(cached.role);
+        toast({ title: "📱 Offline Login", description: "Logged in using cached session." });
+        setLoginLoading(false);
+        return;
+      } else {
+        toast({ title: "Offline Login Failed", description: "No cached session found for this email. Please connect to the internet for your first login.", variant: "destructive" });
+        setLoginLoading(false);
+        return;
+      }
+    }
+
     if (isSignUp) {
       if (!isAllowedEmail) {
         toast({ title: "Access Restricted", description: "This email is not authorized for FeeDesk. Contact the administrator.", variant: "destructive" });
@@ -276,7 +316,6 @@ const FeeDesk = () => {
       } else {
         toast({ title: "Account Created!", description: "Please check your email to verify your account, then sign in." });
         setIsSignUp(false);
-        // Notify admins about new signup
         try {
           await supabase.functions.invoke("notify-admin-signup", { body: { email } });
         } catch (e) {
@@ -293,6 +332,7 @@ const FeeDesk = () => {
   };
 
   const handleLogout = async () => {
+    await offlineDb.clearAuthSession();
     window.location.href = "/";
     supabase.auth.signOut();
   };
