@@ -209,20 +209,24 @@ const FeeDesk = () => {
   useEffect(() => {
     const checkAuth = async () => {
       setLoading(true);
+      // Always try cached session first for instant offline access
+      const cached = await offlineDb.getCachedAuthSession();
+      if (cached) {
+        setUser(cached.user);
+        setRole(cached.role);
+      }
+      // If online, also try to refresh from server
       if (navigator.onLine) {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setUser(session.user);
-          setRoleLoading(true);
-          await fetchRole(session.user.id);
-          setRoleLoading(false);
-        }
-      } else {
-        // Offline: restore cached session
-        const cached = await offlineDb.getCachedAuthSession();
-        if (cached) {
-          setUser(cached.user);
-          setRole(cached.role);
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            setUser(session.user);
+            setRoleLoading(true);
+            await fetchRole(session.user.id);
+            setRoleLoading(false);
+          }
+        } catch (e) {
+          console.log("Online auth check failed, using cached session");
         }
       }
       setLoading(false);
@@ -332,9 +336,12 @@ const FeeDesk = () => {
   };
 
   const handleLogout = async () => {
-    await offlineDb.clearAuthSession();
-    window.location.href = "/";
-    supabase.auth.signOut();
+    // Keep cached auth session so offline login works forever
+    setUser(null);
+    setRole(null);
+    if (navigator.onLine) {
+      supabase.auth.signOut();
+    }
   };
 
   // Fetch students
