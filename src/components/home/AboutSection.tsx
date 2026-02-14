@@ -19,14 +19,14 @@ const AboutSection = () => {
               <div className="space-y-4">
                 <div className="relative overflow-hidden rounded-2xl shadow-lg">
                   <img
-                    src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=400&h=300&fit=crop"
+                    src="/photos/academics/classroom-learning.jpg"
                     alt="Students in classroom"
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="relative overflow-hidden rounded-2xl shadow-lg">
                   <img
-                    src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=400&fit=crop"
+                    src="/photos/activities/school-activities.jpg"
                     alt="School activities"
                     className="w-full h-56 object-cover hover:scale-105 transition-transform duration-500"
                   />
@@ -35,14 +35,14 @@ const AboutSection = () => {
               <div className="pt-8 space-y-4">
                 <div className="relative overflow-hidden rounded-2xl shadow-lg">
                   <img
-                    src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=400&h=400&fit=crop"
+                    src="/photos/facilities/library.jpg"
                     alt="Library"
                     className="w-full h-56 object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="relative overflow-hidden rounded-2xl shadow-lg">
                   <img
-                    src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=400&h=300&fit=crop"
+                    src="/photos/sports/sports-activities.jpg"
                     alt="Sports activities"
                     className="w-full h-48 object-cover hover:scale-105 transition-transform duration-500"
                   />

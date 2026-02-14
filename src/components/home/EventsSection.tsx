@@ -9,7 +9,7 @@ const events = [
     title: "Annual Sports Day 2024",
     date: "March 15, 2024",
     description: "A day filled with athletic competitions, team sports, and fun activities for all students.",
-    image: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop",
+    image: "/photos/annual-sports-day/sports-day.jpg",
     category: "Sports",
   },
   {
@@ -17,7 +17,7 @@ const events = [
     title: "Science Exhibition",
     date: "February 28, 2024",
     description: "Students showcase their innovative science projects and experiments to judges and parents.",
-    image: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&h=400&fit=crop",
+    image: "/photos/science-exhibition/science-expo.jpg",
     category: "Academic",
   },
   {
@@ -25,7 +25,7 @@ const events = [
     title: "Cultural Festival",
     date: "January 20, 2024",
     description: "Celebrating the rich cultural heritage through dance, music, and art performances.",
-    image: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=600&h=400&fit=crop",
+    image: "/photos/cultural-festival/cultural-event.jpg",
     category: "Cultural",
   },
   {
@@ -33,7 +33,7 @@ const events = [
     title: "Parent-Teacher Meeting",
     date: "April 10, 2024",
     description: "An opportunity for parents to discuss their child's progress with teachers.",
-    image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=600&h=400&fit=crop",
+    image: "/photos/parent-teacher/ptm.jpg",
     category: "Meeting",
   },
   {
@@ -41,7 +41,7 @@ const events = [
     title: "School Annual Picnic",
     date: "November 15, 2024",
     description: "A fun-filled outing for students and teachers to relax, play games, and enjoy nature together.",
-    image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&h=400&fit=crop",
+    image: "/photos/school-picnic/picnic.jpg",
     category: "Recreation",
   },
   {
@@ -49,7 +49,7 @@ const events = [
     title: "Art & Craft Exhibition",
     date: "October 20, 2024",
     description: "Students display their creative artwork, paintings, handicrafts, and sculptures for parents and visitors.",
-    image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop",
+    image: "/photos/art-craft/art-exhibition.jpg",
     category: "Cultural",
   },
   {
@@ -57,7 +57,7 @@ const events = [
     title: "Teachers' Day Celebration",
     date: "September 5, 2024",
     description: "Students honour their beloved teachers with performances, speeches, and heartfelt gratitude.",
-    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600&h=400&fit=crop",
+    image: "/photos/teachers-day/teachers-day.jpg",
     category: "Celebration",
   },
   {
@@ -65,7 +65,7 @@ const events = [
     title: "Yoga & Wellness Day",
     date: "June 21, 2024",
     description: "Promoting physical and mental well-being through yoga sessions, meditation, and wellness workshops.",
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=600&h=400&fit=crop",
+    image: "/photos/yoga-wellness/yoga-day.jpg",
     category: "Wellness",
   },
   {
@@ -73,7 +73,7 @@ const events = [
     title: "Career Guidance Workshop",
     date: "August 10, 2024",
     description: "Expert sessions to guide students on career paths, higher education options, and skill development.",
-    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop",
+    image: "/photos/career-guidance/career-workshop.jpg",
     category: "Workshop",
   },
 ];

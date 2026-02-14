@@ -7,19 +7,19 @@ const facilities = [
     icon: Book,
     title: "Library",
     description: "Well-stocked library with thousands of books and digital resources",
-    image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=300&fit=crop",
+    image: "/photos/facilities/library-books.jpg",
   },
   {
     icon: Dumbbell,
     title: "Sports Complex",
     description: "Modern sports facilities for various indoor and outdoor activities",
-    image: "https://images.unsplash.com/photo-1461896836934- voices?w=400&h=300&fit=crop",
+    image: "/photos/facilities/sports-complex.jpg",
   },
   {
     icon: Bus,
     title: "Transport",
     description: "Safe and comfortable transportation covering major routes",
-    image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&h=300&fit=crop",
+    image: "/photos/facilities/transport.jpg",
   },
 ];
 
