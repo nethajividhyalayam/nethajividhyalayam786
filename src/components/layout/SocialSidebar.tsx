@@ -8,10 +8,38 @@ const XIcon = ({ className }: { className?: string }) => (
 );
 
 const socials = [
-  { icon: Facebook, href: "https://www.facebook.com/nethajividhyalayam", label: "Facebook", bg: "bg-[#1877F2]", activeShadow: "shadow-[0_0_20px_rgba(24,119,242,0.5)]", color: "#1877F2" },
-  { icon: XIcon, href: "https://x.com/nethajividhya", label: "X", bg: "bg-[#000000]", activeShadow: "shadow-[0_0_20px_rgba(0,0,0,0.5)]", color: "#000" },
-  { icon: Youtube, href: "https://www.youtube.com/@nethajividhyalayam", label: "YouTube", bg: "bg-[#FF0000]", activeShadow: "shadow-[0_0_20px_rgba(255,0,0,0.4)]", color: "#FF0000" },
-  { icon: Instagram, href: "https://www.instagram.com/nethajividhyalayam", label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]", activeShadow: "shadow-[0_0_20px_rgba(225,48,108,0.4)]", color: "#e6683c" },
+  {
+    icon: Facebook,
+    href: "https://www.facebook.com/nethajividhyalayam2002",
+    label: "Facebook",
+    bg: "bg-[#1877F2]",
+    activeShadow: "shadow-[0_0_20px_rgba(24,119,242,0.5)]",
+    color: "#1877F2",
+  },
+  {
+    icon: XIcon,
+    href: "https://x.com/nethajividhya",
+    label: "X",
+    bg: "bg-[#000000]",
+    activeShadow: "shadow-[0_0_20px_rgba(0,0,0,0.5)]",
+    color: "#000",
+  },
+  {
+    icon: Youtube,
+    href: "https://www.youtube.com/@nethajividhyalayam",
+    label: "YouTube",
+    bg: "bg-[#FF0000]",
+    activeShadow: "shadow-[0_0_20px_rgba(255,0,0,0.4)]",
+    color: "#FF0000",
+  },
+  {
+    icon: Instagram,
+    href: "https://www.instagram.com/nethajividhyalayam",
+    label: "Instagram",
+    bg: "bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743]",
+    activeShadow: "shadow-[0_0_20px_rgba(225,48,108,0.4)]",
+    color: "#e6683c",
+  },
 ];
 
 const getAcademicYear = () => {
@@ -98,7 +126,12 @@ const SocialSidebar = () => {
 
   const dayName = now.toLocaleDateString("en-US", { weekday: "short" });
   const dateStr = now.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
-  const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+  const timeStr = now.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
 
   return (
     <>
@@ -106,16 +139,27 @@ const SocialSidebar = () => {
       <div ref={dateRef} className="fixed left-0 top-1/3 -translate-y-1/2 z-50 hidden md:flex flex-col">
         <div
           onClick={() => setExpanded(!expanded)}
-          style={dateHover && !expanded ? { transform: `translateX(6px) scale(1.08) rotate(${Math.sin(Date.now() / 200) * 3}deg)`, transition: "transform 0.15s ease-out" } : undefined}
+          style={
+            dateHover && !expanded
+              ? {
+                  transform: `translateX(6px) scale(1.08) rotate(${Math.sin(Date.now() / 200) * 3}deg)`,
+                  transition: "transform 0.15s ease-out",
+                }
+              : undefined
+          }
           className={`bg-primary/90 backdrop-blur-md border border-white/10 rounded-r-2xl px-3 py-4 text-white text-center shadow-2xl cursor-pointer transition-all duration-500 overflow-hidden ${expanded ? "w-44" : "w-14"} ${dateHover && !expanded ? "shadow-[0_0_25px_rgba(var(--primary),0.4)]" : ""}`}
         >
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 w-8 flex flex-col items-center">
               <span className="text-[10px] uppercase tracking-widest text-accent font-bold">{dayName}</span>
               <span className="text-lg font-bold font-serif leading-tight">{now.getDate()}</span>
-              <span className="text-[9px] text-white/60 uppercase">{now.toLocaleDateString("en-US", { month: "short" })}</span>
+              <span className="text-[9px] text-white/60 uppercase">
+                {now.toLocaleDateString("en-US", { month: "short" })}
+              </span>
             </div>
-            <div className={`transition-opacity duration-500 whitespace-nowrap text-left ${expanded ? "opacity-100" : "opacity-0"}`}>
+            <div
+              className={`transition-opacity duration-500 whitespace-nowrap text-left ${expanded ? "opacity-100" : "opacity-0"}`}
+            >
               <div className="text-lg font-bold font-serif tabular-nums">{timeStr}</div>
               <div className="text-[10px] text-white/60">{dateStr}</div>
               <div className="mt-1.5 text-[9px] bg-accent/20 border border-accent/30 rounded-full px-2 py-0.5 text-accent font-semibold">
@@ -145,7 +189,9 @@ const SocialSidebar = () => {
               <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
                 <Icon className={`h-5 w-5 ${mouseY !== null && !isActive ? "animate-pulse" : ""}`} />
               </div>
-              <span className={`whitespace-nowrap text-sm font-semibold transition-opacity duration-300 pr-3 ${isActive ? "opacity-100" : "opacity-0"}`}>
+              <span
+                className={`whitespace-nowrap text-sm font-semibold transition-opacity duration-300 pr-3 ${isActive ? "opacity-100" : "opacity-0"}`}
+              >
                 {label}
               </span>
             </a>
