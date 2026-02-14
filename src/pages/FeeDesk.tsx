@@ -447,12 +447,22 @@ const FeeDesk = () => {
   // ===== FEATURE 2: Delete fee payment (admin only) =====
   const handleDeletePayment = async (paymentId: string) => {
     setDeleteLoading(true);
-    const { error } = await supabase.from("fee_payments").delete().eq("id", paymentId);
-    if (error) {
-      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
+    if (!navigator.onLine) {
+      await offlineDb.addPendingMutation({ table: "fee_payments", type: "delete", data: { id: paymentId } });
+      setPayments((prev) => prev.filter((p) => p.id !== paymentId));
+      await refreshPendingCount();
+      toast({ title: "💾 Saved Offline", description: "Delete queued. Will sync when online." });
     } else {
-      toast({ title: "Payment Deleted", description: "The fee entry has been removed." });
-      fetchPayments();
+      const { error } = await supabase.from("fee_payments").delete().eq("id", paymentId);
+      if (error) {
+        await offlineDb.addPendingMutation({ table: "fee_payments", type: "delete", data: { id: paymentId } });
+        setPayments((prev) => prev.filter((p) => p.id !== paymentId));
+        await refreshPendingCount();
+        toast({ title: "⚠️ Saved Offline", description: "Server error. Delete queued for sync." });
+      } else {
+        toast({ title: "Payment Deleted", description: "The fee entry has been removed." });
+        fetchPayments();
+      }
     }
     setDeletePaymentId(null);
     setDeleteLoading(false);
@@ -475,18 +485,34 @@ const FeeDesk = () => {
       return;
     }
     setEditPaymentLoading(true);
-    const { error } = await supabase.from("fee_payments").update({
+    const updateData = {
+      id: editingPaymentId,
       amount: parseFloat(editPaymentForm.amount),
       term: editPaymentForm.term,
       payment_method: editPaymentForm.payment_method,
       reference_id: editPaymentForm.reference_id || null,
-    }).eq("id", editingPaymentId);
-    if (error) {
-      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Payment Updated!" });
+    };
+
+    if (!navigator.onLine) {
+      await offlineDb.addPendingMutation({ table: "fee_payments", type: "update", data: updateData });
+      setPayments((prev) => prev.map((p) => p.id === editingPaymentId ? { ...p, ...updateData } : p));
+      await refreshPendingCount();
+      toast({ title: "💾 Saved Offline", description: "Edit queued. Will sync when online." });
       setEditingPaymentId(null);
-      fetchPayments();
+    } else {
+      const { id, ...rest } = updateData;
+      const { error } = await supabase.from("fee_payments").update(rest).eq("id", editingPaymentId);
+      if (error) {
+        await offlineDb.addPendingMutation({ table: "fee_payments", type: "update", data: updateData });
+        setPayments((prev) => prev.map((p) => p.id === editingPaymentId ? { ...p, ...updateData } : p));
+        await refreshPendingCount();
+        toast({ title: "⚠️ Saved Offline", description: "Server error. Edit queued for sync." });
+        setEditingPaymentId(null);
+      } else {
+        toast({ title: "Payment Updated!" });
+        setEditingPaymentId(null);
+        fetchPayments();
+      }
     }
     setEditPaymentLoading(false);
   };
@@ -577,13 +603,30 @@ const FeeDesk = () => {
     if (selectedStudentIds.size === 0) return;
     setBulkDeleteLoading(true);
     const ids = Array.from(selectedStudentIds);
-    const { error } = await supabase.from("students").update({ status: "inactive" }).in("id", ids);
-    if (error) {
-      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Students Removed", description: `${ids.length} student(s) removed from active list.` });
+
+    if (!navigator.onLine) {
+      for (const id of ids) {
+        await offlineDb.addPendingMutation({ table: "students", type: "delete", data: { id } });
+      }
+      setStudents((prev) => prev.filter((s) => !ids.includes(s.id)));
+      await refreshPendingCount();
+      toast({ title: "💾 Saved Offline", description: `${ids.length} student delete(s) queued for sync.` });
       setSelectedStudentIds(new Set());
-      fetchStudents();
+    } else {
+      const { error } = await supabase.from("students").update({ status: "inactive" }).in("id", ids);
+      if (error) {
+        for (const id of ids) {
+          await offlineDb.addPendingMutation({ table: "students", type: "delete", data: { id } });
+        }
+        setStudents((prev) => prev.filter((s) => !ids.includes(s.id)));
+        await refreshPendingCount();
+        toast({ title: "⚠️ Saved Offline", description: "Server error. Deletes queued for sync." });
+        setSelectedStudentIds(new Set());
+      } else {
+        toast({ title: "Students Removed", description: `${ids.length} student(s) removed from active list.` });
+        setSelectedStudentIds(new Set());
+        fetchStudents();
+      }
     }
     setBulkDeleteLoading(false);
   };
