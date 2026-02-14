@@ -336,15 +336,27 @@ const FeeDesk = () => {
       toast({ title: "Missing Fields", description: "Fill required fields.", variant: "destructive" });
       return;
     }
-    const { error } = await supabase.from("students").insert([{ ...newStudent, date_of_birth: newStudent.date_of_birth || null, gender: newStudent.gender || null }]);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+    const studentData = { ...newStudent, date_of_birth: newStudent.date_of_birth || null, gender: newStudent.gender || null, status: "active" };
+
+    if (!navigator.onLine) {
+      const offlineId = `offline_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      await offlineDb.addPendingMutation({ table: "students", type: "insert", data: studentData });
+      setStudents((prev) => [...prev, { ...studentData, id: offlineId, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }]);
+      await refreshPendingCount();
+      toast({ title: "💾 Saved Offline", description: "Student saved locally. Will sync when online." });
     } else {
-      toast({ title: "Student Added!" });
-      setShowAddStudent(false);
-      setNewStudent({ admission_number: "", student_name: "", standard: "", section: "A", parent_name: "", parent_phone: "", date_of_birth: "", gender: "" });
-      fetchStudents();
+      const { error } = await supabase.from("students").insert([studentData]);
+      if (error) {
+        await offlineDb.addPendingMutation({ table: "students", type: "insert", data: studentData });
+        await refreshPendingCount();
+        toast({ title: "⚠️ Saved Offline", description: "Server error. Student saved locally for sync." });
+      } else {
+        toast({ title: "Student Added!" });
+        fetchStudents();
+      }
     }
+    setShowAddStudent(false);
+    setNewStudent({ admission_number: "", student_name: "", standard: "", section: "A", parent_name: "", parent_phone: "", date_of_birth: "", gender: "" });
   };
 
   // ===== FEATURE 1: Upload students from Excel/CSV =====
@@ -603,19 +615,34 @@ const FeeDesk = () => {
       return;
     }
     setEditLoading(true);
-    const { error } = await supabase.from("students").update({
+    const updateData = {
+      id: editingStudentId,
       admission_number: editForm.admission_number,
       student_name: editForm.student_name,
       standard: editForm.standard,
       section: editForm.section,
       parent_phone: editForm.parent_phone || null,
-    }).eq("id", editingStudentId);
-    if (error) {
-      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Student Updated!" });
+    };
+
+    if (!navigator.onLine) {
+      await offlineDb.addPendingMutation({ table: "students", type: "update", data: updateData });
+      setStudents((prev) => prev.map((s) => s.id === editingStudentId ? { ...s, ...updateData } : s));
+      await refreshPendingCount();
+      toast({ title: "💾 Saved Offline", description: "Edit saved locally. Will sync when online." });
       setEditingStudentId(null);
-      fetchStudents();
+    } else {
+      const { id, ...rest } = updateData;
+      const { error } = await supabase.from("students").update(rest).eq("id", editingStudentId);
+      if (error) {
+        await offlineDb.addPendingMutation({ table: "students", type: "update", data: updateData });
+        await refreshPendingCount();
+        toast({ title: "⚠️ Saved Offline", description: "Server error. Edit saved locally for sync." });
+        setEditingStudentId(null);
+      } else {
+        toast({ title: "Student Updated!" });
+        setEditingStudentId(null);
+        fetchStudents();
+      }
     }
     setEditLoading(false);
   };
