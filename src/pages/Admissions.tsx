@@ -31,9 +31,45 @@ const Admissions = () => {
 
   // Fee payment state
   const [feeForm, setFeeForm] = useState({ childName: "", standard: "", section: "", referenceId: "", paymentMethod: "UPI (GPay/PhonePe/Paytm)", amount: "" });
-  const isQrEnabled = feeForm.childName.trim() && feeForm.standard && feeForm.section;
   const [feeSubmitted, setFeeSubmitted] = useState(false);
   const [feeLoading, setFeeLoading] = useState(false);
+  const [studentVerified, setStudentVerified] = useState<boolean | null>(null); // null = not checked, true = found, false = not found
+  const [verifying, setVerifying] = useState(false);
+
+  const verifyStudent = async () => {
+    const name = feeForm.childName.trim();
+    const std = feeForm.standard;
+    const sec = feeForm.section;
+    if (!name || !std || !sec) return;
+    setVerifying(true);
+    setStudentVerified(null);
+    try {
+      const { data, error } = await supabase
+        .from("students")
+        .select("id")
+        .ilike("student_name", name)
+        .eq("standard", std)
+        .eq("section", sec)
+        .eq("status", "active")
+        .limit(1);
+      if (error) throw error;
+      setStudentVerified(data && data.length > 0);
+      if (!data || data.length === 0) {
+        toast({ title: "⚠️ Student Not Found", description: `No active student "${name}" found in Class ${std} ${sec}. Please check the details.`, variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Error", description: "Could not verify student. Please try again.", variant: "destructive" });
+      setStudentVerified(false);
+    }
+    setVerifying(false);
+  };
+
+  // Reset verification when fields change
+  useEffect(() => {
+    setStudentVerified(null);
+  }, [feeForm.childName, feeForm.standard, feeForm.section]);
+
+  const isQrEnabled = studentVerified === true;
 
   // Apply Now form state
   const [applyForm, setApplyForm] = useState({
@@ -304,16 +340,33 @@ const Admissions = () => {
                     </div>
                   </div>
 
-                  {/* QR Code */}
-                  <div className="text-center p-8 rounded-xl border-2 border-dashed border-accent bg-accent/5 transition-all">
-                    <div className="space-y-4">
-                      <p className="font-semibold text-primary">Scan QR Code to Pay</p>
-                      <div className="inline-block bg-white p-4 rounded-xl shadow-md">
-                        <img src="/photos/qr-payment.jpg" alt="UPI QR Code for Fee Payment" className="w-[200px] h-[200px] object-contain" />
-                      </div>
-                      <p className="text-sm text-muted-foreground">Nethaji Vidhyalayam — CUB UPI Payment</p>
+                  {/* Verify Button */}
+                  {feeForm.childName.trim() && feeForm.standard && feeForm.section && studentVerified !== true && (
+                    <Button onClick={verifyStudent} disabled={verifying} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-4">
+                      {verifying ? <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Verifying Student...</> : "Verify Student & Show QR Code"}
+                    </Button>
+                  )}
+
+                  {/* Warning if not found */}
+                  {studentVerified === false && (
+                    <div className="text-center p-6 rounded-xl border-2 border-destructive bg-destructive/5">
+                      <p className="font-semibold text-destructive">❌ Student not found in our records</p>
+                      <p className="text-sm text-muted-foreground mt-1">Please check the name, standard, and section. The name must match exactly as registered in the school.</p>
                     </div>
-                  </div>
+                  )}
+
+                  {/* QR Code - only shown after verification */}
+                  {studentVerified === true && (
+                    <div className="text-center p-8 rounded-xl border-2 border-dashed border-accent bg-accent/5 transition-all">
+                      <div className="space-y-4">
+                        <p className="font-semibold text-primary">✅ Student Verified — Scan QR Code to Pay</p>
+                        <div className="inline-block bg-white p-4 rounded-xl shadow-md">
+                          <img src="/photos/qr-payment.jpg" alt="UPI QR Code for Fee Payment" className="w-[200px] h-[200px] object-contain" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">{feeForm.childName} — Class {feeForm.standard} {feeForm.section}</p>
+                      </div>
+                    </div>
+                  )}
 
                   {/* After payment section */}
                   {isQrEnabled && (
