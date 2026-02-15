@@ -4,19 +4,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Users, Award, Heart, Send, Printer } from "lucide-react";
-import { useState } from "react";
+import { Briefcase, Users, Award, Heart, Send, Printer, Upload } from "lucide-react";
+import { useState, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
 import { sendEmail, sendParentCopy, sendFormEmail } from "@/lib/emailjs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
+import { supabase } from "@/integrations/supabase/client";
 
 const Career = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: "", dob: "", gender: "", email: "", phone: "", address: "",
     qualification: "", professionalDegree: "", currentPosition: "",
-    positionApplying: "", experience: "",
+    positionApplying: "", experience: "", resumeUrl: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -42,8 +45,9 @@ const Career = () => {
         { label: "Professional Degree", value: formData.professionalDegree },
         { label: "Current Position", value: formData.currentPosition || "N/A" },
         { label: "Position Applying For", value: formData.positionApplying || "N/A" },
-        { label: "Experience", value: formData.experience || "N/A" },
-      ],
+      { label: "Experience", value: formData.experience || "N/A" },
+      { label: "Resume", value: formData.resumeUrl ? "Uploaded" : "Not uploaded" },
+    ],
     },
   ];
 
@@ -51,6 +55,23 @@ const Career = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Upload resume if provided
+      let resumeUrl = "";
+      if (resumeFile) {
+        const fileExt = resumeFile.name.split(".").pop();
+        const fileName = `${Date.now()}-${formData.name.replace(/\s+/g, "_")}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("resumes")
+          .upload(fileName, resumeFile);
+        if (uploadError) {
+          console.error("Resume upload error:", uploadError);
+          toast({ title: "Resume upload failed", description: uploadError.message, variant: "destructive" });
+          setLoading(false);
+          return;
+        }
+        resumeUrl = uploadData?.path || "";
+        setFormData(prev => ({ ...prev, resumeUrl }));
+      }
       const fieldGroups = getFieldGroups();
       // EmailJS to school
       sendEmail({
@@ -134,7 +155,7 @@ const Career = () => {
                 <Button onClick={handlePrint} variant="outline" className="gap-2">
                   <Printer className="h-4 w-4" /> Print / Download Copy
                 </Button>
-                <Button onClick={() => { setSubmitted(false); setFormData({ name: "", dob: "", gender: "", email: "", phone: "", address: "", qualification: "", professionalDegree: "", currentPosition: "", positionApplying: "", experience: "" }); }} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Button onClick={() => { setSubmitted(false); setResumeFile(null); setFormData({ name: "", dob: "", gender: "", email: "", phone: "", address: "", qualification: "", professionalDegree: "", currentPosition: "", positionApplying: "", experience: "", resumeUrl: "" }); }} className="bg-accent hover:bg-accent/90 text-accent-foreground">
                   Submit Another
                 </Button>
               </div>
@@ -213,6 +234,36 @@ const Career = () => {
                       <SelectItem value="5+">Above 5 years</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label className="font-semibold">Attach Resume *</Label>
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onDrop={(e) => { e.preventDefault(); e.stopPropagation(); const f = e.dataTransfer.files?.[0]; if (f) setResumeFile(f); }}
+                    className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary transition-colors"
+                  >
+                    <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    {resumeFile ? (
+                      <p className="text-sm font-medium text-foreground">{resumeFile.name}</p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Click to upload or drag and drop<br /><span className="text-xs">PDF, DOC, DOCX (Max 5MB)</span></p>
+                    )}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f && f.size > 5 * 1024 * 1024) {
+                          toast({ title: "File too large", description: "Max file size is 5MB", variant: "destructive" });
+                          return;
+                        }
+                        if (f) setResumeFile(f);
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 
