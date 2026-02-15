@@ -12,7 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { sendEmail, sendParentCopy, sendFormEmail } from "@/lib/emailjs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckCircle, FileText, CreditCard, ClipboardList, Printer, Loader2 } from "lucide-react";
+import { CheckCircle, FileText, CreditCard, ClipboardList, Printer, Loader2, Search } from "lucide-react";
 
 const standards = ["Pre-KG", "LKG", "UKG", "I", "II", "III", "IV", "V"];
 const sections = ["A", "B", "C", "D"];
@@ -33,8 +33,65 @@ const Admissions = () => {
   const [feeForm, setFeeForm] = useState({ childName: "", standard: "", section: "", referenceId: "", paymentMethod: "UPI (GPay/PhonePe/Paytm)", amount: "" });
   const [feeSubmitted, setFeeSubmitted] = useState(false);
   const [feeLoading, setFeeLoading] = useState(false);
-  const [studentVerified, setStudentVerified] = useState<boolean | null>(null); // null = not checked, true = found, false = not found
+  const [studentVerified, setStudentVerified] = useState<boolean | null>(null);
   const [verifying, setVerifying] = useState(false);
+
+  // Autocomplete state
+  const [studentSuggestions, setStudentSuggestions] = useState<{ id: string; student_name: string; standard: string; section: string }[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
+  // Normalize name: remove initials (single letter followed by dot/space), lowercase, trim
+  const normalizeName = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/\b[a-z]\.\s*/g, "") // remove "K. " style initials
+      .replace(/\s+/g, " ")
+      .trim();
+  };
+
+  // Fetch matching students when name/standard/section change
+  useEffect(() => {
+    const name = feeForm.childName.trim();
+    if (name.length < 2 || !feeForm.standard || !feeForm.section) {
+      setStudentSuggestions([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoadingSuggestions(true);
+      try {
+        const { data } = await supabase
+          .from("students")
+          .select("id, student_name, standard, section")
+          .eq("standard", feeForm.standard)
+          .eq("section", feeForm.section)
+          .eq("status", "active");
+
+        if (data) {
+          const normalizedInput = normalizeName(name);
+          const filtered = data.filter((s) => {
+            const normalizedStudent = normalizeName(s.student_name);
+            return normalizedStudent.includes(normalizedInput) || normalizedInput.includes(normalizedStudent);
+          });
+          setStudentSuggestions(filtered);
+          setShowSuggestions(filtered.length > 0);
+        }
+      } catch {
+        // silently fail
+      }
+      setLoadingSuggestions(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [feeForm.childName, feeForm.standard, feeForm.section]);
+
+  const selectStudent = (student: typeof studentSuggestions[0]) => {
+    setFeeForm({ ...feeForm, childName: student.student_name });
+    setShowSuggestions(false);
+    // Auto-verify since we picked from DB
+    setStudentVerified(true);
+  };
 
   const verifyStudent = async () => {
     const name = feeForm.childName.trim();
@@ -44,18 +101,28 @@ const Admissions = () => {
     setVerifying(true);
     setStudentVerified(null);
     try {
+      // Fetch all active students in that class/section, then fuzzy match
       const { data, error } = await supabase
         .from("students")
-        .select("id")
-        .ilike("student_name", name)
+        .select("id, student_name")
         .eq("standard", std)
         .eq("section", sec)
-        .eq("status", "active")
-        .limit(1);
+        .eq("status", "active");
       if (error) throw error;
-      setStudentVerified(data && data.length > 0);
-      if (!data || data.length === 0) {
-        toast({ title: "⚠️ Student Not Found", description: `No active student "${name}" found in Class ${std} ${sec}. Please check the details.`, variant: "destructive" });
+
+      const normalizedInput = normalizeName(name);
+      const match = data?.find((s) => {
+        const normalizedStudent = normalizeName(s.student_name);
+        return normalizedStudent === normalizedInput || normalizedStudent.includes(normalizedInput) || normalizedInput.includes(normalizedStudent);
+      });
+
+      if (match) {
+        setStudentVerified(true);
+        // Update name to official name from DB
+        setFeeForm((prev) => ({ ...prev, childName: match.student_name }));
+      } else {
+        setStudentVerified(false);
+        toast({ title: "⚠️ Student Not Found", description: `No active student matching "${name}" found in Class ${std} ${sec}. Please check the details.`, variant: "destructive" });
       }
     } catch {
       toast({ title: "Error", description: "Could not verify student. Please try again.", variant: "destructive" });
@@ -331,9 +398,35 @@ const Admissions = () => {
                 </div>
               ) : (
                 <div className="bg-card p-8 rounded-2xl shadow-lg space-y-6">
-                  <div className="space-y-2">
+                  <div className="space-y-2 relative">
                     <Label className="font-semibold">Child's Name *</Label>
-                    <Input placeholder="Enter child's full name" value={feeForm.childName} onChange={(e) => setFeeForm({ ...feeForm, childName: e.target.value })} />
+                    <div className="relative">
+                      <Input
+                        placeholder="Enter child's name (initials optional)"
+                        value={feeForm.childName}
+                        onChange={(e) => { setFeeForm({ ...feeForm, childName: e.target.value }); setShowSuggestions(true); }}
+                        onFocus={() => studentSuggestions.length > 0 && setShowSuggestions(true)}
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                        autoComplete="off"
+                      />
+                      {loadingSuggestions && <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-pulse text-muted-foreground" />}
+                    </div>
+                    {showSuggestions && studentSuggestions.length > 0 && (
+                      <div className="absolute z-50 w-full bg-popover border rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
+                        {studentSuggestions.map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            className="w-full text-left px-4 py-2.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors border-b last:border-b-0"
+                            onMouseDown={() => selectStudent(s)}
+                          >
+                            <span className="font-medium">{s.student_name}</span>
+                            <span className="text-muted-foreground ml-2 text-xs">Class {s.standard} - {s.section}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground">Type your child's name — suggestions will appear. Select to auto-verify.</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
