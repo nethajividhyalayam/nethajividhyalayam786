@@ -29,8 +29,8 @@ const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground">
       {/* Main Footer */}
-      <div className="container-custom section-padding">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="container-custom py-12 px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
@@ -82,29 +82,25 @@ const Footer = () => {
           {/* Contact Info */}
           <div>
             <h4 className="font-serif font-bold text-lg mb-6">Contact Us</h4>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+            <ul className="space-y-3">
+              <li className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
                 <div className="min-w-0">
-                  <span className="text-sm text-primary-foreground/80 block leading-relaxed">
-                    5/325, Rajiv Nagar, S.Kolathur Main Road,
-                    <br />
-                    S.Kolathur, Kovilambakkam Post,
-                    <br />
-                    Chennai - 600129
+                  <span className="text-sm text-primary-foreground/80 leading-snug">
+                    5/325, Rajiv Nagar, S.Kolathur Main Road, S.Kolathur, Kovilambakkam Post, Chennai - 600129
                   </span>
                   <a
                     href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam,+S.Kolathur,+Kovilambakkam,+Chennai+600129"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent hover:underline text-xs inline-flex items-center gap-1 mt-2"
+                    className="text-accent hover:underline text-xs inline-flex items-center gap-1 mt-1"
                   >
                     Get Directions <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-accent flex-shrink-0" />
+              <li className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-accent flex-shrink-0" />
                 <a
                   href="tel:+919841594945"
                   className="text-sm text-primary-foreground/80 hover:text-accent transition-colors"
@@ -112,14 +108,14 @@ const Footer = () => {
                   9841594945 / 6380967675
                 </a>
               </li>
-              <li className="flex items-start gap-3">
-                <Mail className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+              <li className="flex items-start gap-2">
+                <Mail className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 overflow-hidden">
                   <AnimatedEmailScroller className="text-sm text-primary-foreground/80 hover:text-accent transition-colors" />
                 </div>
               </li>
-              <li className="flex items-center gap-3">
-                <Clock className="h-5 w-5 text-accent flex-shrink-0" />
+              <li className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-accent flex-shrink-0" />
                 <span className="text-sm text-primary-foreground/80">Mon - Sat: 8:50 AM - 3:30 PM</span>
               </li>
             </ul>
