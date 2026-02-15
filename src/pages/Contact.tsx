@@ -198,6 +198,16 @@ const Contact = () => {
               <div className="rounded-2xl overflow-hidden shadow-lg h-64">
                 <iframe src="https://maps.google.com/maps?q=Nethaji+Vidhyalayam,+S.Kolathur,+Kovilambakkam,+Chennai+600129&output=embed" width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" referrerPolicy="no-referrer-when-downgrade" title="School Location" />
               </div>
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam,+S.Kolathur,+Kovilambakkam,+Chennai+600129"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 bg-accent text-accent-foreground px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-accent/90 transition-colors"
+              >
+                <MapPin className="h-4 w-4" />
+                Get Directions
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             </div>
           </div>
         </div>
