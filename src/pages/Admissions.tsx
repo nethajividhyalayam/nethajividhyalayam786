@@ -23,11 +23,14 @@ const Admissions = () => {
   const [activeTab, setActiveTab] = useState<"process" | "fees" | "apply">("process");
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get("tab");
     const hash = location.hash.replace("#", "");
-    if (hash === "fees") setActiveTab("fees");
-    else if (hash === "apply") setActiveTab("apply");
+
+    if (tabParam === "fees" || hash === "fees") setActiveTab("fees");
+    else if (tabParam === "apply" || hash === "apply") setActiveTab("apply");
     else if (hash === "process" || hash === "") setActiveTab("process");
-  }, [location.hash]);
+  }, [location.search, location.hash]);
 
   // Fee payment state
   const [feeForm, setFeeForm] = useState({ childName: "", standard: "", section: "", referenceId: "", paymentMethod: "UPI (GPay/PhonePe/Paytm)", amount: "" });
@@ -35,6 +38,22 @@ const Admissions = () => {
   const [feeLoading, setFeeLoading] = useState(false);
   const [studentVerified, setStudentVerified] = useState<boolean | null>(null);
   const [verifying, setVerifying] = useState(false);
+
+  // Pre-fill fee form from URL query params (from AI chatbot)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const name = params.get("name");
+    const std = params.get("std");
+    const sec = params.get("sec");
+    if (name || std || sec) {
+      setFeeForm((prev) => ({
+        ...prev,
+        childName: name || prev.childName,
+        standard: std || prev.standard,
+        section: sec || prev.section,
+      }));
+    }
+  }, [location.search]);
 
   // Autocomplete state
   const [studentSuggestions, setStudentSuggestions] = useState<{ id: string; student_name: string; standard: string; section: string }[]>([]);
