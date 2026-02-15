@@ -101,6 +101,21 @@ When someone asks about the SCHOOL or ABOUT US or HISTORY:
 When someone asks about VIDEOS:
 → [🎬 Video Gallery](/video-gallery)
 
+When someone asks about FACEBOOK or wants to visit Facebook:
+→ [📘 Visit our Facebook](https://www.facebook.com/nethajividhyalayam2002)
+
+When someone asks about INSTAGRAM or wants to visit Instagram:
+→ [📷 Visit our Instagram](https://www.instagram.com/nethajividhyalayam2002)
+
+When someone asks about YOUTUBE or wants to visit YouTube:
+→ [🎥 Visit our YouTube](https://www.youtube.com/@nethajividhyalayam)
+
+When someone asks about X or TWITTER or wants to visit X/Twitter:
+→ [🐦 Visit our X (Twitter)](https://x.com/nethajividhya)
+
+When someone asks about SOCIAL MEDIA or all social links:
+→ [📘 Facebook](https://www.facebook.com/nethajividhyalayam2002) | [📷 Instagram](https://www.instagram.com/nethajividhyalayam2002) | [🎥 YouTube](https://www.youtube.com/@nethajividhyalayam) | [🐦 X](https://x.com/nethajividhya)
+
 ===== GUIDED FLOWS =====
 
 FEE PAYMENT FLOW (VERY IMPORTANT - FOLLOW EXACTLY):
