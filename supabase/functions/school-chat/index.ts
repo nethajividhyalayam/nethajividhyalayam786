@@ -68,6 +68,9 @@ When someone asks to EMAIL or MAIL:
 When someone asks about FEE PAYMENT or PAY FEES:
 → [💰 Pay School Fees](/admissions#fees)
 
+When someone asks about FEEDESK or FEE DESK or STAFF LOGIN or ADMIN LOGIN or MANAGEMENT PORTAL:
+→ [🔐 FeeDesk Staff Login](/feedesk)
+
 When someone asks about ADMISSION or APPLY or ENROLL:
 → [📝 Apply for Admission](/admissions)
 

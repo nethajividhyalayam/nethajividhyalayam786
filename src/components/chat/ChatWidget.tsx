@@ -7,14 +7,37 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/school-chat`;
 const IDLE_TIMEOUT = 30000; // 30 seconds
+const HISTORY_KEY = "nv_chat_history";
+const HISTORY_TTL = 4 * 60 * 60 * 1000; // 4 hours in ms
+
+const DEFAULT_MSG: Msg = { role: "assistant", content: "👋 Welcome to Nethaji Vidhyalayam! How can I help you today?" };
+
+const loadHistory = (): Msg[] => {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [DEFAULT_MSG];
+    const { ts, msgs } = JSON.parse(raw);
+    if (Date.now() - ts > HISTORY_TTL) {
+      localStorage.removeItem(HISTORY_KEY);
+      return [DEFAULT_MSG];
+    }
+    return msgs?.length ? msgs : [DEFAULT_MSG];
+  } catch {
+    return [DEFAULT_MSG];
+  }
+};
+
+const saveHistory = (msgs: Msg[]) => {
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify({ ts: Date.now(), msgs }));
+  } catch {}
+};
 
 const ChatWidget = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
-  const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: "👋 Welcome to Nethaji Vidhyalayam! How can I help you today?" },
-  ]);
+  const [messages, setMessages] = useState<Msg[]>(loadHistory);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -25,6 +48,11 @@ const ChatWidget = () => {
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages]);
+
+  // Persist chat history to localStorage
+  useEffect(() => {
+    if (messages.length > 1) saveHistory(messages);
   }, [messages]);
 
   // Pulse animation cycle for the floating button
