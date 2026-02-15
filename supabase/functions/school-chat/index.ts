@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getTodayPanchangamText } from "./panchangam.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,12 +17,16 @@ serve(async (req) => {
     const now = new Date();
     const currentDate = now.toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Kolkata' });
     const currentTime = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata', hour12: true });
+    const todayPanchangam = getTodayPanchangamText();
 
     const systemPrompt = `You are the friendly AI assistant for Nethaji Vidhyalayam, a school in Chennai, India. You help parents, students, and visitors with ALL information about the school AND general knowledge questions.
 
 CURRENT DATE & TIME: Today is ${currentDate}. Current time in Chennai: ${currentTime} IST.
 
+${todayPanchangam}
+
 Keep responses SHORT, SWEET, and HELPFUL. Maximum 3-4 lines per answer + relevant action links.
+When asked about today's date, time, nakshatra, tithi, or panchangam, provide the details from TODAY'S TAMIL PANCHANGAM above. Always include the relevant details directly in your answer.
 
 SCHOOL OVERVIEW:
 - School Name: Nethaji Vidhyalayam
