@@ -46,7 +46,7 @@ const Career = () => {
         { label: "Current Position", value: formData.currentPosition || "N/A" },
         { label: "Position Applying For", value: formData.positionApplying || "N/A" },
       { label: "Experience", value: formData.experience || "N/A" },
-      { label: "Resume", value: formData.resumeUrl ? "Uploaded" : "Not uploaded" },
+      { label: "Resume", value: formData.resumeUrl || "Not uploaded" },
     ],
     },
   ];
@@ -69,10 +69,39 @@ const Career = () => {
           setLoading(false);
           return;
         }
-        resumeUrl = uploadData?.path || "";
+        const filePath = uploadData?.path || "";
+        // Generate a signed URL valid for 7 days for email delivery
+        const { data: signedData } = await supabase.storage
+          .from("resumes")
+          .createSignedUrl(filePath, 60 * 60 * 24 * 7);
+        resumeUrl = signedData?.signedUrl || filePath;
         setFormData(prev => ({ ...prev, resumeUrl }));
       }
-      const fieldGroups = getFieldGroups();
+      const updatedFormData = { ...formData, resumeUrl };
+      const fieldGroups = [
+        {
+          heading: "Personal Details",
+          fields: [
+            { label: "Name of the Applicant", value: updatedFormData.name },
+            { label: "Date of Birth", value: updatedFormData.dob },
+            { label: "Gender", value: updatedFormData.gender || "N/A" },
+            { label: "Email ID", value: updatedFormData.email },
+            { label: "Contact Number", value: updatedFormData.phone },
+            { label: "Address", value: updatedFormData.address || "N/A" },
+          ],
+        },
+        {
+          heading: "Academic & Professional Details",
+          fields: [
+            { label: "Academic Qualification", value: updatedFormData.qualification },
+            { label: "Professional Degree", value: updatedFormData.professionalDegree },
+            { label: "Current Position", value: updatedFormData.currentPosition || "N/A" },
+            { label: "Position Applying For", value: updatedFormData.positionApplying || "N/A" },
+            { label: "Experience", value: updatedFormData.experience || "N/A" },
+            { label: "Resume", value: resumeUrl ? `Download: ${resumeUrl}` : "Not uploaded" },
+          ],
+        },
+      ];
       // EmailJS to school
       sendEmail({
         from_name: formData.name,
