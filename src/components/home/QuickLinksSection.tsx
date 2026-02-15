@@ -11,10 +11,14 @@ const quickLinks = [
   },
   {
     icon: CreditCard,
-    title: "Pay Fees",
-    description: "Online fee payment",
-    path: "/admissions#fees",
+    title: "Pay School Fees Online",
+    description: "",
+    path: "",
     color: "bg-school-green",
+    customLinks: [
+      { label: "Visit Fee Payment →", path: "/admissions#fees" },
+      { label: "Visit FeeDesk Portal →", path: "/feedesk" },
+    ],
   },
   {
     icon: Calendar,
@@ -49,11 +53,29 @@ const QuickLinksSection = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-1">{item.title}</h3>
-                    <p className="text-sm text-white/80">{item.description}</p>
+                    {'customLinks' in item && item.customLinks ? (
+                      <div className="space-y-1">
+                        {item.customLinks.map((link: { label: string; path: string }) => (
+                          <Link key={link.path} to={link.path} className="block text-sm text-white/90 hover:text-white hover:underline transition-colors">
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-white/80">{item.description}</p>
+                    )}
                   </div>
                 </div>
               </div>
             );
+
+            if ('customLinks' in item && item.customLinks) {
+              return (
+                <div key={item.title} className="animate-fade-up">
+                  {content}
+                </div>
+              );
+            }
 
             if ('external' in item && item.external) {
               return (
