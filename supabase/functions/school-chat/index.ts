@@ -111,7 +111,7 @@ QUICK ACTION LINKS (use these in your responses when relevant):
 - Get Directions to School: [📍 Get Directions](https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai)
 - Call the School: [📞 Call 9841594945](tel:+919841594945) or [📞 Call 6380967675](tel:+916380967675)
 - Email the School: [✉️ Email Us](mailto:nethajividhyalayam@gmail.com)
-- Pay School Fees: [💰 Go to Fee Payment](/feedesk)
+- Pay School Fees: [💰 Go to Fee Payment](/admissions#fees)
 - Apply for Admission: [📝 Apply Now](/admissions)
 - View Gallery: [📸 Photo Gallery](/gallery)
 - View Events: [🎉 Events & Calendar](/events)
