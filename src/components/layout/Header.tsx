@@ -90,7 +90,7 @@ const Header = () => {
               <h1 className="font-serif font-extrabold text-xl text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
               </h1>
-              <p className="font-sans font-bold text-accent text-[10px] tracking-widest"> KOVILAMBAKKAM </p>
+              <p className="font-sans font-bold text-accent text-[10px] tracking-widest"> CHENNAI KOVILAMBAKKAM </p>
             </div>
           </Link>
 
