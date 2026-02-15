@@ -94,24 +94,51 @@ const Contact = () => {
         <div className="container-custom">
           {/* Contact Cards */}
           <div className="grid md:grid-cols-3 gap-6 mb-16">
-            {[
-              { icon: Phone, title: "Call Us Directly", content: "9841594945 / 6380967675", sub: "Mon-Sat, 8:50 AM - 3:30 PM", href: "tel:+919841594945", cta: "Call Now" },
-              { icon: Mail, title: "Send an Email", content: "nethajividhyalayam@gmail.com / info@nethajividhyalayam.org", sub: "24-hour response time", href: "mailto:nethajividhyalayam@gmail.com", cta: "Email Us" },
-              { icon: MapPin, title: "Visit Campus", content: "5/325, Rajiv Nagar, S.Kolathur Main Road", sub: "S.Kolathur, Kovilambakkam Post, Chennai - 600129", href: "https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai", cta: "Get Directions" },
-            ].map((item, i) => (
-              <div key={i} className="bg-card p-8 rounded-2xl shadow-lg text-center card-hover">
-                <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="h-8 w-8 text-accent" />
-                </div>
-                <h3 className="font-serif text-lg font-bold text-primary mb-2">{item.title}</h3>
-                <a href={item.href} className="text-muted-foreground hover:text-accent transition-colors block mb-1">{item.content}</a>
-                <p className="text-sm text-muted-foreground mb-4">{item.sub}</p>
-                <a href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined} className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors">
-                  {item.cta}
-                  {item.href.startsWith("http") && <ExternalLink className="h-3 w-3" />}
-                </a>
+            {/* Phone Card */}
+            <div className="bg-card p-8 rounded-2xl shadow-lg text-center card-hover">
+              <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Phone className="h-8 w-8 text-accent" />
               </div>
-            ))}
+              <h3 className="font-serif text-lg font-bold text-primary mb-2">Call Us Directly</h3>
+              <div className="mb-1 space-y-1">
+                <a href="tel:+919841594945" className="text-muted-foreground hover:text-accent transition-colors block">9841594945</a>
+                <a href="tel:+916380967675" className="text-muted-foreground hover:text-accent transition-colors block">6380967675</a>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">Mon-Sat, 8:50 AM - 3:30 PM</p>
+              <a href="tel:+919841594945" className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors">
+                Call Now
+              </a>
+            </div>
+
+            {/* Email Card */}
+            <div className="bg-card p-8 rounded-2xl shadow-lg text-center card-hover">
+              <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Mail className="h-8 w-8 text-accent" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-primary mb-2">Send an Email</h3>
+              <div className="mb-1 space-y-1">
+                <a href="mailto:nethajividhyalayam@gmail.com" className="text-muted-foreground hover:text-accent transition-colors block">nethajividhyalayam@gmail.com</a>
+                <a href="mailto:info@nethajividhyalayam.org" className="text-muted-foreground hover:text-accent transition-colors block">info@nethajividhyalayam.org</a>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">24-hour response time</p>
+              <a href="mailto:nethajividhyalayam@gmail.com" className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors">
+                Email Us
+              </a>
+            </div>
+
+            {/* Location Card */}
+            <div className="bg-card p-8 rounded-2xl shadow-lg text-center card-hover">
+              <div className="w-16 h-16 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <MapPin className="h-8 w-8 text-accent" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-primary mb-2">Visit Campus</h3>
+              <p className="text-muted-foreground block mb-1">5/325, Rajiv Nagar, S.Kolathur Main Road</p>
+              <p className="text-sm text-muted-foreground mb-4">S.Kolathur, Kovilambakkam Post, Chennai&nbsp;-&nbsp;600129</p>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam+S.Kolathur+Chennai" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors">
+                Get Directions
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
