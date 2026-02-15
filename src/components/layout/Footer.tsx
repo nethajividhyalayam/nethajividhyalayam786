@@ -87,7 +87,7 @@ const Footer = () => {
                 <MapPin className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
                   <span className="text-sm text-primary-foreground/80 leading-snug block">
-                    5/325, Rajiv Nagar, S.Kolathur Main Road, S.Kolathur, Kovilambakkam Post,{" "}Chennai&nbsp;-&nbsp;600129
+                    5/325, Rajiv Nagar, S.Kolathur Main Road, S.Kolathur, Kovilambakkam Post, Chennai&nbsp;-&nbsp;600129
                   </span>
                   <a
                     href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam,+S.Kolathur,+Kovilambakkam,+Chennai+600129"
@@ -168,7 +168,7 @@ const Footer = () => {
             </form>
             {/* FeeDesk Link */}
             <div className="mt-6 p-4 bg-accent/20 rounded-lg">
-              <p className="text-sm font-medium mb-2">Pay School Fees Online</p>
+              <p className="text-sm font-medium mb-2">Login FeeDesk For Office Use </p>
               <Link to="/feedesk" className="inline-flex items-center gap-2 text-accent hover:underline text-sm">
                 Visit FeeDesk Portal →
               </Link>
