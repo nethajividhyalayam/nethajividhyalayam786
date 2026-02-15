@@ -196,7 +196,7 @@ const panchangamData = {
   ]
 };
 
-type TabType = "school" | "panchangam" | "festivals" | "leaders";
+type TabType = "school" | "panchangam";
 
 const SchoolCalendar = () => {
   const [activeTab, setActiveTab] = useState<TabType>("school");
@@ -227,20 +227,6 @@ const SchoolCalendar = () => {
           >
             <Star className="inline-block w-4 h-4 mr-2" />
             தமிழ் பஞ்சாங்கம் (Panchangam)
-          </button>
-          <button
-            onClick={() => setActiveTab("festivals")}
-            className={`px-6 py-3 rounded-t-lg font-semibold text-sm transition-colors ${activeTab === "festivals" ? "bg-background text-primary shadow" : "text-muted-foreground hover:text-foreground"}`}
-          >
-            <Sun className="inline-block w-4 h-4 mr-2" />
-            முக்கிய பண்டிகைகள் (Festivals)
-          </button>
-          <button
-            onClick={() => setActiveTab("leaders")}
-            className={`px-6 py-3 rounded-t-lg font-semibold text-sm transition-colors ${activeTab === "leaders" ? "bg-background text-primary shadow" : "text-muted-foreground hover:text-foreground"}`}
-          >
-            <Award className="inline-block w-4 h-4 mr-2" />
-            சுதந்திர வீரர்கள் (Leaders)
           </button>
         </div>
       </div>
@@ -466,56 +452,6 @@ const SchoolCalendar = () => {
         </section>
       )}
 
-      {activeTab === "festivals" && (
-        <section className="section-padding bg-background">
-          <div className="container-custom space-y-10">
-            <div>
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <Sun className="w-6 h-6 text-primary" /> முக்கிய பண்டிகைகள் (Important Festivals)
-              </h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {panchangamData.importantFestivals.map((f, i) => (
-                  <div key={i} className="bg-card rounded-xl p-5 shadow border flex gap-4 items-start hover:shadow-lg transition-shadow">
-                    <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded flex-shrink-0">{f.date}</span>
-                    <div>
-                      <h3 className="font-bold text-foreground">{f.name}</h3>
-                      <p className="text-sm text-muted-foreground">{f.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {activeTab === "leaders" && (
-        <section className="section-padding bg-background">
-          <div className="container-custom space-y-10">
-            <div>
-              <h2 className="font-serif text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <Award className="w-6 h-6 text-primary" /> சுதந்திர போராட்ட வீரர்கள் & தலைவர்கள் (Freedom Fighters & Leaders)
-              </h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {leaderAnniversaries.map((l, i) => (
-                  <div key={i} className="bg-card rounded-xl p-5 shadow border flex gap-4 items-start hover:shadow-lg transition-shadow">
-                    <div className="flex flex-col items-center flex-shrink-0">
-                      <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded">{l.date}</span>
-                      <span className={`text-[10px] mt-1 font-semibold px-2 py-0.5 rounded-full ${l.type === "பிறந்த நாள்" ? "bg-accent text-accent-foreground" : l.type === "நினைவு நாள்" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
-                        {l.type}
-                      </span>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-foreground">{l.name}</h3>
-                      <p className="text-sm text-muted-foreground">{l.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
     </Layout>
   );
 };
