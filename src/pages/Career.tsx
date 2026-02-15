@@ -4,22 +4,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Users, Award, Heart, Send, Printer, Upload } from "lucide-react";
-import { useState, useRef } from "react";
+import { Briefcase, Users, Award, Heart, Send, Printer } from "lucide-react";
+import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { sendEmail, sendParentCopy, sendFormEmail } from "@/lib/emailjs";
 import { openPrintableTemplate, buildEmailMessage } from "@/lib/printTemplate";
-import { supabase } from "@/integrations/supabase/client";
 
 const Career = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
-    name: "", dob: "", gender: "", email: "", phone: "", address: "",
-    qualification: "", professionalDegree: "", currentPosition: "",
-    positionApplying: "", experience: "", resumeUrl: "",
+    name: "",
+    dob: "",
+    gender: "",
+    email: "",
+    phone: "",
+    address: "",
+    qualification: "",
+    professionalDegree: "",
+    currentPosition: "",
+    positionApplying: "",
+    experience: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -45,9 +50,8 @@ const Career = () => {
         { label: "Professional Degree", value: formData.professionalDegree },
         { label: "Current Position", value: formData.currentPosition || "N/A" },
         { label: "Position Applying For", value: formData.positionApplying || "N/A" },
-      { label: "Experience", value: formData.experience || "N/A" },
-      { label: "Resume", value: formData.resumeUrl || "Not uploaded" },
-    ],
+        { label: "Experience", value: formData.experience || "N/A" },
+      ],
     },
   ];
 
@@ -55,53 +59,7 @@ const Career = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Upload resume if provided
-      let resumeUrl = "";
-      if (resumeFile) {
-        const fileExt = resumeFile.name.split(".").pop();
-        const fileName = `${Date.now()}-${formData.name.replace(/\s+/g, "_")}.${fileExt}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("resumes")
-          .upload(fileName, resumeFile);
-        if (uploadError) {
-          console.error("Resume upload error:", uploadError);
-          toast({ title: "Resume upload failed", description: uploadError.message, variant: "destructive" });
-          setLoading(false);
-          return;
-        }
-        const filePath = uploadData?.path || "";
-        // Generate a signed URL valid for 7 days for email delivery
-        const { data: signedData } = await supabase.storage
-          .from("resumes")
-          .createSignedUrl(filePath, 60 * 60 * 24 * 7);
-        resumeUrl = signedData?.signedUrl || filePath;
-        setFormData(prev => ({ ...prev, resumeUrl }));
-      }
-      const updatedFormData = { ...formData, resumeUrl };
-      const fieldGroups = [
-        {
-          heading: "Personal Details",
-          fields: [
-            { label: "Name of the Applicant", value: updatedFormData.name },
-            { label: "Date of Birth", value: updatedFormData.dob },
-            { label: "Gender", value: updatedFormData.gender || "N/A" },
-            { label: "Email ID", value: updatedFormData.email },
-            { label: "Contact Number", value: updatedFormData.phone },
-            { label: "Address", value: updatedFormData.address || "N/A" },
-          ],
-        },
-        {
-          heading: "Academic & Professional Details",
-          fields: [
-            { label: "Academic Qualification", value: updatedFormData.qualification },
-            { label: "Professional Degree", value: updatedFormData.professionalDegree },
-            { label: "Current Position", value: updatedFormData.currentPosition || "N/A" },
-            { label: "Position Applying For", value: updatedFormData.positionApplying || "N/A" },
-            { label: "Experience", value: updatedFormData.experience || "N/A" },
-            { label: "Resume", value: resumeUrl ? `Download: ${resumeUrl}` : "Not uploaded" },
-          ],
-        },
-      ];
+      const fieldGroups = getFieldGroups();
       // EmailJS to school
       sendEmail({
         from_name: formData.name,
@@ -111,7 +69,12 @@ const Career = () => {
         message: buildEmailMessage("Career Inquiry Form", fieldGroups),
       }).catch(console.error);
       // Send thank-you copy to applicant via EmailJS
-      sendParentCopy(formData.email, formData.name, "Career Application", buildEmailMessage("Career Inquiry Form", fieldGroups)).catch(console.error);
+      sendParentCopy(
+        formData.email,
+        formData.name,
+        "Career Application",
+        buildEmailMessage("Career Inquiry Form", fieldGroups),
+      ).catch(console.error);
       // Send rich HTML email with attachment via backend
       sendFormEmail({
         formType: "career",
@@ -154,9 +117,21 @@ const Career = () => {
           <h2 className="section-title text-center mb-12">Why Join Nethaji Vidhyalayam?</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { icon: Briefcase, title: "Growth Opportunities", desc: "Professional development and career advancement programs" },
-              { icon: Users, title: "Collaborative Culture", desc: "Work with passionate educators and supportive staff" },
-              { icon: Award, title: "Competitive Salary", desc: "Attractive compensation with benefits and bonuses" },
+              {
+                icon: Briefcase,
+                title: "Growth Opportunities",
+                desc: "Professional development and career advancement programs",
+              },
+              {
+                icon: Users,
+                title: "Collaborative Culture",
+                desc: "Work with passionate educators and supportive staff",
+              },
+              {
+                icon: Award,
+                title: "Competitive Salary",
+                desc: "Attractive compensation benefits with Reinforces that the base itself is strong",
+              },
               { icon: Heart, title: "Work-Life Balance", desc: "Supportive policies for a healthy work-life balance" },
             ].map((item, i) => (
               <div key={i} className="bg-card p-6 rounded-2xl shadow-lg text-center card-hover">
@@ -184,7 +159,25 @@ const Career = () => {
                 <Button onClick={handlePrint} variant="outline" className="gap-2">
                   <Printer className="h-4 w-4" /> Print / Download Copy
                 </Button>
-                <Button onClick={() => { setSubmitted(false); setResumeFile(null); setFormData({ name: "", dob: "", gender: "", email: "", phone: "", address: "", qualification: "", professionalDegree: "", currentPosition: "", positionApplying: "", experience: "", resumeUrl: "" }); }} className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Button
+                  onClick={() => {
+                    setSubmitted(false);
+                    setFormData({
+                      name: "",
+                      dob: "",
+                      gender: "",
+                      email: "",
+                      phone: "",
+                      address: "",
+                      qualification: "",
+                      professionalDegree: "",
+                      currentPosition: "",
+                      positionApplying: "",
+                      experience: "",
+                    });
+                  }}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
                   Submit Another
                 </Button>
               </div>
@@ -203,48 +196,98 @@ const Career = () => {
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Gender</Label>
-                  <Select value={formData.gender} onValueChange={(v) => setFormData((prev) => ({ ...prev, gender: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Select Gender" /></SelectTrigger>
+                  <Select
+                    value={formData.gender}
+                    onValueChange={(v) => setFormData((prev) => ({ ...prev, gender: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Gender" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="female">Female</SelectItem>
                       <SelectItem value="male">Male</SelectItem>
                       <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground italic">* Current openings are for female candidates only as per school policy.</p>
+                  <p className="text-xs text-muted-foreground italic">
+                    * Current openings are for female candidates only as per school policy.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Email ID *</Label>
-                  <Input required type="email" name="email" value={formData.email} onChange={handleChange} placeholder="email@example.com" />
+                  <Input
+                    required
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="email@example.com"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Contact Number *</Label>
-                  <Input required name="phone" value={formData.phone} onChange={handleChange} placeholder="10-digit mobile" />
+                  <Input
+                    required
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="10-digit mobile"
+                  />
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label className="font-semibold">Address</Label>
-                  <Textarea name="address" value={formData.address} onChange={handleChange} placeholder="Full address" rows={2} />
+                  <Textarea
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Full address"
+                    rows={2}
+                  />
                 </div>
               </div>
 
-              <h3 className="font-serif text-xl font-bold text-primary border-b pb-3 pt-4">Academic & Professional Details</h3>
+              <h3 className="font-serif text-xl font-bold text-primary border-b pb-3 pt-4">
+                Academic & Professional Details
+              </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="font-semibold">Academic Qualification *</Label>
-                  <Input required name="qualification" value={formData.qualification} onChange={handleChange} placeholder="Highest qualification" />
+                  <Input
+                    required
+                    name="qualification"
+                    value={formData.qualification}
+                    onChange={handleChange}
+                    placeholder="Highest qualification"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Professional Degree *</Label>
-                  <Input required name="professionalDegree" value={formData.professionalDegree} onChange={handleChange} placeholder="e.g. B.Ed, M.Ed" />
+                  <Input
+                    required
+                    name="professionalDegree"
+                    value={formData.professionalDegree}
+                    onChange={handleChange}
+                    placeholder="e.g. B.Ed, M.Ed"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Current Position (If any)</Label>
-                  <Input name="currentPosition" value={formData.currentPosition} onChange={handleChange} placeholder="Current role" />
+                  <Input
+                    name="currentPosition"
+                    value={formData.currentPosition}
+                    onChange={handleChange}
+                    placeholder="Current role"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Position Applying For</Label>
-                  <Select value={formData.positionApplying} onValueChange={(v) => setFormData((prev) => ({ ...prev, positionApplying: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <Select
+                    value={formData.positionApplying}
+                    onValueChange={(v) => setFormData((prev) => ({ ...prev, positionApplying: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="teaching">Teaching</SelectItem>
                       <SelectItem value="non-teaching">Non-Teaching</SelectItem>
@@ -254,8 +297,13 @@ const Career = () => {
                 </div>
                 <div className="space-y-2">
                   <Label className="font-semibold">Experience</Label>
-                  <Select value={formData.experience} onValueChange={(v) => setFormData((prev) => ({ ...prev, experience: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Select Experience Level" /></SelectTrigger>
+                  <Select
+                    value={formData.experience}
+                    onValueChange={(v) => setFormData((prev) => ({ ...prev, experience: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Experience Level" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="fresher">Fresher</SelectItem>
                       <SelectItem value="less-1">Less than 1 year</SelectItem>
@@ -264,39 +312,13 @@ const Career = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label className="font-semibold">Attach Resume *</Label>
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                    onDrop={(e) => { e.preventDefault(); e.stopPropagation(); const f = e.dataTransfer.files?.[0]; if (f) setResumeFile(f); }}
-                    className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary transition-colors"
-                  >
-                    <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    {resumeFile ? (
-                      <p className="text-sm font-medium text-foreground">{resumeFile.name}</p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">Click to upload or drag and drop<br /><span className="text-xs">PDF, DOC, DOCX (Max 5MB)</span></p>
-                    )}
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      className="hidden"
-                      onChange={(e) => {
-                        const f = e.target.files?.[0];
-                        if (f && f.size > 5 * 1024 * 1024) {
-                          toast({ title: "File too large", description: "Max file size is 5MB", variant: "destructive" });
-                          return;
-                        }
-                        if (f) setResumeFile(f);
-                      }}
-                    />
-                  </div>
-                </div>
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg py-6">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg py-6"
+              >
                 {loading ? "Sending..." : "Submit Application"}
               </Button>
             </form>
