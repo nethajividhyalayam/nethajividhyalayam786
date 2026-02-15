@@ -72,7 +72,8 @@ const Admissions = () => {
           const normalizedInput = normalizeName(name);
           const filtered = data.filter((s) => {
             const normalizedStudent = normalizeName(s.student_name);
-            return normalizedStudent.includes(normalizedInput) || normalizedInput.includes(normalizedStudent);
+            // Only suggest when the full name (without initials) matches exactly
+            return normalizedStudent === normalizedInput;
           });
           setStudentSuggestions(filtered);
           setShowSuggestions(filtered.length > 0);
