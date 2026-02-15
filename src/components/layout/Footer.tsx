@@ -1,15 +1,5 @@
 import { Link } from "react-router-dom";
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Facebook, 
-  Instagram, 
-  Twitter, 
-  Youtube,
-  Send,
-  Clock
-} from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Send, Clock } from "lucide-react";
 import logo from "@/assets/nethaji_logo.svg";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,10 +11,10 @@ const Footer = () => {
   const quickLinks = [
     { label: "About Us", path: "/about" },
     { label: "Admissions", path: "/admissions" },
-    { label: "Academics", path: "/academics" },
+    // @ts-ignore{ label: "Academics", path: "/academics" },
     { label: "Facilities", path: "/facilities" },
-    { label: "Gallery", path: "/gallery" },
-    { label: "Events", path: "/events" },
+    // @ts-ignore{ label: "Gallery", path: "/gallery" },
+    // @ts-ignore{ label: "Events", path: "/events" },
     { label: "Career", path: "/career" },
     { label: "Contact Us", path: "/contact" },
   ];
@@ -51,9 +41,8 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-sm text-primary-foreground/80 leading-relaxed">
-              Nethaji Vidhyalayam is committed to providing quality education that nurtures 
-              young minds and prepares them for a bright future. Established on 11th June 2002, we have 
-              been a beacon of academic excellence.
+              Nethaji Vidhyalayam is committed to providing quality education that nurtures young minds and prepares
+              them for a bright future. Established on 11th June 2002, we have been a beacon of academic excellence.
             </p>
             {/* Social Links */}
             <div className="flex gap-3">
@@ -97,14 +86,15 @@ const Footer = () => {
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
                 <span className="text-sm text-primary-foreground/80">
-                  5/325, Rajiv Nagar, S.Kolathur Main Road,<br />
+                  5/325, Rajiv Nagar, S.Kolathur Main Road,
+                  <br />
                   S.Kolathur, Kovilambakkam Post, Chennai - 600129
                 </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-accent flex-shrink-0" />
-                <a 
-                  href="tel:+919841594945" 
+                <a
+                  href="tel:+919841594945"
                   className="text-sm text-primary-foreground/80 hover:text-accent transition-colors"
                 >
                   9841594945 / 6380967675
@@ -116,9 +106,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-accent flex-shrink-0" />
-                <span className="text-sm text-primary-foreground/80">
-                  Mon - Sat: 8:50 AM - 3:30 PM
-                </span>
+                <span className="text-sm text-primary-foreground/80">Mon - Sat: 8:50 AM - 3:30 PM</span>
               </li>
             </ul>
           </div>
@@ -133,17 +121,25 @@ const Footer = () => {
               <Mail className="h-3 w-3" />
               <AnimatedEmailScroller className="hover:text-accent transition-colors underline" />
             </p>
-            <form className="space-y-3" onSubmit={(e) => {
-              e.preventDefault();
-              const form = e.target as HTMLFormElement;
-              const emailInput = form.querySelector('input[type="email"]') as HTMLInputElement;
-              if (emailInput?.value) {
-                const subject = encodeURIComponent('Newsletter Subscription');
-                const body = encodeURIComponent(`Please subscribe me to the newsletter.\n\nMy email: ${emailInput.value}`);
-                window.open(`https://mail.google.com/mail/?view=cm&to=nethajividhyalayam@gmail.com&su=${subject}&body=${body}`, '_blank');
-                emailInput.value = '';
-              }
-            }}>
+            <form
+              className="space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.target as HTMLFormElement;
+                const emailInput = form.querySelector('input[type="email"]') as HTMLInputElement;
+                if (emailInput?.value) {
+                  const subject = encodeURIComponent("Newsletter Subscription");
+                  const body = encodeURIComponent(
+                    `Please subscribe me to the newsletter.\n\nMy email: ${emailInput.value}`,
+                  );
+                  window.open(
+                    `https://mail.google.com/mail/?view=cm&to=nethajividhyalayam@gmail.com&su=${subject}&body=${body}`,
+                    "_blank",
+                  );
+                  emailInput.value = "";
+                }
+              }}
+            >
               <div className="relative">
                 <Input
                   type="email"
@@ -151,7 +147,7 @@ const Footer = () => {
                   required
                   className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 pr-12"
                 />
-                <Button 
+                <Button
                   type="submit"
                   size="icon"
                   className="absolute right-1 top-1/2 -translate-y-1/2 bg-accent hover:bg-accent/90 h-8 w-8"
@@ -163,10 +159,7 @@ const Footer = () => {
             {/* FeeDesk Link */}
             <div className="mt-6 p-4 bg-accent/20 rounded-lg">
               <p className="text-sm font-medium mb-2">Pay School Fees Online</p>
-              <Link
-                to="/feedesk"
-                className="inline-flex items-center gap-2 text-accent hover:underline text-sm"
-              >
+              <Link to="/feedesk" className="inline-flex items-center gap-2 text-accent hover:underline text-sm">
                 Visit FeeDesk Portal →
               </Link>
             </div>
