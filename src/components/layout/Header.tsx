@@ -86,11 +86,11 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
             <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-11 h-11 object-contain drop-shadow-md" />
-            <div className="hidden sm:block">
+            <div className="hidden sm:block text-center">
               <h1 className="font-serif font-extrabold text-xl text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
               </h1>
-              <p className="font-sans font-bold text-accent text-[10px] tracking-widest"> CHENNAI - KOVILAMBAKKAM </p>
+              <p className="font-sans font-bold text-accent text-[10px] tracking-widest">CHENNAI - KOVILAMBAKKAM</p>
             </div>
           </Link>
 
