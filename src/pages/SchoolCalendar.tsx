@@ -138,71 +138,6 @@ const SchoolCalendar = () => {
         </div>
       </div>
 
-      {/* Today's Panchangam Card */}
-      <section className="bg-gradient-to-r from-primary/5 to-accent/10 border-b">
-        <div className="container-custom py-8">
-          <div className="bg-card rounded-2xl shadow-lg border overflow-hidden">
-            <div className="bg-primary text-primary-foreground px-6 py-4 flex items-center gap-3">
-              <Sun className="w-6 h-6" />
-              <div>
-                <h2 className="font-serif text-xl font-bold">இன்றைய பஞ்சாங்கம் — Today's Panchangam</h2>
-                <p className="text-sm opacity-80">{today.date}</p>
-              </div>
-            </div>
-            <div className="p-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">வாரம் (Day)</p>
-                <p className="text-sm font-bold text-foreground">{today.tamilDay}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">தமிழ் மாதம்</p>
-                <p className="text-sm font-bold text-foreground">{today.tamilMonth}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">பக்ஷம் (Paksham)</p>
-                <p className="text-sm font-bold text-foreground">{today.paksham}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">திதி (Tithi)</p>
-                <p className="text-sm font-bold text-primary">{today.tithi}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">நட்சத்திரம் (Nakshatra)</p>
-                <p className="text-sm font-bold text-primary">{today.nakshatra}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">யோகம் (Yogam)</p>
-                <p className="text-sm font-bold text-foreground">{today.yogam}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">கரணம் (Karanam)</p>
-                <p className="text-sm font-bold text-foreground">{today.karanam}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">ராகு காலம்</p>
-                <p className="text-sm font-bold text-destructive">{today.rahuKalam}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">சூரிய உதயம்</p>
-                <p className="text-sm font-bold text-foreground">{today.sunrise}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">சூரிய அஸ்தமனம்</p>
-                <p className="text-sm font-bold text-foreground">{today.sunset}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">நிறம் (Color)</p>
-                <p className="text-sm font-bold text-foreground">{today.tamilDayColor}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground font-semibold uppercase">தெய்வம் (Deity)</p>
-                <p className="text-sm font-bold text-foreground">{today.tamilDayDeity}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {activeTab === "school" && (
         <section className="section-padding bg-background">
           <div className="container-custom">
@@ -233,6 +168,67 @@ const SchoolCalendar = () => {
       {activeTab === "panchangam" && (
         <section className="section-padding bg-background">
           <div className="container-custom space-y-10">
+
+            {/* Today's Panchangam Card */}
+            <div className="bg-card rounded-2xl shadow-lg border overflow-hidden">
+              <div className="bg-primary text-primary-foreground px-6 py-4 flex items-center gap-3">
+                <Sun className="w-6 h-6" />
+                <div>
+                  <h2 className="font-serif text-xl font-bold">இன்றைய பஞ்சாங்கம் — Today's Panchangam</h2>
+                  <p className="text-sm opacity-80">{today.date}</p>
+                </div>
+              </div>
+              <div className="p-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">வாரம் (Day)</p>
+                  <p className="text-sm font-bold text-foreground">{today.tamilDay}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">தமிழ் மாதம்</p>
+                  <p className="text-sm font-bold text-foreground">{today.tamilMonth}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">பக்ஷம் (Paksham)</p>
+                  <p className="text-sm font-bold text-foreground">{today.paksham}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">திதி (Tithi)</p>
+                  <p className="text-sm font-bold text-primary">{today.tithi}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">நட்சத்திரம் (Nakshatra)</p>
+                  <p className="text-sm font-bold text-primary">{today.nakshatra}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">யோகம் (Yogam)</p>
+                  <p className="text-sm font-bold text-foreground">{today.yogam}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">கரணம் (Karanam)</p>
+                  <p className="text-sm font-bold text-foreground">{today.karanam}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">ராகு காலம்</p>
+                  <p className="text-sm font-bold text-destructive">{today.rahuKalam}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">சூரிய உதயம்</p>
+                  <p className="text-sm font-bold text-foreground">{today.sunrise}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">சூரிய அஸ்தமனம்</p>
+                  <p className="text-sm font-bold text-foreground">{today.sunset}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">நிறம் (Color)</p>
+                  <p className="text-sm font-bold text-foreground">{today.tamilDayColor}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground font-semibold uppercase">தெய்வம் (Deity)</p>
+                  <p className="text-sm font-bold text-foreground">{today.tamilDayDeity}</p>
+                </div>
+              </div>
+            </div>
 
             {/* Kali Yugam & Year Info */}
             <div className="bg-gradient-to-br from-accent/30 to-primary/10 rounded-2xl p-8 text-center border">
