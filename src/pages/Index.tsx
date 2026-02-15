@@ -6,7 +6,7 @@ import LeadershipSection from "@/components/home/LeadershipSection";
 import FacilitiesSection from "@/components/home/FacilitiesSection";
 import EventsSection from "@/components/home/EventsSection";
 import GallerySection from "@/components/home/GallerySection";
-import FeePaymentSection from "@/components/home/FeePaymentSection";
+
 import CTASection from "@/components/home/CTASection";
 
 const Index = () => {
@@ -19,7 +19,7 @@ const Index = () => {
       <FacilitiesSection />
       <EventsSection />
       <GallerySection />
-      <FeePaymentSection />
+      
       <CTASection />
     </Layout>
   );

@@ -174,6 +174,27 @@ const Footer = () => {
         </div>
       </div>
 
+      {/* Fee Payment Banner */}
+      <div className="border-t border-primary-foreground/20 bg-accent/10">
+        <div className="container-custom py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <h4 className="font-serif font-bold text-lg">Pay School Fees Online</h4>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              to="/admissions#fees"
+              className="flex items-center gap-2 bg-accent/20 hover:bg-accent/30 px-5 py-2.5 rounded-lg font-semibold transition-colors text-sm"
+            >
+              Visit Fee Payment <span>→</span>
+            </Link>
+            <Link
+              to="/feedesk"
+              className="flex items-center gap-2 bg-accent/20 hover:bg-accent/30 px-5 py-2.5 rounded-lg font-semibold transition-colors text-sm"
+            >
+              Visit FeeDesk Portal <span>→</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
       {/* Bottom Bar */}
       <div className="border-t border-primary-foreground/20">
         <div className="container-custom py-6 flex flex-col md:flex-row justify-between items-center gap-4">
