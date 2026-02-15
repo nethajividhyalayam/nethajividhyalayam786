@@ -85,18 +85,19 @@ const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="text-sm text-primary-foreground/80">
+                <div className="min-w-0">
+                  <span className="text-sm text-primary-foreground/80 block leading-relaxed">
                     5/325, Rajiv Nagar, S.Kolathur Main Road,
                     <br />
-                    S.Kolathur, Kovilambakkam Post, Chennai - 600129
+                    S.Kolathur, Kovilambakkam Post,
+                    <br />
+                    Chennai - 600129
                   </span>
-                  <br />
                   <a
                     href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam,+S.Kolathur,+Kovilambakkam,+Chennai+600129"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent hover:underline text-xs inline-flex items-center gap-1 mt-1"
+                    className="text-accent hover:underline text-xs inline-flex items-center gap-1 mt-2"
                   >
                     Get Directions <ExternalLink className="h-3 w-3" />
                   </a>
@@ -111,9 +112,11 @@ const Footer = () => {
                   9841594945 / 6380967675
                 </a>
               </li>
-              <li className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-accent flex-shrink-0" />
-                <AnimatedEmailScroller className="text-sm text-primary-foreground/80 hover:text-accent transition-colors" />
+              <li className="flex items-start gap-3">
+                <Mail className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                <div className="min-w-0 overflow-hidden">
+                  <AnimatedEmailScroller className="text-sm text-primary-foreground/80 hover:text-accent transition-colors" />
+                </div>
               </li>
               <li className="flex items-center gap-3">
                 <Clock className="h-5 w-5 text-accent flex-shrink-0" />
