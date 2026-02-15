@@ -267,7 +267,40 @@ const ChatWidget = () => {
                 >
                   {m.role === "assistant" ? (
                     <div className="prose prose-sm max-w-none [&_p]:m-0 [&_ul]:my-1 [&_ol]:my-1">
-                      <ReactMarkdown>{m.content}</ReactMarkdown>
+                      <ReactMarkdown
+                        components={{
+                          a: ({ href, children }) => {
+                            const isExternal = href?.startsWith("http") || href?.startsWith("mailto:") || href?.startsWith("tel:");
+                            if (isExternal) {
+                              return (
+                                <a
+                                  href={href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-accent font-semibold hover:underline no-underline"
+                                >
+                                  {children}
+                                </a>
+                              );
+                            }
+                            // Internal links - use window.location for navigation
+                            return (
+                              <a
+                                href={href}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (href) window.location.href = href;
+                                }}
+                                className="inline-flex items-center gap-1 bg-accent/10 text-accent font-semibold px-2 py-0.5 rounded-md hover:bg-accent/20 transition-colors cursor-pointer no-underline"
+                              >
+                                {children}
+                              </a>
+                            );
+                          },
+                        }}
+                      >
+                        {m.content}
+                      </ReactMarkdown>
                     </div>
                   ) : (
                     m.content
