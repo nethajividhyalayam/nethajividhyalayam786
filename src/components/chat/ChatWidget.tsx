@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { MessageCircle, X, Send, Mic, MicOff, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -8,6 +9,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/school-chat`
 const IDLE_TIMEOUT = 30000; // 30 seconds
 
 const ChatWidget = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([
@@ -270,26 +272,34 @@ const ChatWidget = () => {
                       <ReactMarkdown
                         components={{
                           a: ({ href, children }) => {
-                            const isExternal = href?.startsWith("http") || href?.startsWith("mailto:") || href?.startsWith("tel:");
-                            if (isExternal) {
+                            const isMailto = href?.startsWith("mailto:");
+                            const isTel = href?.startsWith("tel:");
+                            const isExternal = href?.startsWith("http");
+                            
+                            if (isMailto || isTel || isExternal) {
                               return (
                                 <a
                                   href={href}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-accent font-semibold hover:underline no-underline"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    if (href) window.open(href, "_blank", "noopener,noreferrer");
+                                  }}
+                                  className="inline-flex items-center gap-1 text-accent font-semibold hover:underline cursor-pointer no-underline"
                                 >
                                   {children}
                                 </a>
                               );
                             }
-                            // Internal links - use window.location for navigation
+                            // Internal links - use React Router navigate
                             return (
                               <a
                                 href={href}
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  if (href) window.location.href = href;
+                                  if (href) {
+                                    navigate(href);
+                                    setOpen(false);
+                                  }
                                 }}
                                 className="inline-flex items-center gap-1 bg-accent/10 text-accent font-semibold px-2 py-0.5 rounded-md hover:bg-accent/20 transition-colors cursor-pointer no-underline"
                               >
