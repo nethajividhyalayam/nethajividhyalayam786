@@ -13,7 +13,7 @@ const Footer = () => {
     { label: "Admissions", path: "/admissions" },
     // @ts-ignore{ label: "Academics", path: "/academics" },
     { label: "Facilities", path: "/facilities" },
-    // @ts-ignore{ label: "Gallery", path: "/gallery" },
+    { label: "Gallery", path: "/gallery" },
     // @ts-ignore{ label: "Events", path: "/events" },
     { label: "Career", path: "/career" },
     { label: "Contact Us", path: "/contact" },
