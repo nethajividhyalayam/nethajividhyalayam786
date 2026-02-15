@@ -81,13 +81,13 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-serif font-bold text-lg mb-6">Contact Us</h4>
-            <ul className="space-y-3">
+            <h4 className="font-serif font-bold text-lg mb-4">Contact Us</h4>
+            <ul className="space-y-2.5">
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
-                <div className="min-w-0">
-                  <span className="text-sm text-primary-foreground/80 leading-snug">
-                    5/325, Rajiv Nagar, S.Kolathur Main Road, S.Kolathur, Kovilambakkam Post, Chennai - 600129
+                <div className="min-w-0 flex-1">
+                  <span className="text-sm text-primary-foreground/80 leading-snug block">
+                    5/325, Rajiv Nagar, S.Kolathur Main Road, S.Kolathur, Kovilambakkam Post,{" "}Chennai&nbsp;-&nbsp;600129
                   </span>
                   <a
                     href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam,+S.Kolathur,+Kovilambakkam,+Chennai+600129"
