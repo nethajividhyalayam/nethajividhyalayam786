@@ -538,13 +538,20 @@ const FeeDesk = () => {
         }
       }
 
-      if (studentsToInsert.length === 0) {
+      // Deduplicate by admission_number (keep last occurrence)
+      const deduped = new Map<string, typeof studentsToInsert[0]>();
+      for (const s of studentsToInsert) {
+        deduped.set(s.admission_number, s);
+      }
+      const uniqueStudents = Array.from(deduped.values());
+
+      if (uniqueStudents.length === 0) {
         toast({ title: "No Valid Rows", description: "No rows had the required fields (Admission Number, Student Name, Standard).", variant: "destructive" });
         setUploadLoading(false);
         return;
       }
 
-      const { error } = await supabase.from("students").upsert(studentsToInsert, { onConflict: "admission_number" });
+      const { error } = await supabase.from("students").upsert(uniqueStudents, { onConflict: "admission_number" });
       if (error) {
         toast({ title: "Upload Error", description: error.message, variant: "destructive" });
       } else {
