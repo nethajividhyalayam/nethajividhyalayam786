@@ -306,7 +306,21 @@ const ChatWidget = () => {
                             const isTel = href.startsWith("tel:");
                             const isExternal = href.startsWith("http");
                             
-                            if (isMailto || isTel || isExternal) {
+                            if (isTel || isMailto) {
+                              return (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    window.location.href = href;
+                                  }}
+                                  className="inline-flex items-center gap-1 bg-accent text-accent-foreground font-semibold px-3 py-1 rounded-lg hover:bg-accent/90 transition-colors cursor-pointer text-xs my-1"
+                                >
+                                  {children}
+                                </button>
+                              );
+                            }
+                            
+                            if (isExternal) {
                               return (
                                 <button
                                   type="button"
