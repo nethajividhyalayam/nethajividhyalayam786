@@ -1,21 +1,114 @@
 import Layout from "@/components/layout/Layout";
 import { useState, useMemo } from "react";
-import { Sun, Moon, Star, Calendar, Clock } from "lucide-react";
+import { Sun, Moon, Star, Calendar, Clock, Award } from "lucide-react";
 import { calculateTodayPanchangam } from "@/lib/panchangam";
 
 const calendarMonths = [
-  { month: "June 2025", tamilMonth: "வைகாசி / ஆனி", events: [{ date: "1", title: "School Reopens" }, { date: "5", title: "Orientation Day" }, { date: "21", title: "International Yoga Day" }] },
-  { month: "July 2025", tamilMonth: "ஆனி / ஆடி", events: [{ date: "4", title: "Science Week Begins" }, { date: "15", title: "Parent-Teacher Meet" }, { date: "28", title: "Talent Show" }] },
-  { month: "August 2025", tamilMonth: "ஆடி / ஆவணி", events: [{ date: "15", title: "Independence Day" }, { date: "20", title: "Inter-house Quiz" }, { date: "26", title: "Sports Week Begins" }] },
-  { month: "September 2025", tamilMonth: "ஆவணி / புரட்டாசி", events: [{ date: "5", title: "Teachers' Day" }, { date: "15", title: "Half-Yearly Exams Begin" }, { date: "28", title: "Results Day" }] },
-  { month: "October 2025", tamilMonth: "புரட்டாசி / ஐப்பசி", events: [{ date: "2", title: "Gandhi Jayanti" }, { date: "10-18", title: "Dussehra / Diwali Holidays" }, { date: "25", title: "School Resumes" }] },
-  { month: "November 2025", tamilMonth: "ஐப்பசி / கார்த்திகை", events: [{ date: "5", title: "Children's Day Celebrations" }, { date: "14", title: "Children's Day" }, { date: "20", title: "Annual Day Rehearsals" }] },
-  { month: "December 2025", tamilMonth: "கார்த்திகை / மார்கழி", events: [{ date: "1", title: "Annual Day" }, { date: "15", title: "Christmas Celebrations" }, { date: "22-31", title: "Winter Holidays" }] },
-  { month: "January 2026", tamilMonth: "மார்கழி / தை", events: [{ date: "2", title: "School Reopens" }, { date: "14", title: "Pongal Celebrations" }, { date: "26", title: "Republic Day & Sports Day" }] },
-  { month: "February 2026", tamilMonth: "தை / மாசி", events: [{ date: "1", title: "Science Exhibition" }, { date: "14", title: "Valentine's Week Activities" }, { date: "20", title: "Pre-Board Exams" }] },
-  { month: "March 2026", tamilMonth: "மாசி / பங்குனி", events: [{ date: "1-15", title: "Annual Exams" }, { date: "20", title: "Results Day" }, { date: "25", title: "Farewell Day" }] },
-  { month: "April 2026", tamilMonth: "பங்குனி / சித்திரை", events: [{ date: "1", title: "Summer Holidays Begin" }, { date: "14", title: "Tamil New Year (புத்தாண்டு)" }] },
-  { month: "May 2026", tamilMonth: "சித்திரை / வைகாசி", events: [{ date: "1", title: "May Day" }, { date: "15", title: "Summer Camp (Optional)" }, { date: "31", title: "Summer Holidays End" }] },
+  { month: "June 2025", tamilMonth: "வைகாசி / ஆனி", events: [
+    { date: "1", title: "School Reopens" }, { date: "5", title: "Orientation Day" },
+    { date: "21", title: "International Yoga Day" },
+    { date: "12", title: "🇮🇳 V.O.C. Birth Anniversary (வ.உ.சி. பிறந்த நாள்)" },
+  ]},
+  { month: "July 2025", tamilMonth: "ஆனி / ஆடி", events: [
+    { date: "4", title: "Science Week Begins" }, { date: "15", title: "Parent-Teacher Meet" },
+    { date: "23", title: "🇮🇳 Bal Gangadhar Tilak Birth Anniversary" },
+    { date: "28", title: "🇮🇳 Bharathiar Memorial Day (பாரதியார் நினைவு நாள்)" },
+    { date: "28", title: "Talent Show" },
+  ]},
+  { month: "August 2025", tamilMonth: "ஆடி / ஆவணி", events: [
+    { date: "15", title: "🇮🇳 Independence Day (சுதந்திர தினம்)" },
+    { date: "20", title: "🇮🇳 Rajaji Birth Anniversary (ராஜாஜி பிறந்த நாள்)" },
+    { date: "20", title: "Inter-house Quiz" }, { date: "26", title: "Sports Week Begins" },
+  ]},
+  { month: "September 2025", tamilMonth: "ஆவணி / புரட்டாசி", events: [
+    { date: "5", title: "Teachers' Day (Dr. Radhakrishnan Birthday)" },
+    { date: "11", title: "🇮🇳 Bharathiar Birth Anniversary (பாரதியார் பிறந்த நாள்)" },
+    { date: "15", title: "Half-Yearly Exams Begin" },
+    { date: "17", title: "🇮🇳 Periyar Birth Anniversary (பெரியார் பிறந்த நாள்)" },
+    { date: "28", title: "Results Day" },
+  ]},
+  { month: "October 2025", tamilMonth: "புரட்டாசி / ஐப்பசி", events: [
+    { date: "2", title: "🇮🇳 Gandhi Jayanti (காந்தி ஜெயந்தி)" },
+    { date: "7", title: "🇮🇳 VOC Memorial Day (வ.உ.சி. நினைவு நாள்)" },
+    { date: "10-18", title: "Dussehra / Diwali Holidays" },
+    { date: "15", title: "🇮🇳 APJ Abdul Kalam Birth Anniversary" },
+    { date: "25", title: "School Resumes" },
+    { date: "31", title: "🇮🇳 Sardar Patel Birth Anniversary (ஒற்றுமை நாள்)" },
+  ]},
+  { month: "November 2025", tamilMonth: "ஐப்பசி / கார்த்திகை", events: [
+    { date: "5", title: "🇮🇳 Virendranath Chattopadhyay Birth Anniversary" },
+    { date: "11", title: "🇮🇳 Maulana Azad Birth Anniversary (Education Day)" },
+    { date: "14", title: "Children's Day (Nehru Jayanti)" },
+    { date: "19", title: "🇮🇳 Rani Lakshmibai Birth Anniversary" },
+    { date: "20", title: "Annual Day Rehearsals" },
+  ]},
+  { month: "December 2025", tamilMonth: "கார்த்திகை / மார்கழி", events: [
+    { date: "1", title: "Annual Day" },
+    { date: "6", title: "🇮🇳 Dr. B.R. Ambedkar Memorial Day (அம்பேத்கர் நினைவு நாள்)" },
+    { date: "11", title: "🇮🇳 Subramania Bharati Birth Anniversary (Revised)" },
+    { date: "15", title: "Christmas Celebrations" },
+    { date: "22-31", title: "Winter Holidays" },
+    { date: "24", title: "🇮🇳 Periyar Memorial Day (பெரியார் நினைவு நாள்)" },
+  ]},
+  { month: "January 2026", tamilMonth: "மார்கழி / தை", events: [
+    { date: "2", title: "School Reopens" },
+    { date: "12", title: "🇮🇳 Swami Vivekananda Birthday (Youth Day)" },
+    { date: "14", title: "Pongal Celebrations" },
+    { date: "23", title: "🇮🇳 Netaji Subhas Chandra Bose Birthday" },
+    { date: "26", title: "🇮🇳 Republic Day & Sports Day (குடியரசு தினம்)" },
+    { date: "30", title: "🇮🇳 Mahatma Gandhi Memorial Day (சகித தினம்)" },
+  ]},
+  { month: "February 2026", tamilMonth: "தை / மாசி", events: [
+    { date: "1", title: "Science Exhibition" },
+    { date: "14", title: "Valentine's Week Activities" },
+    { date: "18", title: "🇮🇳 Kamaraj Birth Anniversary (காமராஜர் பிறந்த நாள்)" },
+    { date: "20", title: "Pre-Board Exams" },
+    { date: "28", title: "🇮🇳 Rajendra Prasad Memorial Day" },
+  ]},
+  { month: "March 2026", tamilMonth: "மாசி / பங்குனி", events: [
+    { date: "1-15", title: "Annual Exams" },
+    { date: "8", title: "🇮🇳 International Women's Day" },
+    { date: "20", title: "Results Day" },
+    { date: "23", title: "🇮🇳 Bhagat Singh, Rajguru & Sukhdev Martyrs' Day (தியாகிகள் தினம்)" },
+    { date: "25", title: "Farewell Day" },
+  ]},
+  { month: "April 2026", tamilMonth: "பங்குனி / சித்திரை", events: [
+    { date: "1", title: "Summer Holidays Begin" },
+    { date: "14", title: "🇮🇳 Tamil New Year (புத்தாண்டு) & Dr. Ambedkar Birthday" },
+  ]},
+  { month: "May 2026", tamilMonth: "சித்திரை / வைகாசி", events: [
+    { date: "1", title: "May Day" },
+    { date: "5", title: "🇮🇳 Karl Marx Birthday" },
+    { date: "7", title: "🇮🇳 Rabindranath Tagore Birthday" },
+    { date: "15", title: "Summer Camp (Optional)" },
+    { date: "22", title: "🇮🇳 Raja Ram Mohan Roy Birth Anniversary" },
+    { date: "31", title: "Summer Holidays End" },
+  ]},
+];
+
+const leaderAnniversaries = [
+  { date: "Jan 12", name: "சுவாமி விவேகானந்தர் (Swami Vivekananda)", type: "பிறந்த நாள்", description: "National Youth Day — Spiritual leader & philosopher" },
+  { date: "Jan 23", name: "நேதாஜி சுபாஷ் சந்திர போஸ் (Netaji Subhas Chandra Bose)", type: "பிறந்த நாள்", description: "Parakram Diwas — INA founder & freedom fighter" },
+  { date: "Jan 26", name: "குடியரசு தினம் (Republic Day)", type: "தேசிய நாள்", description: "Constitution of India came into effect" },
+  { date: "Jan 30", name: "மகாத்மா காந்தி (Mahatma Gandhi)", type: "நினைவு நாள்", description: "Martyrs' Day — Father of the Nation" },
+  { date: "Feb 18", name: "காமராஜர் (Kamaraj)", type: "பிறந்த நாள்", description: "King maker of Indian politics — TN's beloved leader" },
+  { date: "Mar 23", name: "பகத் சிங், ராஜ்குரு, சுக்தேவ் (Bhagat Singh, Rajguru, Sukhdev)", type: "தியாகிகள் தினம்", description: "Martyrs' Day — Young revolutionaries" },
+  { date: "Apr 14", name: "டாக்டர் அம்பேத்கர் (Dr. B.R. Ambedkar)", type: "பிறந்த நாள்", description: "Architect of Indian Constitution" },
+  { date: "May 7", name: "ரவீந்திரநாத் தாகூர் (Rabindranath Tagore)", type: "பிறந்த நாள்", description: "Nobel Laureate — National anthem composer" },
+  { date: "Jun 12", name: "வ.உ.சிதம்பரனார் (V.O. Chidambaranar)", type: "பிறந்த நாள்", description: "Kappalottiya Tamilan — Maritime freedom fighter" },
+  { date: "Jul 23", name: "பால கங்காதர திலகர் (Bal Gangadhar Tilak)", type: "பிறந்த நாள்", description: "'Swaraj is my birthright' — Freedom movement leader" },
+  { date: "Aug 15", name: "சுதந்திர தினம் (Independence Day)", type: "தேசிய நாள்", description: "India's Independence from British rule" },
+  { date: "Sep 5", name: "டாக்டர் ராதாகிருஷ்ணன் (Dr. S. Radhakrishnan)", type: "பிறந்த நாள்", description: "Teachers' Day — Philosopher & 2nd President" },
+  { date: "Sep 11", name: "பாரதியார் (Mahakavi Bharathiar)", type: "பிறந்த நாள்", description: "Tamil poet, freedom fighter & social reformer" },
+  { date: "Sep 17", name: "பெரியார் (Periyar E.V. Ramasamy)", type: "பிறந்த நாள்", description: "Father of Dravidian movement — Social reformer" },
+  { date: "Oct 2", name: "மகாத்மா காந்தி (Mahatma Gandhi)", type: "பிறந்த நாள்", description: "Gandhi Jayanti — Father of the Nation" },
+  { date: "Oct 15", name: "அப்துல் கலாம் (APJ Abdul Kalam)", type: "பிறந்த நாள்", description: "Missile Man of India — 11th President" },
+  { date: "Oct 31", name: "சர்தார் படேல் (Sardar Vallabhbhai Patel)", type: "பிறந்த நாள்", description: "Rashtriya Ekta Diwas — Iron Man of India" },
+  { date: "Nov 11", name: "மௌலானா அபுல் கலாம் ஆசாத் (Maulana Abul Kalam Azad)", type: "பிறந்த நாள்", description: "National Education Day — First Education Minister" },
+  { date: "Nov 14", name: "ஜவஹர்லால் நேரு (Jawaharlal Nehru)", type: "பிறந்த நாள்", description: "Children's Day — First Prime Minister" },
+  { date: "Nov 19", name: "ராணி லட்சுமிபாய் (Rani Lakshmibai)", type: "பிறந்த நாள்", description: "Jhansi ki Rani — Warrior queen of 1857 revolt" },
+  { date: "Dec 6", name: "டாக்டர் அம்பேத்கர் (Dr. B.R. Ambedkar)", type: "நினைவு நாள்", description: "Mahaparinirvan Divas" },
+  { date: "Dec 24", name: "பெரியார் (Periyar E.V. Ramasamy)", type: "நினைவு நாள்", description: "Social justice pioneer — Self-respect movement" },
 ];
 
 const panchangamData = {
@@ -365,6 +458,29 @@ const SchoolCalendar = () => {
                     <div>
                       <h3 className="font-bold text-foreground">{f.name}</h3>
                       <p className="text-sm text-muted-foreground">{f.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Freedom Fighters & Leaders */}
+            <div>
+              <h2 className="font-serif text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
+                <Award className="w-6 h-6 text-primary" /> சுதந்திர போராட்ட வீரர்கள் & தலைவர்கள் (Freedom Fighters & Leaders)
+              </h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {leaderAnniversaries.map((l, i) => (
+                  <div key={i} className="bg-card rounded-xl p-5 shadow border flex gap-4 items-start hover:shadow-lg transition-shadow">
+                    <div className="flex flex-col items-center flex-shrink-0">
+                      <span className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded">{l.date}</span>
+                      <span className={`text-[10px] mt-1 font-semibold px-2 py-0.5 rounded-full ${l.type === "பிறந்த நாள்" ? "bg-accent text-accent-foreground" : l.type === "நினைவு நாள்" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
+                        {l.type}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-foreground">{l.name}</h3>
+                      <p className="text-sm text-muted-foreground">{l.description}</p>
                     </div>
                   </div>
                 ))}
