@@ -9,22 +9,22 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const quickLinks = [
-    { label: "About Us", path: "/about" },
-    { label: "Admissions", path: "/admissions" },
-    // @ts-ignore{ label: "Academics", path: "/academics" },
-    { label: "Facilities", path: "/facilities" },
-    { label: "Gallery", path: "/gallery" },
-    // @ts-ignore{ label: "Events", path: "/events" },
-    { label: "Career", path: "/career" },
-    { label: "Contact Us", path: "/contact" },
-  ];
+  { label: "About Us", path: "/about" },
+  { label: "Admissions", path: "/admissions" },
+  // @ts-ignore{ label: "Academics", path: "/academics" },
+  { label: "Facilities", path: "/facilities" },
+  { label: "Gallery", path: "/gallery" },
+  // @ts-ignore{ label: "Events", path: "/events" },
+  { label: "Career", path: "/career" },
+  { label: "Contact Us", path: "/contact" }];
+
 
   const socialLinks = [
-    { icon: Facebook, href: "https://www.facebook.com/nethajividhyalayam", label: "Facebook" },
-    { icon: Instagram, href: "https://www.instagram.com/nethajividhyalayam", label: "Instagram" },
-    { icon: Twitter, href: "https://x.com/nethajividhya", label: "X" },
-    { icon: Youtube, href: "https://www.youtube.com/@nethajividhyalayam", label: "YouTube" },
-  ];
+  { icon: Facebook, href: "https://www.facebook.com/nethajividhyalayam", label: "Facebook" },
+  { icon: Instagram, href: "https://www.instagram.com/nethajividhyalayam", label: "Instagram" },
+  { icon: Twitter, href: "https://x.com/nethajividhya", label: "X" },
+  { icon: Youtube, href: "https://www.youtube.com/@nethajividhyalayam", label: "YouTube" }];
+
 
   return (
     <footer className="bg-primary text-primary-foreground">
@@ -34,7 +34,7 @@ const Footer = () => {
           {/* About Section */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="Nethaji Vidhyalayam Logo" className="w-12 h-12 object-contain" />
+              <img alt="Nethaji Vidhyalayam Logo" className="w-12 h-12 object-contain" src="/lovable-uploads/4b1e5885-823f-43b9-b7a8-6e9d8245139d.svg" />
               <div>
                 <h3 className="font-serif font-bold text-lg">Nethaji Vidhyalayam</h3>
                 <p className="text-xs text-primary-foreground/70">Nurturing Tomorrow's Leaders</p>
@@ -46,18 +46,18 @@ const Footer = () => {
             </p>
             {/* Social Links */}
             <div className="flex gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-primary-foreground/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
-                  aria-label={social.label}
-                >
+              {socialLinks.map((social) =>
+              <a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-primary-foreground/10 rounded-full flex items-center justify-center hover:bg-accent transition-colors"
+                aria-label={social.label}>
+
                   <social.icon className="h-5 w-5" />
                 </a>
-              ))}
+              )}
             </div>
           </div>
 
@@ -65,17 +65,17 @@ const Footer = () => {
           <div>
             <h4 className="font-serif font-bold text-lg mb-6">Quick Links</h4>
             <ul className="space-y-3">
-              {quickLinks.map((link) => (
-                <li key={link.label}>
+              {quickLinks.map((link) =>
+              <li key={link.label}>
                   <Link
-                    to={link.path}
-                    className="text-sm text-primary-foreground/80 hover:text-accent transition-colors inline-flex items-center gap-2"
-                  >
+                  to={link.path}
+                  className="text-sm text-primary-foreground/80 hover:text-accent transition-colors inline-flex items-center gap-2">
+
                     <span className="w-1.5 h-1.5 bg-accent rounded-full" />
                     {link.label}
                   </Link>
                 </li>
-              ))}
+              )}
             </ul>
           </div>
 
@@ -93,8 +93,8 @@ const Footer = () => {
                     href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam,+S.Kolathur,+Kovilambakkam,+Chennai+600129"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-accent hover:underline text-xs inline-flex items-center gap-1 mt-1"
-                  >
+                    className="text-accent hover:underline text-xs inline-flex items-center gap-1 mt-1">
+
                     Get Directions <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
@@ -139,28 +139,28 @@ const Footer = () => {
                 if (emailInput?.value) {
                   const subject = encodeURIComponent("Newsletter Subscription");
                   const body = encodeURIComponent(
-                    `Please subscribe me to the newsletter.\n\nMy email: ${emailInput.value}`,
+                    `Please subscribe me to the newsletter.\n\nMy email: ${emailInput.value}`
                   );
                   window.open(
                     `https://mail.google.com/mail/?view=cm&to=nethajividhyalayam@gmail.com&su=${subject}&body=${body}`,
-                    "_blank",
+                    "_blank"
                   );
                   emailInput.value = "";
                 }
-              }}
-            >
+              }}>
+
               <div className="relative">
                 <Input
                   type="email"
                   placeholder="Enter your email"
                   required
-                  className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 pr-12"
-                />
+                  className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50 pr-12" />
+
                 <Button
                   type="submit"
                   size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-accent hover:bg-accent/90 h-8 w-8"
-                >
+                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-accent hover:bg-accent/90 h-8 w-8">
+
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
@@ -192,8 +192,8 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>);
+
 };
 
 export default Footer;
