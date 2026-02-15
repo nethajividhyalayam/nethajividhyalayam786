@@ -272,39 +272,38 @@ const ChatWidget = () => {
                       <ReactMarkdown
                         components={{
                           a: ({ href, children }) => {
-                            const isMailto = href?.startsWith("mailto:");
-                            const isTel = href?.startsWith("tel:");
-                            const isExternal = href?.startsWith("http");
+                            if (!href) return <span>{children}</span>;
+                            
+                            const isMailto = href.startsWith("mailto:");
+                            const isTel = href.startsWith("tel:");
+                            const isExternal = href.startsWith("http");
                             
                             if (isMailto || isTel || isExternal) {
                               return (
-                                <a
-                                  href={href}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (href) window.open(href, "_blank", "noopener,noreferrer");
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    window.open(href, "_blank", "noopener,noreferrer");
                                   }}
-                                  className="inline-flex items-center gap-1 text-accent font-semibold hover:underline cursor-pointer no-underline"
+                                  className="inline-flex items-center gap-1 bg-accent text-accent-foreground font-semibold px-3 py-1 rounded-lg hover:bg-accent/90 transition-colors cursor-pointer text-xs my-1"
                                 >
                                   {children}
-                                </a>
+                                </button>
                               );
                             }
-                            // Internal links - use React Router navigate
+                            
+                            // Internal app links - use React Router
                             return (
-                              <a
-                                href={href}
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  if (href) {
-                                    navigate(href);
-                                    setOpen(false);
-                                  }
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigate(href);
+                                  setOpen(false);
                                 }}
-                                className="inline-flex items-center gap-1 bg-accent/10 text-accent font-semibold px-2 py-0.5 rounded-md hover:bg-accent/20 transition-colors cursor-pointer no-underline"
+                                className="inline-flex items-center gap-1 bg-primary text-primary-foreground font-semibold px-3 py-1 rounded-lg hover:bg-primary/90 transition-colors cursor-pointer text-xs my-1"
                               >
                                 {children}
-                              </a>
+                              </button>
                             );
                           },
                         }}
