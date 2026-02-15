@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Send, Clock } from "lucide-react";
+import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Send, Clock, ExternalLink } from "lucide-react";
 import logo from "@/assets/nethaji_logo.svg";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -85,11 +85,22 @@ const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
-                <span className="text-sm text-primary-foreground/80">
-                  5/325, Rajiv Nagar, S.Kolathur Main Road,
+                <div>
+                  <span className="text-sm text-primary-foreground/80">
+                    5/325, Rajiv Nagar, S.Kolathur Main Road,
+                    <br />
+                    S.Kolathur, Kovilambakkam Post, Chennai - 600129
+                  </span>
                   <br />
-                  S.Kolathur, Kovilambakkam Post, Chennai - 600129
-                </span>
+                  <a
+                    href="https://www.google.com/maps/dir/?api=1&destination=Nethaji+Vidhyalayam,+S.Kolathur,+Kovilambakkam,+Chennai+600129"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent hover:underline text-xs inline-flex items-center gap-1 mt-1"
+                  >
+                    Get Directions <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-accent flex-shrink-0" />
