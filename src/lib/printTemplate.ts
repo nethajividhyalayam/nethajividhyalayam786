@@ -91,7 +91,7 @@ const generateHTML = (options: PrintTemplateOptions, logoDataUri: string): strin
   <div style="max-width:700px;margin:0 auto;border:2px solid #1a3a5c;border-radius:12px;overflow:hidden;">
     <!-- Header -->
     <div style="background:#1a3a5c;color:#fff;padding:20px;display:flex;align-items:center;gap:16px;">
-      <img src="${logoDataUri}" alt="${schoolName} Logo" style="width:auto;height:100%;max-height:64px;min-width:40px;object-fit:contain;image-rendering:-webkit-optimize-contrast;filter:brightness(1.1) contrast(1.05);" />
+      <img src="${logoDataUri}" alt="${schoolName} Logo" style="width:auto;height:100%;max-height:120px;min-width:60px;object-fit:contain;image-rendering:-webkit-optimize-contrast;filter:brightness(1.1) contrast(1.05);" />
       <div style="flex:1;">
         <h1 style="margin:0;font-size:22px;letter-spacing:1px;">${schoolName}</h1>
         <p style="margin:4px 0 0;font-size:12px;opacity:0.85;">${schoolAddress}</p>
