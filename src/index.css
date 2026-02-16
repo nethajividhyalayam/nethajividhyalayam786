@@ -273,3 +273,46 @@
     }
   }
 }
+
+/* Interactive Logo Pulse Animation - zoom out expand then zoom in collapse */
+@keyframes logoPulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 0px hsl(var(--accent) / 0));
+  }
+  15% {
+    transform: scale(1.18) rotate(3deg);
+    filter: drop-shadow(0 0 8px hsl(var(--accent) / 0.5));
+  }
+  30% {
+    transform: scale(0.95) rotate(-2deg);
+    filter: drop-shadow(0 0 2px hsl(var(--accent) / 0.2));
+  }
+  45% {
+    transform: scale(1.12) rotate(1deg);
+    filter: drop-shadow(0 0 6px hsl(var(--accent) / 0.4));
+  }
+  60% {
+    transform: scale(0.98) rotate(-1deg);
+    filter: drop-shadow(0 0 1px hsl(var(--accent) / 0.1));
+  }
+  75% {
+    transform: scale(1.08) rotate(0.5deg);
+    filter: drop-shadow(0 0 4px hsl(var(--accent) / 0.3));
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 0px hsl(var(--accent) / 0));
+  }
+}
+
+.animate-logo-pulse {
+  animation: logoPulse 4s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.animate-logo-pulse:hover {
+  animation-play-state: paused;
+  transform: scale(1.25) rotate(5deg);
+  filter: drop-shadow(0 0 12px hsl(var(--accent) / 0.6));
+}
