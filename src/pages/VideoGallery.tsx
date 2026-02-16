@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { Play, Pause, ChevronLeft, ChevronRight, X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Layout from "@/components/layout/Layout";
 import { schoolVideos, type SchoolVideo } from "@/data/schoolVideos";
 
 const VideoGallery = () => {
@@ -58,7 +57,7 @@ const VideoGallery = () => {
   };
 
   return (
-    <Layout>
+    <>
       <main className="min-h-screen bg-background">
         {/* Header */}
         <section className="bg-primary text-white py-16 text-center">
@@ -215,7 +214,7 @@ const VideoGallery = () => {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 };
 

@@ -1,4 +1,3 @@
-import Layout from "@/components/layout/Layout";
 import { useState, useMemo } from "react";
 import { Sun, Moon, Star, Calendar, Clock, Award } from "lucide-react";
 import { calculateTodayPanchangam } from "@/lib/panchangam";
@@ -203,7 +202,7 @@ const SchoolCalendar = () => {
   const today = useMemo(() => calculateTodayPanchangam(), []);
 
   return (
-    <Layout>
+    <>
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container-custom text-center">
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">School Calendar & Tamil Panchangam</h1>
@@ -452,7 +451,7 @@ const SchoolCalendar = () => {
         </section>
       )}
 
-    </Layout>
+    </>
   );
 };
 

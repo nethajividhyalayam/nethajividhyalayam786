@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "@/components/layout/Layout";
 import { Calendar, MapPin, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 const events = [
@@ -25,7 +24,7 @@ const Events = () => {
   const nextEvent = () => setSelectedEvent((p) => p !== null ? (p + 1) % events.length : 0);
 
   return (
-    <Layout>
+    <>
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container-custom text-center">
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Events</h1>
@@ -113,7 +112,7 @@ const Events = () => {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 };
 

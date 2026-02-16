@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import Layout from "@/components/layout/Layout";
 import useScrollToHash from "@/hooks/useScrollToHash";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -347,7 +346,7 @@ const Admissions = () => {
   ];
 
   return (
-    <Layout>
+    <>
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container-custom text-center">
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Admissions Overview</h1>
@@ -638,7 +637,7 @@ const Admissions = () => {
           )}
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

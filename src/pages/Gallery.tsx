@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "@/components/layout/Layout";
 import { X, ChevronLeft, ChevronRight, ZoomIn, Info } from "lucide-react";
 import { galleryImages, galleryCategories } from "@/data/galleryData";
 
@@ -23,7 +22,7 @@ const Gallery = () => {
   const featured = filtered.find((img) => img.id === selectedImageId) || filtered[0];
 
   return (
-    <Layout>
+    <>
       {/* Hero Banner */}
       <section className="bg-primary text-primary-foreground py-16 md:py-20">
         <div className="container-custom text-center">
@@ -213,7 +212,7 @@ const Gallery = () => {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 };
 

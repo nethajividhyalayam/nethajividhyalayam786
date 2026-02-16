@@ -1,4 +1,3 @@
-import Layout from "@/components/layout/Layout";
 import useScrollToHash from "@/hooks/useScrollToHash";
 import { BookOpen, GraduationCap, Palette, Award, Star } from "lucide-react";
 
@@ -6,7 +5,7 @@ const Academics = () => {
   useScrollToHash();
 
   return (
-    <Layout>
+    <>
       {/* Banner */}
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container-custom text-center">
@@ -180,7 +179,7 @@ const Academics = () => {
           </div>
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

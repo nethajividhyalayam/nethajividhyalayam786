@@ -16,6 +16,7 @@ import Contact from "./pages/Contact";
 import Academics from "./pages/Academics";
 import FeeDesk from "./pages/FeeDesk";
 import VideoGallery from "./pages/VideoGallery";
+import Layout from "./components/layout/Layout";
 import useFaviconPulse from "./hooks/useFaviconPulse";
 import faviconLogo from "./assets/nethaji_logo2_circle.webp";
 
@@ -29,22 +30,24 @@ const App = () => {
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/admissions" element={<Admissions />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/calendar" element={<SchoolCalendar />} />
-          <Route path="/academics" element={<Academics />} />
-          <Route path="/facilities" element={<Facilities />} />
-          <Route path="/career" element={<Career />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/feedesk" element={<FeeDesk />} />
-          <Route path="/video-gallery" element={<VideoGallery />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/admissions" element={<Admissions />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/calendar" element={<SchoolCalendar />} />
+            <Route path="/academics" element={<Academics />} />
+            <Route path="/facilities" element={<Facilities />} />
+            <Route path="/career" element={<Career />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/feedesk" element={<FeeDesk />} />
+            <Route path="/video-gallery" element={<VideoGallery />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Layout>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
