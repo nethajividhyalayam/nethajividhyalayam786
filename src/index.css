@@ -274,45 +274,61 @@
   }
 }
 
-/* Interactive Logo Pulse Animation - zoom out expand then zoom in collapse */
+/* Interactive Logo Pulse Animation - slow 60s cycle, big clear zoom */
 @keyframes logoPulse {
   0% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(1);
     filter: drop-shadow(0 0 0px hsl(var(--accent) / 0));
   }
-  15% {
-    transform: scale(1.18) rotate(3deg);
-    filter: drop-shadow(0 0 8px hsl(var(--accent) / 0.5));
+  10% {
+    transform: scale(1.35);
+    filter: drop-shadow(0 0 12px hsl(var(--accent) / 0.5));
+  }
+  20% {
+    transform: scale(0.9);
+    filter: drop-shadow(0 0 2px hsl(var(--accent) / 0.1));
   }
   30% {
-    transform: scale(0.95) rotate(-2deg);
-    filter: drop-shadow(0 0 2px hsl(var(--accent) / 0.2));
+    transform: scale(1.25) rotate(5deg);
+    filter: drop-shadow(0 0 10px hsl(var(--accent) / 0.45));
   }
-  45% {
-    transform: scale(1.12) rotate(1deg);
-    filter: drop-shadow(0 0 6px hsl(var(--accent) / 0.4));
+  40% {
+    transform: scale(0.95) rotate(-3deg);
+    filter: drop-shadow(0 0 3px hsl(var(--accent) / 0.15));
+  }
+  50% {
+    transform: scale(1.4);
+    filter: drop-shadow(0 0 14px hsl(var(--accent) / 0.55));
   }
   60% {
-    transform: scale(0.98) rotate(-1deg);
-    filter: drop-shadow(0 0 1px hsl(var(--accent) / 0.1));
+    transform: scale(0.88) rotate(4deg);
+    filter: drop-shadow(0 0 2px hsl(var(--accent) / 0.1));
   }
-  75% {
-    transform: scale(1.08) rotate(0.5deg);
-    filter: drop-shadow(0 0 4px hsl(var(--accent) / 0.3));
+  70% {
+    transform: scale(1.3) rotate(-2deg);
+    filter: drop-shadow(0 0 10px hsl(var(--accent) / 0.4));
+  }
+  80% {
+    transform: scale(0.92);
+    filter: drop-shadow(0 0 3px hsl(var(--accent) / 0.15));
+  }
+  90% {
+    transform: scale(1.2) rotate(2deg);
+    filter: drop-shadow(0 0 8px hsl(var(--accent) / 0.35));
   }
   100% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(1);
     filter: drop-shadow(0 0 0px hsl(var(--accent) / 0));
   }
 }
 
 .animate-logo-pulse {
-  animation: logoPulse 4s ease-in-out infinite;
+  animation: logoPulse 60s ease-in-out infinite;
   transition: transform 0.3s ease;
 }
 
 .animate-logo-pulse:hover {
   animation-play-state: paused;
-  transform: scale(1.25) rotate(5deg);
-  filter: drop-shadow(0 0 12px hsl(var(--accent) / 0.6));
+  transform: scale(1.5) rotate(8deg);
+  filter: drop-shadow(0 0 16px hsl(var(--accent) / 0.7));
 }

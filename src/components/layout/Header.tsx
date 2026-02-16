@@ -82,10 +82,10 @@ const Header = () => {
       )}>
 
       <div className="w-full px-6">
-        <div className="flex items-center justify-between h-[60px]">
+        <div className="flex items-center justify-between h-[80px]">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <img alt="Nethaji Vidhyalayam Logo" className="w-16 h-16 object-contain drop-shadow-md animate-logo-pulse" src={logo} />
+          <Link to="/" className="flex items-center gap-3 shrink-0">
+            <img alt="Nethaji Vidhyalayam Logo" className="w-20 h-20 object-contain drop-shadow-lg animate-logo-pulse" src={logo} />
             <div className="hidden sm:block text-center">
               <h1 className="font-serif font-extrabold text-xl text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
