@@ -76,6 +76,7 @@ const generateHTML = (options: PrintTemplateOptions): string => {
   <div style="max-width:700px;margin:0 auto;border:2px solid #1a3a5c;border-radius:12px;overflow:hidden;">
     <!-- Header -->
     <div style="background:#1a3a5c;color:#fff;padding:20px;text-align:center;">
+      <img src="${window.location.origin}/logo.png" alt="${schoolName} Logo" style="width:80px;height:80px;border-radius:50%;object-fit:contain;margin-bottom:10px;image-rendering:-webkit-optimize-contrast;filter:brightness(1.1) contrast(1.05);" />
       <h1 style="margin:0;font-size:22px;letter-spacing:1px;">${schoolName}</h1>
       <p style="margin:4px 0 0;font-size:12px;opacity:0.85;">${schoolAddress}</p>
       <p style="margin:4px 0 0;font-size:12px;opacity:0.85;">Phone: +91 9841594945 / 6380967675 | Email: nethajividhyalayam@gmail.com</p>
