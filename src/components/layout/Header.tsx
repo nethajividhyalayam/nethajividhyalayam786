@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
-import logo from "@/assets/nethaji_logo.svg";
+import logo from "@/assets/logo.png";
 
 const navItems = [
 { label: "Home", path: "/" },
@@ -85,7 +85,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-[60px]">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 shrink-0">
-            <img alt="Nethaji Vidhyalayam Logo" className="w-11 h-11 object-contain drop-shadow-md" src="/lovable-uploads/27e9807b-ebcc-4b07-9264-311753b6246e.png" />
+            <img alt="Nethaji Vidhyalayam Logo" className="w-11 h-11 object-contain drop-shadow-md" src={logo} />
             <div className="hidden sm:block text-center">
               <h1 className="font-serif font-extrabold text-xl text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
