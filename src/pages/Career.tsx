@@ -1,4 +1,3 @@
-import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,7 +102,7 @@ const Career = () => {
   };
 
   return (
-    <Layout>
+    <>
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container-custom text-center">
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Join Our Team</h1>
@@ -325,7 +324,7 @@ const Career = () => {
           )}
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

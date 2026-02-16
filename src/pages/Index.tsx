@@ -1,4 +1,3 @@
-import Layout from "@/components/layout/Layout";
 import HeroSection from "@/components/home/HeroSection";
 import QuickLinksSection from "@/components/home/QuickLinksSection";
 import AboutSection from "@/components/home/AboutSection";
@@ -10,7 +9,7 @@ import CTASection from "@/components/home/CTASection";
 
 const Index = () => {
   return (
-    <Layout>
+    <>
       <HeroSection />
       <QuickLinksSection />
       <AboutSection />
@@ -19,7 +18,7 @@ const Index = () => {
       <EventsSection />
       <GallerySection />
       <CTASection />
-    </Layout>
+    </>
   );
 };
 

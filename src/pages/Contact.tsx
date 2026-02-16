@@ -1,4 +1,3 @@
-import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -79,7 +78,7 @@ const Contact = () => {
   };
 
   return (
-    <Layout>
+    <>
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container-custom text-center">
           <p className="text-accent font-semibold mb-2 uppercase tracking-wider text-sm">We're Here to Help</p>
@@ -239,7 +238,7 @@ const Contact = () => {
           </div>
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

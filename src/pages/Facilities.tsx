@@ -1,4 +1,3 @@
-import Layout from "@/components/layout/Layout";
 import { Book, Dumbbell, Bus, Shield, Wifi, Users, Monitor, Beaker, Music, Utensils, Camera, Heart, Eye, BadgeCheck, UserCheck } from "lucide-react";
 
 const facilities = [
@@ -22,7 +21,7 @@ const safetyFeatures = [
 
 const Facilities = () => {
   return (
-    <Layout>
+    <>
       <section className="bg-primary text-primary-foreground py-20">
         <div className="container-custom text-center">
           <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Our Facilities</h1>
@@ -122,7 +121,7 @@ const Facilities = () => {
           </div>
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 
