@@ -325,8 +325,8 @@
 .animate-logo-pulse {
   animation: logoPulse 60s ease-in-out infinite;
   transition: transform 0.3s ease;
+  image-rendering: high-quality;
   image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
 }
 
 .animate-logo-pulse:hover {
