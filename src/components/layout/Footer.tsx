@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Send, Clock, ExternalLink } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/nethaji_logo2_circle.webp";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import AnimatedEmailScroller from "@/components/ui/AnimatedEmailScroller";
@@ -34,7 +34,7 @@ const Footer = () => {
           {/* About Section */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <img alt="Nethaji Vidhyalayam Logo" className="w-[80px] h-[80px] object-contain brightness-110 contrast-105" style={{ imageRendering: '-webkit-optimize-contrast' }} src="/lovable-uploads/d5c76e6d-3288-4004-a140-e8fb9531ba9d.webp" />
+              <img alt="Nethaji Vidhyalayam Logo" className="w-[120px] h-[120px] object-contain brightness-110 contrast-105 animate-logo-pulse" style={{ imageRendering: '-webkit-optimize-contrast' }} src={logo} />
               <div>
                 <h3 className="font-serif font-bold text-lg">Nethaji Vidhyalayam</h3>
                 <p className="text-xs text-primary-foreground/70">Nurturing Tomorrow's Leaders</p>
