@@ -16,10 +16,14 @@ import Contact from "./pages/Contact";
 import Academics from "./pages/Academics";
 import FeeDesk from "./pages/FeeDesk";
 import VideoGallery from "./pages/VideoGallery";
+import useFaviconPulse from "./hooks/useFaviconPulse";
+import faviconLogo from "./assets/nethaji_logo2_circle.webp";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useFaviconPulse(faviconLogo);
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -44,6 +48,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
