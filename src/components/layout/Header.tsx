@@ -85,7 +85,7 @@ const Header = () => {
         <div className="flex items-center justify-between h-[80px]">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 shrink-0">
-            <img alt="Nethaji Vidhyalayam Logo" className="w-[60px] h-[60px] object-contain drop-shadow-lg brightness-110 contrast-105 animate-logo-pulse" style={{ imageRendering: '-webkit-optimize-contrast' }} src={logo} />
+            <img alt="Nethaji Vidhyalayam Logo" className="w-[80px] h-[80px] object-contain drop-shadow-lg brightness-110 contrast-105 animate-logo-pulse" style={{ imageRendering: '-webkit-optimize-contrast' }} src={logo} />
             <div className="hidden sm:block text-center">
               <h1 className="font-serif font-extrabold text-xl text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
