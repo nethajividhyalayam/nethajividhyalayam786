@@ -34,7 +34,7 @@ const Footer = () => {
           {/* About Section */}
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <img alt="Nethaji Vidhyalayam Logo" className="w-12 h-12 object-contain" src="/lovable-uploads/6e723ebc-0e69-429d-8000-a7352e3ee5f6.jpg" />
+              <img alt="Nethaji Vidhyalayam Logo" className="w-12 h-12 object-contain" src="/lovable-uploads/fbee826f-04da-4594-a43b-c130490034ea.png" />
               <div>
                 <h3 className="font-serif font-bold text-lg">Nethaji Vidhyalayam</h3>
                 <p className="text-xs text-primary-foreground/70">Nurturing Tomorrow's Leaders</p>
