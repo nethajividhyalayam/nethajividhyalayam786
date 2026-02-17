@@ -81,7 +81,7 @@ const Header = () => {
         isScrolled ? "bg-primary/95 backdrop-blur-md shadow-lg" : "bg-primary",
       )}
     >
-      <div className="w-full px-6">
+      <div className="w-full px-4">
         <div className="flex items-center justify-between h-[110px]">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-4 shrink-0 overflow-visible">
@@ -114,7 +114,7 @@ const Header = () => {
                   <Link
                     to={item.path}
                     className={cn(
-                      "nav-link-animated flex items-center gap-0.5 px-3 py-2 text-sm font-bold rounded-md transition-all duration-300 whitespace-nowrap",
+                      "nav-link-animated flex items-center gap-0.5 px-2 py-2 text-xs font-bold rounded-md transition-all duration-300 whitespace-nowrap",
                       isActive(item.path)
                         ? "text-accent bg-primary-foreground/10"
                         : "text-primary-foreground/90 hover:text-accent hover:bg-primary-foreground/10 hover:scale-105",
