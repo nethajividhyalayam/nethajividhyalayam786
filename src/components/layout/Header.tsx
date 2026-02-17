@@ -97,12 +97,14 @@ const Header = () => {
               <h1 className="font-serif font-extrabold text-[23px] text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
               </h1>
-              <p className="font-sans font-bold text-accent text-[11px] tracking-widest">
+              <p className="font-sans font-bold text-primary text-[11px] tracking-widest">
                 Nurturing Tomorrow's Leaders
               </p>
               {/* Optional motto/subtitle 
               <p className="mt-2 text-sm text-primary-foreground/80 font-medium italic">
                 Nurturing Excellence • Empowering Futures
+                //<p className="text-xs text-primary-foreground/70">Nurturing Tomorrow's Leaders</p>
+                //<p className="font-sans font-bold text-accent text-[11px] tracking-widest">
               </p>*/}
             </div>
           </Link>
