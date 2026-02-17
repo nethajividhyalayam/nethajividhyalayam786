@@ -94,7 +94,7 @@ const Header = () => {
               />
             </div>
             <div className="hidden sm:block text-center">
-              <h1 className="font-serif font-extrabold text-[20px] text-primary-foreground leading-tight tracking-tight">
+              <h1 className="font-serif font-extrabold text-[24px] text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
               </h1>
               <p className="font-sans font-bold text-accent text-[12px] tracking-widest">CHENNAI - KOVILAMBAKKAM</p>
