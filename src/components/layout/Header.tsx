@@ -81,7 +81,7 @@ const Header = () => {
         isScrolled ? "bg-primary/95 backdrop-blur-md shadow-lg" : "bg-primary",
       )}
     >
-      <div className="w-full px-4">
+      <div className="w-full px-6">
         <div className="flex items-center justify-between h-[110px]">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-4 shrink-0 overflow-visible">
