@@ -84,7 +84,7 @@ const Header = () => {
       <div className="w-full px-6">
         <div className="flex items-center justify-between h-[110px]">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-4 shrink-0 overflow-visible">
+          <Link to="/" className="flex items-center gap-2 shrink-0 overflow-visible">
             <div className="w-[160px] h-[110px] shrink-0 flex items-center justify-center">
               <img
                 alt="Nethaji Vidhyalayam Logo"
@@ -158,7 +158,7 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <a
               href="tel:+919841594945"
-              className="hidden md:flex items-center gap-0.5 bg-accent text-accent-foreground px-4 py-2 rounded-md text-sm font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
+              className="hidden md:flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md text-sm font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
             >
               <Phone className="h-3.5 w-3.5" />
               <span>Call Us</span>
