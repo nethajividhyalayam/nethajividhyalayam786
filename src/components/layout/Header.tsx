@@ -81,7 +81,7 @@ const Header = () => {
         isScrolled ? "bg-primary/95 backdrop-blur-md shadow-lg" : "bg-primary",
       )}
     >
-      <div className="w-full px-4">
+      <div className="w-full px-6">
         <div className="flex items-center justify-between h-[110px]">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-4 shrink-0 overflow-visible">
@@ -94,10 +94,10 @@ const Header = () => {
               />
             </div>
             <div className="hidden sm:block text-center">
-              <h1 className="font-serif font-extrabold text-[20px] text-primary-foreground leading-tight tracking-tight">
+              <h1 className="font-serif font-extrabold text-[22px] text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
               </h1>
-              <p className="font-sans font-bold text-accent text-[12px] tracking-widest">CHENNAI - KOVILAMBAKKAM</p>
+              <p className="font-sans font-bold text-accent text-[10px] tracking-widest">CHENNAI - KOVILAMBAKKAM</p>
             </div>
           </Link>
 
