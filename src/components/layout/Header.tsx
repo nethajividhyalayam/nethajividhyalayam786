@@ -97,8 +97,8 @@ const Header = () => {
               <h1 className="font-serif font-extrabold text-[23px] text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
               </h1>
-              <p className="font-sans font-bold text-accent text-[10px] tracking-widest">
-                Empowering Young Minds Since 2002
+              <p className="font-sans font-bold text-accent text-[11px] tracking-widest">
+                Empowering Futures Since 2002
               </p>
               {/* Optional motto/subtitle 
               <p className="mt-2 text-sm text-primary-foreground/80 font-medium italic">
