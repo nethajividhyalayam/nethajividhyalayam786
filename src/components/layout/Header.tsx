@@ -98,11 +98,11 @@ const Header = () => {
                 NETHAJI VIDHYALAYAM
               </h1>
               <p className="font-sans font-bold text-accent text-[10px] tracking-widest">
-                Empowering Young Minds Since 2002
+                Empowering Futures Since 2002
               </p>
               {/* Optional motto/subtitle 
               <p className="mt-2 text-sm text-primary-foreground/80 font-medium italic">
-                Nurturing Excellence • Empowering Futures
+                Nurturing Excellence • Empowering Futures or Empowering Young Minds Since 2002
               </p>*/}
             </div>
           </Link>
