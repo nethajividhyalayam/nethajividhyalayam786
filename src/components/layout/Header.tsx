@@ -158,7 +158,7 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <a
               href="tel:+919841594945"
-              className="hidden md:flex items-center gap-1.5 bg-accent text-accent-foreground px-4 py-2 rounded-md text-sm font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
+              className="hidden md:flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md text-sm font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
             >
               <Phone className="h-3.5 w-3.5" />
               <span>Call Us</span>
