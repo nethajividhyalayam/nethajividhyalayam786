@@ -94,7 +94,7 @@ const Header = () => {
               />
             </div>
             <div className="hidden sm:block text-center">
-              <h1 className="font-serif font-extrabold text-[24px] text-primary-foreground leading-tight tracking-tight">
+              <h1 className="font-serif font-extrabold text-[20px] text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
               </h1>
               <p className="font-sans font-bold text-accent text-[12px] tracking-widest">CHENNAI - KOVILAMBAKKAM</p>
@@ -114,7 +114,7 @@ const Header = () => {
                   <Link
                     to={item.path}
                     className={cn(
-                      "nav-link-animated flex items-center gap-0.5 px-2 py-2 text-xs font-bold rounded-md transition-all duration-300 whitespace-nowrap",
+                      "nav-link-animated flex items-center gap-0.5 px-3 py-2 text-sm font-bold rounded-md transition-all duration-300 whitespace-nowrap",
                       isActive(item.path)
                         ? "text-accent bg-primary-foreground/10"
                         : "text-primary-foreground/90 hover:text-accent hover:bg-primary-foreground/10 hover:scale-105",
