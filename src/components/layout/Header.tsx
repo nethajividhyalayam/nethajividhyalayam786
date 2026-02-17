@@ -98,6 +98,10 @@ const Header = () => {
                 NETHAJI VIDHYALAYAM
               </h1>
               <p className="font-sans font-bold text-accent text-[10px] tracking-widest">CHENNAI - KOVILAMBAKKAM</p>
+              {/* Optional motto/subtitle */}
+              <p className="mt-2 text-sm text-primary-foreground/80 font-medium italic">
+                Nurturing Excellence • Empowering Futures
+              </p>
             </div>
           </Link>
 
