@@ -90,48 +90,307 @@ const CURRICULA = [
 
 const TERMS = ["Term 1", "Term 2", "Term 3"];
 
-const GRADES = ["LKG", "UKG", "1st", "2nd", "3rd", "4th", "5th"];
+const GRADES = ["Pre-KG", "LKG", "UKG", "1st", "2nd", "3rd", "4th", "5th"];
 
 // Subjects per curriculum
 const SAMACHEER_SUBJECTS = ["Tamil", "English", "Maths", "EVS/Science", "Social Studies"];
-const MERRY_BIRDS_SUBJECTS = ["English", "Maths", "EVS/Science", "Tamil"];
+const MERRY_BIRDS_SUBJECTS = ["English", "Maths", "EVS/Science", "Social Studies", "General Knowledge"];
 
 const LANGUAGES = ["English", "Tamil", "Bilingual"];
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 const STORAGE_KEY = "samacheer_worksheets_v2";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
-// Topic suggestions per grade+subject
-const TOPIC_SUGGESTIONS: Record<string, string[]> = {
-  "LKG-Tamil": ["அ ஆ இ", "எழுத்துக்கள்", "பழங்கள்", "விலங்குகள்"],
-  "LKG-English": ["A B C", "Animals", "Colours", "Fruits"],
-  "LKG-Maths": ["Numbers 1-10", "Shapes", "Counting"],
-  "UKG-Tamil": ["சொல் படிக்கலாம்", "உயிர் எழுத்துக்கள்", "பழங்கள்"],
-  "UKG-English": ["Phonics", "Simple Words", "My Family", "Animals"],
-  "UKG-Maths": ["Numbers 1-20", "Addition", "Shapes"],
-  "1st-Tamil": ["உயிர் எழுத்துக்கள்", "மெய் எழுத்துக்கள்", "சொற்கள்"],
-  "1st-English": ["My Body", "My School", "Animals and their Homes"],
-  "1st-Maths": ["Addition", "Subtraction", "Shapes", "Numbers"],
-  "1st-EVS/Science": ["Parts of Plant", "Animals", "My Family"],
-  "2nd-Tamil": ["கவிதை", "உயிர்மெய் எழுத்துக்கள்", "வாக்கியம்"],
-  "2nd-English": ["Action Words", "Describing Words", "The Crow and the Pitcher"],
-  "2nd-Maths": ["Addition", "Subtraction", "Multiplication", "Time"],
-  "2nd-EVS/Science": ["Water", "Air", "Food", "Parts of Plant"],
-  "3rd-Tamil": ["நிலா", "பாடல்", "செய்யுள்"],
-  "3rd-English": ["Animals", "Flowers", "Seasons", "Community Helpers"],
-  "3rd-Maths": ["Multiplication", "Division", "Fractions", "Measurement"],
-  "3rd-EVS/Science": ["Plants", "Animals", "Food Chain", "Water Cycle"],
-  "3rd-Social Studies": ["Our State", "Maps", "Transport"],
-  "4th-Tamil": ["இயற்கை", "கவிதை", "உரைநடை"],
-  "4th-English": ["Environment", "Space", "Ancient Tamil Literature"],
-  "4th-Maths": ["Fractions", "Decimals", "Geometry", "Area and Perimeter"],
-  "4th-EVS/Science": ["Human Body", "Solar System", "Rocks and Soil"],
-  "4th-Social Studies": ["India", "Rivers", "Occupations"],
-  "5th-Tamil": ["வீரமாமுனிவர்", "பாரதியார்", "திருக்குறள்"],
-  "5th-English": ["Famous Personalities", "Environment", "Technology"],
-  "5th-Maths": ["Percentages", "Profit and Loss", "Algebra", "Data Handling"],
-  "5th-EVS/Science": ["Digestive System", "Plants", "Light and Shadow"],
-  "5th-Social Studies": ["Indian History", "Civics", "Geography"],
+// Topic suggestions: key = `${curricShort}-${term}-${grade}-${subject}`
+// curricShort: "MB" = Merry Birds, "SK" = Samacheer Kalvi
+const TOPIC_SUGGESTIONS_MAP: Record<string, string[]> = {
+
+  // ══════════════════════════════════════════════════════
+  // OXFORD MERRY BIRDS — PRE-KG
+  // ══════════════════════════════════════════════════════
+  "MB-Term 1-Pre-KG-English":          ["Hello! My Name Is", "My Body Parts", "Colours Around Me"],
+  "MB-Term 2-Pre-KG-English":          ["Animals I Know", "Fruits and Vegetables", "My Home"],
+  "MB-Term 3-Pre-KG-English":          ["Transport", "Community Helpers", "Weather and Seasons"],
+  "MB-Term 1-Pre-KG-Maths":            ["Numbers 1–5", "Shapes (Circle, Square)", "Big and Small"],
+  "MB-Term 2-Pre-KG-Maths":            ["Numbers 6–10", "Tall and Short", "Patterns"],
+  "MB-Term 3-Pre-KG-Maths":            ["Numbers 1–10 (Review)", "More and Less", "Inside and Outside"],
+  "MB-Term 1-Pre-KG-EVS/Science":      ["My Senses", "My Family", "Plants Around Us"],
+  "MB-Term 2-Pre-KG-EVS/Science":      ["Animals and their Sounds", "Food We Eat", "Clean Habits"],
+  "MB-Term 3-Pre-KG-EVS/Science":      ["Water Uses", "Air Around Us", "Day and Night"],
+  "MB-Term 1-Pre-KG-General Knowledge":["Days of the Week", "Colours", "Shapes I See"],
+  "MB-Term 2-Pre-KG-General Knowledge":["Animals and Babies", "Fruits and Vegetables", "National Flag"],
+  "MB-Term 3-Pre-KG-General Knowledge":["Birds of India", "Months of the Year", "Good Habits"],
+
+  // ══════════════════════════════════════════════════════
+  // OXFORD MERRY BIRDS — LKG
+  // ══════════════════════════════════════════════════════
+  "MB-Term 1-LKG-English":          ["Alphabet A–E (Phonics)", "My School", "Animals and their Sounds"],
+  "MB-Term 2-LKG-English":          ["Alphabet F–M (Phonics)", "My Family", "Action Words"],
+  "MB-Term 3-LKG-English":          ["Alphabet N–Z (Phonics)", "My Neighbourhood", "Seasons"],
+  "MB-Term 1-LKG-Maths":            ["Numbers 1–10", "Shapes (Triangle, Rectangle)", "Counting Objects"],
+  "MB-Term 2-LKG-Maths":            ["Numbers 11–20", "Patterns", "Long and Short"],
+  "MB-Term 3-LKG-Maths":            ["Numbers 1–20 (Review)", "Before and After", "Addition (intro)"],
+  "MB-Term 1-LKG-EVS/Science":      ["My Body Parts", "My Family", "Plants Around Us"],
+  "MB-Term 2-LKG-EVS/Science":      ["Animals and their Homes", "Food I Eat", "Water"],
+  "MB-Term 3-LKG-EVS/Science":      ["Air and Wind", "Seasons", "Community Helpers"],
+  "MB-Term 1-LKG-Social Studies":   ["My School", "My Home", "People Who Help Us"],
+  "MB-Term 2-LKG-Social Studies":   ["My Village / City", "Transport (Land)", "Transport (Water, Air)"],
+  "MB-Term 3-LKG-Social Studies":   ["National Symbols", "Festivals", "Good Citizens"],
+  "MB-Term 1-LKG-General Knowledge":["Days of the Week", "Colours", "National Flag of India"],
+  "MB-Term 2-LKG-General Knowledge":["Animals and their Babies", "Birds of India", "Fruits"],
+  "MB-Term 3-LKG-General Knowledge":["Months and Seasons", "Famous Indians", "Good Habits"],
+
+  // ══════════════════════════════════════════════════════
+  // OXFORD MERRY BIRDS — UKG
+  // ══════════════════════════════════════════════════════
+  "MB-Term 1-UKG-English":          ["Phonics – Short Vowel 'a'", "Simple CVC Words", "My Family"],
+  "MB-Term 2-UKG-English":          ["Phonics – Short Vowels e/i", "Animals and their Habitats", "Community Helpers"],
+  "MB-Term 3-UKG-English":          ["Phonics – Short Vowels o/u", "Simple Sentences", "Seasons and Weather"],
+  "MB-Term 1-UKG-Maths":            ["Numbers 1–20", "Addition (Single Digit)", "Shapes"],
+  "MB-Term 2-UKG-Maths":            ["Numbers 21–50", "Subtraction (Single Digit)", "Measurement (Long/Short)"],
+  "MB-Term 3-UKG-Maths":            ["Numbers 51–100", "Patterns", "Time (Day/Night/Morning)"],
+  "MB-Term 1-UKG-EVS/Science":      ["Plants and their Parts", "Animals (Domestic, Wild)", "Clean Habits"],
+  "MB-Term 2-UKG-EVS/Science":      ["Food We Eat (Healthy vs Junk)", "Water Uses", "Air Around Us"],
+  "MB-Term 3-UKG-EVS/Science":      ["Weather and Seasons", "Our Earth", "Light and Darkness"],
+  "MB-Term 1-UKG-Social Studies":   ["My School", "My Village and City", "Land Transport"],
+  "MB-Term 2-UKG-Social Studies":   ["Water Transport", "Air Transport", "Occupations"],
+  "MB-Term 3-UKG-Social Studies":   ["Our Country India", "National Symbols", "Festivals of India"],
+  "MB-Term 1-UKG-General Knowledge":["Days, Months, Seasons", "Animals and their Young", "National Symbols"],
+  "MB-Term 2-UKG-General Knowledge":["Famous Persons of India", "World Around Us", "Sports"],
+  "MB-Term 3-UKG-General Knowledge":["Inventions (Wheel, Fire)", "Human Body Facts", "Solar System (intro)"],
+
+  // ══════════════════════════════════════════════════════
+  // OXFORD MERRY BIRDS — CLASS 1
+  // ══════════════════════════════════════════════════════
+  "MB-Term 1-1st-English":          ["The Little Red Hen", "Phonics – Consonant Blends", "Articles a/an"],
+  "MB-Term 2-1st-English":          ["The Magic Drum (Story)", "Nouns (Common & Proper)", "Action Verbs"],
+  "MB-Term 3-1st-English":          ["The Honest Woodcutter", "Adjectives", "Simple Sentences & Punctuation"],
+  "MB-Term 1-1st-Maths":            ["Numbers 1–100", "Addition (2-Digit)", "Subtraction"],
+  "MB-Term 2-1st-Maths":            ["Multiplication (2x, 3x)", "Shapes and Patterns", "Measurement (CM)"],
+  "MB-Term 3-1st-Maths":            ["Division (intro)", "Money", "Time (Hours)"],
+  "MB-Term 1-1st-EVS/Science":      ["Plants Around Us", "Animals and their Young Ones", "Air and Water"],
+  "MB-Term 2-1st-EVS/Science":      ["Food and Nutrition", "Our Senses", "Soil"],
+  "MB-Term 3-1st-EVS/Science":      ["Weather", "Light and Shadow", "Simple Machines"],
+  "MB-Term 1-1st-Social Studies":   ["My Home", "My School", "Community Helpers"],
+  "MB-Term 2-1st-Social Studies":   ["Our Village and City", "Transport and Communication", "Markets"],
+  "MB-Term 3-1st-Social Studies":   ["Our Country India", "National Symbols", "Festivals"],
+  "MB-Term 1-1st-General Knowledge":["Days, Months, Seasons", "National Symbols of India", "Famous Personalities"],
+  "MB-Term 2-1st-General Knowledge":["Animals – Interesting Facts", "Space (Sun, Moon, Stars)", "Sports and Games"],
+  "MB-Term 3-1st-General Knowledge":["Inventions (Telephone, Bulb)", "India's History (intro)", "World Capitals (easy)"],
+
+  // ══════════════════════════════════════════════════════
+  // OXFORD MERRY BIRDS — CLASS 2
+  // ══════════════════════════════════════════════════════
+  "MB-Term 1-2nd-English":          ["The Hen and the Bee (Story)", "Nouns – Singular & Plural", "Rhyming Words"],
+  "MB-Term 2-2nd-English":          ["The Clever Crow (Story)", "Pronouns (I, He, She, They)", "Question Words"],
+  "MB-Term 3-2nd-English":          ["A Rainy Day (Poem)", "Adjectives", "Simple Story Writing"],
+  "MB-Term 1-2nd-Maths":            ["3-Digit Numbers", "Addition with Carry", "Subtraction with Borrow"],
+  "MB-Term 2-2nd-Maths":            ["Multiplication Tables 2–5", "Division (Basic)", "Fractions (Half, Quarter)"],
+  "MB-Term 3-2nd-Maths":            ["Time and Calendar", "Money", "Data Handling (Tally)"],
+  "MB-Term 1-2nd-EVS/Science":      ["Food and Health", "Water Cycle", "Animals (Adaptation)"],
+  "MB-Term 2-2nd-EVS/Science":      ["Plants (Photosynthesis intro)", "Air (Uses)", "Soil Types"],
+  "MB-Term 3-2nd-EVS/Science":      ["Weather and Seasons", "Simple Machines", "Light and Sound"],
+  "MB-Term 1-2nd-Social Studies":   ["Our Country India", "Landforms (Mountains, Plains)", "Rivers of India"],
+  "MB-Term 2-2nd-Social Studies":   ["Crops and Farming", "Occupations", "Transport"],
+  "MB-Term 3-2nd-Social Studies":   ["Our Government", "National Symbols", "Environment Care"],
+  "MB-Term 1-2nd-General Knowledge":["Inventions and Inventors", "World Records", "National Awards"],
+  "MB-Term 2-2nd-General Knowledge":["Space Exploration", "Famous Scientists", "Countries and Capitals"],
+  "MB-Term 3-2nd-General Knowledge":["World Leaders", "Sports Champions", "India's Heritage Sites"],
+
+  // ══════════════════════════════════════════════════════
+  // OXFORD MERRY BIRDS — CLASS 3
+  // ══════════════════════════════════════════════════════
+  "MB-Term 1-3rd-English":          ["The Camel's Hump (Poem)", "Tenses (Past, Present, Future)", "Letter Writing"],
+  "MB-Term 2-3rd-English":          ["The Brave Little Tailor", "Adverbs", "Comprehension Passage"],
+  "MB-Term 3-3rd-English":          ["Robinson Crusoe (excerpts)", "Conjunctions", "Essay Writing"],
+  "MB-Term 1-3rd-Maths":            ["4-Digit Numbers", "Multiplication (3-digit x 1)", "Division"],
+  "MB-Term 2-3rd-Maths":            ["Fractions", "Decimals (intro)", "Geometry (Angles)"],
+  "MB-Term 3-3rd-Maths":            ["Area and Perimeter", "Time and Distance", "Data Handling"],
+  "MB-Term 1-3rd-EVS/Science":      ["Plants and their Parts", "Adaptation in Animals", "Soil and Rocks"],
+  "MB-Term 2-3rd-EVS/Science":      ["Food Chain and Ecosystem", "Water Cycle", "Air Pressure"],
+  "MB-Term 3-3rd-EVS/Science":      ["Human Body Systems", "Force and Motion", "Light and Shadow"],
+  "MB-Term 1-3rd-Social Studies":   ["Maps and Directions", "Our State Tamil Nadu", "Physical Features of India"],
+  "MB-Term 2-3rd-Social Studies":   ["Climate of India", "Agriculture", "Transport and Communication"],
+  "MB-Term 3-3rd-Social Studies":   ["Industries of India", "Our Government", "World Geography (basic)"],
+  "MB-Term 1-3rd-General Knowledge":["Famous Scientists", "World Capitals", "Sports Champions"],
+  "MB-Term 2-3rd-General Knowledge":["India's Freedom Struggle", "Inventions", "Animals – Fun Facts"],
+  "MB-Term 3-3rd-General Knowledge":["Nobel Prize Winners", "World Heritage Sites", "Technology Today"],
+
+  // ══════════════════════════════════════════════════════
+  // OXFORD MERRY BIRDS — CLASS 4
+  // ══════════════════════════════════════════════════════
+  "MB-Term 1-4th-English":          ["Alice in Wonderland (Chapter 1)", "Active and Passive Voice", "Paragraph Writing"],
+  "MB-Term 2-4th-English":          ["The Jungle Book (Story)", "Direct and Indirect Speech", "Dialogue Writing"],
+  "MB-Term 3-4th-English":          ["Gulliver's Travels (excerpts)", "Prepositions", "Report Writing"],
+  "MB-Term 1-4th-Maths":            ["Large Numbers (Lakhs, Crores)", "Factors and Multiples (LCM, HCF)", "Fractions"],
+  "MB-Term 2-4th-Maths":            ["Decimals", "Percentage (intro)", "Geometry – Angles and Lines"],
+  "MB-Term 3-4th-Maths":            ["Area and Perimeter", "Volume (Cuboid, Cube)", "Data Handling – Bar Graphs"],
+  "MB-Term 1-4th-EVS/Science":      ["Human Body – Organ Systems", "Food Chain and Food Web", "Rocks and Minerals"],
+  "MB-Term 2-4th-EVS/Science":      ["Reproduction in Plants", "Solar System", "Force and Pressure"],
+  "MB-Term 3-4th-EVS/Science":      ["Light (Reflection)", "Sound", "Electricity (intro)"],
+  "MB-Term 1-4th-Social Studies":   ["Physical Features of India", "Climate Zones", "Soils and Vegetation"],
+  "MB-Term 2-4th-Social Studies":   ["Agriculture and Industries", "Transport and Trade", "Occupations"],
+  "MB-Term 3-4th-Social Studies":   ["Our Constitution (intro)", "Human Rights", "World – Continents and Oceans"],
+  "MB-Term 1-4th-General Knowledge":["Space Exploration", "World Leaders", "Indian History (Mughal Era)"],
+  "MB-Term 2-4th-General Knowledge":["Famous Scientists and Inventions", "UNESCO Heritage Sites", "Sports Records"],
+  "MB-Term 3-4th-General Knowledge":["Technology Milestones", "Environment and Climate", "Current Affairs (easy)"],
+
+  // ══════════════════════════════════════════════════════
+  // OXFORD MERRY BIRDS — CLASS 5
+  // ══════════════════════════════════════════════════════
+  "MB-Term 1-5th-English":          ["Adventures of Tom Sawyer", "Clauses and Phrases", "Essay Writing"],
+  "MB-Term 2-5th-English":          ["Treasure Island (Story)", "Reported Speech", "Formal Letter Writing"],
+  "MB-Term 3-5th-English":          ["Oliver Twist (excerpts)", "Idioms and Proverbs", "Story Writing"],
+  "MB-Term 1-5th-Maths":            ["LCM and HCF", "Ratio and Proportion", "Percentage"],
+  "MB-Term 2-5th-Maths":            ["Profit and Loss", "Simple Interest", "Algebra (intro)"],
+  "MB-Term 3-5th-Maths":            ["Geometry (Quadrilaterals)", "Data Handling – Pie Charts", "Patterns and Sequences"],
+  "MB-Term 1-5th-EVS/Science":      ["Reproduction in Plants and Animals", "Human Digestive System", "Ecosystems"],
+  "MB-Term 2-5th-EVS/Science":      ["Electricity and Circuits", "Light (Lenses)", "Matter (States)"],
+  "MB-Term 3-5th-EVS/Science":      ["Environment and Conservation", "Space – Planets and Satellites", "Technology in Daily Life"],
+  "MB-Term 1-5th-Social Studies":   ["Ancient Civilizations", "Indian Constitution", "Natural Resources"],
+  "MB-Term 2-5th-Social Studies":   ["Freedom Struggle of India", "Five Year Plans", "World Geography"],
+  "MB-Term 3-5th-Social Studies":   ["Human Rights and Democracy", "Global Warming", "United Nations"],
+  "MB-Term 1-5th-General Knowledge":["Nobel Prize Winners", "India's Space Missions", "World Records"],
+  "MB-Term 2-5th-General Knowledge":["Famous Inventions and Inventors", "World Heritage Sites", "Sports Champions"],
+  "MB-Term 3-5th-General Knowledge":["Current Affairs India", "Technology and AI", "Environmental Heroes"],
+
+  // ══════════════════════════════════════════════════════
+  // SAMACHEER KALVI — LKG
+  // ══════════════════════════════════════════════════════
+  "SK-Term 1-LKG-Tamil":    ["அ, ஆ, இ, ஈ", "குறில் எழுத்துக்கள்", "பழங்கள்"],
+  "SK-Term 2-LKG-Tamil":    ["உ, ஊ, எ, ஏ", "நெடில் எழுத்துக்கள்", "விலங்குகள்"],
+  "SK-Term 3-LKG-Tamil":    ["ஐ, ஒ, ஓ, ஔ", "உயிர் எழுத்துக்கள் (மொத்தம்)", "வண்ணங்கள்"],
+  "SK-Term 1-LKG-English":  ["A B C (Phonics)", "Animals", "Colours"],
+  "SK-Term 2-LKG-English":  ["D E F G (Phonics)", "Fruits", "Shapes"],
+  "SK-Term 3-LKG-English":  ["H–Z (Phonics)", "My Body", "My Family"],
+  "SK-Term 1-LKG-Maths":    ["Numbers 1–5", "Shapes (Circle, Square)", "Counting"],
+  "SK-Term 2-LKG-Maths":    ["Numbers 6–10", "Big and Small", "Patterns"],
+  "SK-Term 3-LKG-Maths":    ["Numbers 1–10 (Review)", "Addition (intro)", "Before and After"],
+  "SK-Term 1-LKG-EVS/Science": ["My Body", "My Family", "Animals Around Me"],
+  "SK-Term 2-LKG-EVS/Science": ["Plants and Flowers", "Food I Eat", "Water Uses"],
+  "SK-Term 3-LKG-EVS/Science": ["Seasons", "Clean Habits", "Community Helpers"],
+
+  // ══════════════════════════════════════════════════════
+  // SAMACHEER KALVI — UKG
+  // ══════════════════════════════════════════════════════
+  "SK-Term 1-UKG-Tamil":    ["உயிர் எழுத்துக்கள்", "அகர வரிசை", "என் குடும்பம்"],
+  "SK-Term 2-UKG-Tamil":    ["மெய் எழுத்துக்கள்", "சொல் படிக்கலாம்", "பூக்கள்"],
+  "SK-Term 3-UKG-Tamil":    ["உயிர்மெய் எழுத்துக்கள் (intro)", "வாக்கியம் படிக்கலாம்", "நல்ல பழக்கங்கள்"],
+  "SK-Term 1-UKG-English":  ["Phonics – Short 'a'", "CVC Words (cat, bat)", "My School"],
+  "SK-Term 2-UKG-English":  ["Phonics – Short 'e' & 'i'", "Animals and Sounds", "My Family"],
+  "SK-Term 3-UKG-English":  ["Phonics – Short 'o' & 'u'", "Simple Sentences", "Community Helpers"],
+  "SK-Term 1-UKG-Maths":    ["Numbers 1–20", "Addition (Single Digit)", "Shapes"],
+  "SK-Term 2-UKG-Maths":    ["Numbers 21–50", "Subtraction (Single Digit)", "Measurement"],
+  "SK-Term 3-UKG-Maths":    ["Numbers 51–100", "Patterns", "Time (Day/Night)"],
+  "SK-Term 1-UKG-EVS/Science": ["My Senses", "Plants (Parts)", "Animals (Domestic, Wild)"],
+  "SK-Term 2-UKG-EVS/Science": ["Food and Health", "Water and its Uses", "Air"],
+  "SK-Term 3-UKG-EVS/Science": ["Seasons and Weather", "Transport", "Festivals"],
+
+  // ══════════════════════════════════════════════════════
+  // SAMACHEER KALVI — CLASS 1
+  // ══════════════════════════════════════════════════════
+  "SK-Term 1-1st-Tamil":    ["உயிர் எழுத்துக்கள்", "வல்லினம் மிகா இடம்", "பெயர்ச்சொல்"],
+  "SK-Term 2-1st-Tamil":    ["மெய் எழுத்துக்கள்", "உயிர்மெய் எழுத்துக்கள்", "வினைச்சொல்"],
+  "SK-Term 3-1st-Tamil":    ["அகர வரிசை", "எதிர்ச்சொல்", "ஒரே மாதிரியான சொற்கள்"],
+  "SK-Term 1-1st-English":  ["My Body", "My School", "Animals and their Homes"],
+  "SK-Term 2-1st-English":  ["Action Words (Verbs)", "Describing Words (Adjectives)", "Days of the Week"],
+  "SK-Term 3-1st-English":  ["Seasons", "Community Helpers", "Simple Sentences"],
+  "SK-Term 1-1st-Maths":    ["Numbers 1–100", "Addition (2-Digit)", "Subtraction"],
+  "SK-Term 2-1st-Maths":    ["Shapes", "Measurement (Long/Short)", "Patterns"],
+  "SK-Term 3-1st-Maths":    ["Money", "Time (Clock)", "Data (Tally)"],
+  "SK-Term 1-1st-EVS/Science": ["Plants Around Us", "Animals and their Young Ones", "My Body"],
+  "SK-Term 2-1st-EVS/Science": ["Food and Nutrition", "Water", "Air"],
+  "SK-Term 3-1st-EVS/Science": ["Weather and Seasons", "Transport", "Community Helpers"],
+
+  // ══════════════════════════════════════════════════════
+  // SAMACHEER KALVI — CLASS 2
+  // ══════════════════════════════════════════════════════
+  "SK-Term 1-2nd-Tamil":    ["உயிர்மெய் எழுத்துக்கள்", "பெயர்ச்சொல் வகைகள்", "கவிதை – தோட்டம்"],
+  "SK-Term 2-2nd-Tamil":    ["வினைச்சொல்", "உவமை", "பாடல் – தாய்மொழி"],
+  "SK-Term 3-2nd-Tamil":    ["சொல் விளையாட்டு", "எதிர்ச்சொல்", "புணர்ச்சி (intro)"],
+  "SK-Term 1-2nd-English":  ["Action Words (Verbs)", "The Crow and the Pitcher (Story)", "Nouns"],
+  "SK-Term 2-2nd-English":  ["Adjectives", "Pronouns", "Question Words (Who, What, Where)"],
+  "SK-Term 3-2nd-English":  ["Rhyming Words", "Simple Story Writing", "Punctuation"],
+  "SK-Term 1-2nd-Maths":    ["3-Digit Numbers", "Addition with Carry", "Subtraction with Borrow"],
+  "SK-Term 2-2nd-Maths":    ["Multiplication Tables 2–5", "Division (Basic)", "Fractions (Half, Quarter)"],
+  "SK-Term 3-2nd-Maths":    ["Time and Calendar", "Money", "Data Handling (Tally Charts)"],
+  "SK-Term 1-2nd-EVS/Science": ["Food", "Water", "Air"],
+  "SK-Term 2-2nd-EVS/Science": ["Plants (Photosynthesis)", "Animals (Adaptation)", "Soil"],
+  "SK-Term 3-2nd-EVS/Science": ["Weather", "Simple Machines", "Light and Sound"],
+  "SK-Term 1-2nd-Social Studies": ["Our Country India", "Our State Tamil Nadu", "National Symbols"],
+  "SK-Term 2-2nd-Social Studies": ["Landforms", "Rivers of India", "Crops and Farming"],
+  "SK-Term 3-2nd-Social Studies": ["Transport", "Occupations", "Government (intro)"],
+
+  // ══════════════════════════════════════════════════════
+  // SAMACHEER KALVI — CLASS 3
+  // ══════════════════════════════════════════════════════
+  "SK-Term 1-3rd-Tamil":    ["நிலா (கவிதை)", "செய்யுள்", "பாடல் – நம் தமிழ்"],
+  "SK-Term 2-3rd-Tamil":    ["உரைநடை", "பெயர்ச்சொல் வகைகள்", "வினைமுற்று"],
+  "SK-Term 3-3rd-Tamil":    ["புணர்ச்சி", "மடக்கு அணி", "தொகைச்சொல்"],
+  "SK-Term 1-3rd-English":  ["Animals", "Flowers and Plants", "Community Helpers"],
+  "SK-Term 2-3rd-English":  ["Seasons and Weather", "Tenses (Simple)", "Letter Writing (Informal)"],
+  "SK-Term 3-3rd-English":  ["Comprehension Passage", "Adjectives", "Essay (My School)"],
+  "SK-Term 1-3rd-Maths":    ["4-Digit Numbers", "Multiplication (3-Digit x 1)", "Division"],
+  "SK-Term 2-3rd-Maths":    ["Fractions", "Decimals (intro)", "Geometry (Angles)"],
+  "SK-Term 3-3rd-Maths":    ["Area and Perimeter", "Time and Distance", "Data Handling"],
+  "SK-Term 1-3rd-EVS/Science": ["Plants and their Parts", "Adaptation in Animals", "Soil and Rocks"],
+  "SK-Term 2-3rd-EVS/Science": ["Food Chain", "Water Cycle", "Air Pressure"],
+  "SK-Term 3-3rd-EVS/Science": ["Human Body", "Force and Motion", "Light and Shadow"],
+  "SK-Term 1-3rd-Social Studies": ["Maps and Directions", "Physical Features of India", "Our State Tamil Nadu"],
+  "SK-Term 2-3rd-Social Studies": ["Climate", "Agriculture of India", "Industries"],
+  "SK-Term 3-3rd-Social Studies": ["Transport and Communication", "Our Government", "Environmental Care"],
+
+  // ══════════════════════════════════════════════════════
+  // SAMACHEER KALVI — CLASS 4
+  // ══════════════════════════════════════════════════════
+  "SK-Term 1-4th-Tamil":    ["இயற்கை (கவிதை)", "உரைநடை", "தமிழ் இலக்கணம்"],
+  "SK-Term 2-4th-Tamil":    ["வீரமாமுனிவர்", "செய்யுள்", "பாரதியார் பாடல்"],
+  "SK-Term 3-4th-Tamil":    ["திருக்குறள்", "அன்றாட வாழ்வில் தமிழ்", "மரபுவழி சொற்கள்"],
+  "SK-Term 1-4th-English":  ["Environment", "Alice in Wonderland (excerpts)", "Active and Passive Voice"],
+  "SK-Term 2-4th-English":  ["Space", "Direct and Indirect Speech", "Paragraph Writing"],
+  "SK-Term 3-4th-English":  ["Famous Personalities", "Prepositions", "Essay Writing"],
+  "SK-Term 1-4th-Maths":    ["Large Numbers (Lakhs, Crores)", "Factors and Multiples (LCM, HCF)", "Fractions"],
+  "SK-Term 2-4th-Maths":    ["Decimals", "Percentage (intro)", "Geometry – Angles"],
+  "SK-Term 3-4th-Maths":    ["Area and Perimeter", "Volume", "Data Handling – Bar Graphs"],
+  "SK-Term 1-4th-EVS/Science": ["Human Body – Organ Systems", "Food Chain", "Rocks and Minerals"],
+  "SK-Term 2-4th-EVS/Science": ["Reproduction in Plants", "Solar System", "Force and Pressure"],
+  "SK-Term 3-4th-EVS/Science": ["Light (Reflection)", "Sound", "Electricity (intro)"],
+  "SK-Term 1-4th-Social Studies": ["Physical Features of India", "Climate Zones", "Soils and Vegetation"],
+  "SK-Term 2-4th-Social Studies": ["Agriculture", "Industries", "Transport and Trade"],
+  "SK-Term 3-4th-Social Studies": ["Our Constitution (intro)", "Human Rights", "World Continents"],
+
+  // ══════════════════════════════════════════════════════
+  // SAMACHEER KALVI — CLASS 5
+  // ══════════════════════════════════════════════════════
+  "SK-Term 1-5th-Tamil":    ["வீரமாமுனிவர்", "பாரதியார் கவிதை", "திருக்குறள் (அதிகாரம் 1–5)"],
+  "SK-Term 2-5th-Tamil":    ["ஔவையார் பாடல்கள்", "உரைநடை", "இலக்கணம் – சொல் வகைகள்"],
+  "SK-Term 3-5th-Tamil":    ["திருவாசகம்", "நவீன கவிதை", "தமிழ் இலக்கண – தொடர்"],
+  "SK-Term 1-5th-English":  ["Famous Personalities", "Clauses and Phrases", "Essay Writing"],
+  "SK-Term 2-5th-English":  ["Environment and Conservation", "Reported Speech", "Formal Letter"],
+  "SK-Term 3-5th-English":  ["Technology and Science", "Idioms and Proverbs", "Story Writing"],
+  "SK-Term 1-5th-Maths":    ["LCM and HCF", "Ratio and Proportion", "Percentage"],
+  "SK-Term 2-5th-Maths":    ["Profit and Loss", "Simple Interest", "Algebra (intro)"],
+  "SK-Term 3-5th-Maths":    ["Geometry (Quadrilaterals)", "Data Handling – Pie Charts", "Patterns"],
+  "SK-Term 1-5th-EVS/Science": ["Reproduction in Plants and Animals", "Human Digestive System", "Ecosystems"],
+  "SK-Term 2-5th-EVS/Science": ["Electricity and Circuits", "Light (Lenses)", "Matter (States)"],
+  "SK-Term 3-5th-EVS/Science": ["Environment and Conservation", "Space", "Technology in Daily Life"],
+  "SK-Term 1-5th-Social Studies": ["Ancient Civilizations", "Indian Constitution", "Natural Resources"],
+  "SK-Term 2-5th-Social Studies": ["Freedom Struggle of India", "Five Year Plans", "World Geography"],
+  "SK-Term 3-5th-Social Studies": ["Human Rights and Democracy", "Global Warming", "United Nations"],
+
+  // Pre-KG Samacheer
+  "SK-Term 1-Pre-KG-Tamil":    ["அ, ஆ", "பழங்கள்", "விலங்குகள்"],
+  "SK-Term 2-Pre-KG-Tamil":    ["இ, ஈ, உ", "பூக்கள்", "வண்ணங்கள்"],
+  "SK-Term 3-Pre-KG-Tamil":    ["ஊ, எ, ஏ", "வீட்டு பொருட்கள்", "என் குடும்பம்"],
+  "SK-Term 1-Pre-KG-English":  ["A B C", "Colours", "Animals"],
+  "SK-Term 2-Pre-KG-English":  ["D E F", "Fruits", "My Body"],
+  "SK-Term 3-Pre-KG-English":  ["G H I J", "My Home", "Shapes"],
+  "SK-Term 1-Pre-KG-Maths":    ["Numbers 1–3", "Shapes", "Big and Small"],
+  "SK-Term 2-Pre-KG-Maths":    ["Numbers 4–7", "Tall and Short", "Patterns"],
+  "SK-Term 3-Pre-KG-Maths":    ["Numbers 8–10", "Inside and Outside", "Counting"],
+  "SK-Term 1-Pre-KG-EVS/Science": ["My Senses", "My Body", "My Family"],
+  "SK-Term 2-Pre-KG-EVS/Science": ["Animals Around Me", "Plants", "Food I Eat"],
+  "SK-Term 3-Pre-KG-EVS/Science": ["Water", "Air", "Clean Habits"],
 };
 
 // ─── Diagram SVG Component ─────────────────────────────────────────────────
@@ -288,9 +547,11 @@ export default function WorksheetMaker() {
 
   // Update topic suggestions when grade/subject changes
   useEffect(() => {
-    const key = `${formData.grade}-${formData.subject}`;
-    setSuggestions(TOPIC_SUGGESTIONS[key] || []);
-  }, [formData.grade, formData.subject]);
+    const isMB = formData.curriculum === "Oxford Merry Birds (Integrated Term Course)";
+    const curricShort = isMB ? "MB" : "SK";
+    const key = `${curricShort}-${formData.term}-${formData.grade}-${formData.subject}`;
+    setSuggestions(TOPIC_SUGGESTIONS_MAP[key] || []);
+  }, [formData.curriculum, formData.term, formData.grade, formData.subject]);
 
   // ─── Generate ──────────────────────────────────────────────────────────────
 
@@ -1103,9 +1364,14 @@ export default function WorksheetMaker() {
               {/* Footer */}
               <div className="px-8 py-4 border-t border-gray-100 bg-gray-50 print:bg-transparent text-center">
                 <p className="text-xs text-gray-400 print:text-gray-600 tamil-font">
-                  Tamil Nadu Samacheer Kalvi Curriculum • Generated by Samacheer Worksheet Maker • Nethaji Vidhyalayam
+                  {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
+                    ? "Oxford Merry Birds • Integrated Term Course (Pre-KG to 5th) • OUP"
+                    : "Tamil Nadu Samacheer Kalvi Curriculum (Pre-KG to 5th)"} • Generated by Worksheet Maker • Nethaji Vidhyalayam
                 </p>
                 <p className="text-xs text-gray-300 print:text-gray-500 mt-0.5 tamil-font">
+                  {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
+                    ? `${formData.term} • Class ${formData.grade} • ${formData.subject}`
+                    : "தமிழ்நாடு சமச்சீர் பாடத்திட்டம் • AI தொழில்நுட்பத்தால் உருவாக்கப்பட்டது"}
                   தமிழ்நாடு சமச்சீர் பாடத்திட்டம் • AI தொழில்நுட்பத்தால் உருவாக்கப்பட்டது
                 </p>
               </div>

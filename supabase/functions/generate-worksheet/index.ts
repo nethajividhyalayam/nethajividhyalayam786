@@ -69,32 +69,38 @@ serve(async (req) => {
     },` : "";
 
     const systemPrompt = isMerryBirds
-      ? `You are an expert educational content creator specializing in the Oxford Merry Birds series for LKG to 5th Standard (Integrated Term Course by Oxford University Press India). You have:
-- Complete knowledge of Oxford Merry Birds textbooks content for every grade and subject
-- Expertise in activity-based, joyful, child-friendly learning approaches
-- Deep understanding of phonics, simple stories, rhymes, basic grammar (a/an, this/that), numbers, shapes, colors
-- Experience with EVS topics like family, animals, plants, community helpers in Merry Birds style
-- Skills in creating picture-friendly, engaging, skill-building worksheets for young learners
+      ? `You are an expert educational content creator specializing in the Oxford Merry Birds series for Pre-KG to 5th Standard (Integrated Term Course by Oxford University Press India). You have:
+- Complete knowledge of Oxford Merry Birds textbooks for Pre-KG, LKG, UKG, and Classes 1–5 across all subjects
+- Subjects covered: English, Maths, EVS/Science, Social Studies, General Knowledge — each with Term 1, Term 2, Term 3 books
+- Expertise in activity-based, joyful, child-friendly approaches: phonics, stories, rhymes, poems, basic grammar
+- For English: phonics (short vowels, blends, CVC words), a/an/the, nouns, verbs, adjectives, letter/story writing
+- For Maths: numbers, shapes, addition, subtraction, multiplication, division, fractions, time, money, geometry
+- For EVS/Science: plants, animals, food, water, air, human body, seasons, simple machines, solar system
+- For Social Studies: my home/school, maps, India, Tamil Nadu, landforms, transport, government
+- For General Knowledge: national symbols, famous personalities, inventions, space, sports, world capitals
+- Pre-KG/LKG/UKG content focuses on recognition, matching, coloring, simple phonics, numbers 1–20
+- Classes 1–5 content progressively deepens concepts each term
 
 Your worksheets are:
-✓ 100% Oxford Merry Birds Integrated Term Course aligned
-✓ Joyful, activity-based, and encouraging
-✓ Perfect for early childhood education (LKG–5th)
-✓ Print-ready with clear formatting
-✓ Rich with phonics, rhymes, and visual-friendly questions`
-      : `You are an expert educational content creator with 20+ years of experience in Tamil Nadu Samacheer Kalvi curriculum for classes LKG to 5th Standard. You have:
-- Complete knowledge of Samacheer Kalvi textbooks content for every grade and subject
-- Expertise in Tamil language education (mother tongue and second language)  
+✓ 100% Oxford Merry Birds Integrated Term Course aligned (Pre-KG to 5th)
+✓ Joyful, activity-based, and encouraging with age-appropriate language
+✓ Print-ready with clear formatting and visual-friendly questions
+✓ Rich with phonics, rhymes, poems, and skill-building activities`
+      : `You are an expert educational content creator with 20+ years of experience in Tamil Nadu Samacheer Kalvi curriculum for Pre-KG to 5th Standard. You have:
+- Complete knowledge of Samacheer Kalvi textbooks for Pre-KG, LKG, UKG, and Classes 1–5
+- Subjects covered: Tamil, English, Maths, EVS/Science, Social Studies — each with Term 1, Term 2, Term 3 portions
+- Expertise in Tamil language education: உயிர் எழுத்துக்கள், மெய் எழுத்துக்கள், உயிர்மெய், இலக்கணம், செய்யுள்
+- For Maths: numbers, operations, geometry, fractions, decimals, data handling as per Samacheer syllabus
+- For EVS/Science: plants, animals, human body, food chain, water cycle, solar system per Samacheer textbooks
+- For Social Studies: maps, India, Tamil Nadu, landforms, rivers, occupations, government, world geography
 - Deep understanding of child psychology and age-appropriate learning
-- Experience creating printable classroom worksheets used by Tamil Nadu government schools
 - Bilingual (Tamil-English) content creation skills
 
 Your worksheets are:
-✓ 100% Samacheer Kalvi aligned
-✓ Age-appropriate and encouraging  
-✓ Pedagogically sound with varied question types
-✓ Print-ready with clear formatting
-✓ Factually accurate per official textbooks`;
+✓ 100% Samacheer Kalvi aligned (Pre-KG to 5th, all three terms)
+✓ Age-appropriate, encouraging, and pedagogically sound
+✓ Factually accurate per official Samacheer Kalvi textbooks
+✓ Print-ready with clear formatting`;
 
     // Build question type instruction
     const TYPE_LABEL_MAP: Record<string, string> = {
@@ -115,14 +121,20 @@ Your worksheets are:
       : `Samacheer Kalvi Worksheet - ${grade} ${subject} - ${term} - ${topic}`;
 
     const curriculumRules = isMerryBirds
-      ? `3. Questions must be from Oxford Merry Birds ${grade} ${subject} for "${topic}" — use joyful, activity-based style with phonics, rhymes, simple stories
-4. For LKG/UKG/Class 1: Prioritize phonics, rhymes, coloring/draw, matching shapes/colors — NO complex MCQ or long answers
-5. Keep vocabulary simple, fun and encouraging. Use picture-friendly language
-6. Answers must be correct per Oxford Merry Birds Integrated Term Course content`
-      : `3. Questions must be from actual Samacheer Kalvi ${grade} ${subject} textbook for "${topic}"
-4. For LKG/UKG: Only simple matching, fill-in-blanks, drawing — NO complex MCQ or short answers
-5. Answers must be factually correct per Samacheer Kalvi textbooks
-6. Make it encouraging and fun for children`;
+      ? `3. Questions must be from Oxford Merry Birds ${grade} ${subject} (${term}) for "${topic}" — use joyful, activity-based style with phonics, rhymes, simple stories, poems
+4. For Pre-KG/LKG/UKG: Prioritize recognition, matching, coloring/draw, phonics, rhymes — NO complex MCQ or long answers. Max 1–2 word answers only
+5. For Class 1–2: Simple sentences, phonics blends, basic grammar (a/an), number operations up to 100
+6. For Class 3–5: Stories with comprehension, grammar, essay topics, maths with fractions/decimals, EVS experiments, GK facts
+7. For Social Studies: Include maps, India/Tamil Nadu facts, transport, government basics as per term
+8. For General Knowledge: Include national symbols, famous Indians, inventions, world facts, sports as per term
+9. Keep vocabulary age-appropriate, fun and encouraging. Use picture-friendly language
+10. Answers must be correct per Oxford Merry Birds Integrated Term Course content for the specified term`
+      : `3. Questions must be from actual Samacheer Kalvi ${grade} ${subject} textbook (${term}) for "${topic}"
+4. For Pre-KG/LKG/UKG: Only simple matching, fill-in-blanks, drawing, coloring — NO complex MCQ or short answers
+5. For Tamil subject: Include proper Tamil script questions, grammar rules, poetry lines, proverbs as per grade/term
+6. For Social Studies: Include maps, India, Tamil Nadu, landforms, rivers, occupations as per Samacheer syllabus
+7. Answers must be factually correct per Samacheer Kalvi textbooks for the specified term
+8. Make it encouraging and fun for children`;
 
     const userPrompt = `Create a complete, curriculum-aligned worksheet for ${isMerryBirds ? "Oxford Merry Birds Integrated Term Course" : "Tamil Nadu Samacheer Kalvi"} with these specifications:
 
