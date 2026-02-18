@@ -11,3 +11,13 @@ verify_jwt = false
 
 [functions.generate-worksheet]
 verify_jwt = false
+
+[functions.elevenlabs-tts]
+verify_jwt = false
+
+[functions.elevenlabs-stt]
+verify_jwt = false
+
+[functions.spoken-english-feedback]
+verify_jwt = false
+
