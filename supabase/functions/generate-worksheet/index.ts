@@ -6,6 +6,28 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Topics that benefit from diagram/drawing sections
+const DIAGRAM_TOPICS = [
+  "plant", "parts of plant", "flower", "leaf", "root", "stem", "seed",
+  "human body", "body parts", "skeleton", "eye", "ear", "heart", "lung",
+  "digestive", "food chain", "ecosystem", "habitat",
+  "solar system", "planets", "earth", "moon", "sun",
+  "water cycle", "rain", "cloud", "evaporation",
+  "animals", "insects", "birds", "fish", "mammals",
+  "triangle", "circle", "square", "rectangle", "shapes", "geometry",
+  "map", "direction", "compass",
+  "செடி", "தாவரம்", "மரம்", "பூ", "இலை", "வேர்", "விதை",
+  "மனித உடல்", "கண்", "காது", "உடல் உறுப்பு",
+  "சூரிய மண்டலம்", "கோள்கள்", "பூமி",
+  "நீர் சுழற்சி", "மேகம்",
+  "விலங்குகள்", "பறவைகள்", "மீன்",
+];
+
+function needsDiagram(topic: string): boolean {
+  const lower = topic.toLowerCase();
+  return DIAGRAM_TOPICS.some((kw) => lower.includes(kw.toLowerCase()));
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -15,83 +37,115 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const hasDiagram = needsDiagram(topic);
+
     const langInstruction =
       language === "Tamil"
-        ? "Write all questions and content in Tamil language (தமிழில் எழுதவும்). Use clear Tamil script."
+        ? "Write ALL questions, answers, instructions, and headings in Tamil script (தமிழில் எழுதவும்). Use proper Tamil grammar. Do not use English at all."
         : language === "Bilingual"
-        ? "Write each question in both English and Tamil (bilingual). Show English first, then Tamil translation in parentheses."
-        : "Write all questions and content in English.";
+        ? "Write each question in English first, then Tamil translation in parentheses. Format: 'English question (தமிழ் மொழிபெயர்ப்பு)'. Section headings also bilingual."
+        : "Write all content in clear, simple English appropriate for the grade level.";
 
     const difficultyGuide =
       difficulty === "Easy"
-        ? "Use simple, direct questions suitable for beginners. Focus on recognition and recall."
+        ? "Use simple, direct questions. Focus on recognition, recall, and single-word answers. Very simple vocabulary."
         : difficulty === "Hard"
-        ? "Use analytical, application-based questions that challenge deeper understanding."
-        : "Use a balanced mix of simple and moderately challenging questions.";
+        ? "Include analytical, application-based questions requiring reasoning, 2-3 sentence answers, and real-world connections."
+        : "Balanced mix: some recall questions, some application questions, moderate vocabulary.";
 
-    const systemPrompt = `You are an expert educational content creator specializing in Tamil Nadu Samacheer Kalvi curriculum for classes LKG to 5th standard. You have deep knowledge of:
-- Samacheer Kalvi textbooks and their exact content for each grade
-- Age-appropriate question formats for young learners
-- Tamil language education methodology
-- Child-friendly instructions and language
+    const diagramSection = hasDiagram ? `
+    {
+      "type": "diagram",
+      "heading": "${language === "Tamil" ? "பிரிவு E: படம் வரைந்து பெயரிடுக" : language === "Bilingual" ? "Section E: Draw and Label (படம் வரைந்து பெயரிடுக)" : "Section E: Draw and Label"}",
+      "questions": [
+        {
+          "id": 99,
+          "question": "${language === "Tamil" ? `${topic} பற்றிய படம் வரைந்து முக்கிய பாகங்களை பெயரிடுக` : language === "Bilingual" ? `Draw a diagram of ${topic} and label its main parts (${topic} பற்றிய படம் வரைந்து பாகங்களை பெயரிடுக)` : `Draw a neat diagram of ${topic} and label its main parts`}",
+          "answer": "See diagram — label the key parts as taught in class",
+          "diagramLabels": ["Part 1", "Part 2", "Part 3", "Part 4"]
+        }
+      ]
+    },` : "";
 
-Always create curriculum-aligned, pedagogically sound worksheets that match the official Samacheer Kalvi syllabus exactly.`;
+    const systemPrompt = `You are an expert educational content creator with 20+ years of experience in Tamil Nadu Samacheer Kalvi curriculum for classes LKG to 5th Standard. You have:
+- Complete knowledge of Samacheer Kalvi textbooks content for every grade and subject
+- Expertise in Tamil language education (mother tongue and second language)  
+- Deep understanding of child psychology and age-appropriate learning
+- Experience creating printable classroom worksheets used by Tamil Nadu government schools
+- Bilingual (Tamil-English) content creation skills
 
-    const userPrompt = `Create a complete, printable worksheet for Tamil Nadu Samacheer Kalvi curriculum with these specifications:
+Your worksheets are:
+✓ 100% Samacheer Kalvi aligned
+✓ Age-appropriate and encouraging  
+✓ Pedagogically sound with varied question types
+✓ Print-ready with clear formatting
+✓ Factually accurate per official textbooks`;
 
-- Grade: ${grade}
-- Subject: ${subject}  
-- Topic/Chapter: ${topic}
-- Number of Questions: ${numQuestions}
-- Language: ${language} — ${langInstruction}
-- Difficulty: ${difficulty} — ${difficultyGuide}
+    const userPrompt = `Create a complete, curriculum-aligned worksheet for Tamil Nadu Samacheer Kalvi with these specifications:
 
-Return ONLY a valid JSON object in this exact format (no markdown, no code blocks, just raw JSON):
+Grade: ${grade}
+Subject: ${subject}
+Topic/Chapter: ${topic}
+Number of Questions: ${numQuestions}
+Language: ${language} — ${langInstruction}
+Difficulty: ${difficulty} — ${difficultyGuide}
+${hasDiagram ? "⚠️ This topic requires a DRAW AND LABEL diagram section — include it!" : ""}
+
+Return ONLY valid JSON (no markdown, no code blocks, no explanations — just raw JSON):
 
 {
   "title": "Samacheer Kalvi Worksheet - ${grade} ${subject} - ${topic}",
   "grade": "${grade}",
   "subject": "${subject}",
   "topic": "${topic}",
-  "instructions": "A 2-3 sentence instruction for students in simple, encouraging language appropriate for ${grade}",
+  "instructions": "2-3 sentence encouragement + instructions in ${language} for ${grade} students",
   "sections": [
     {
       "type": "fill_in_blanks",
-      "heading": "Section A: Fill in the Blanks",
+      "heading": "${language === "Tamil" ? "பிரிவு A: காலி இடங்களை நிரப்புக" : language === "Bilingual" ? "Section A: Fill in the Blanks (காலி இடங்களை நிரப்புக)" : "Section A: Fill in the Blanks"}",
       "questions": [
-        { "id": 1, "question": "question text with _______ for blank", "answer": "correct answer" }
+        { "id": 1, "question": "sentence with _______ for the blank", "answer": "exact answer word" }
       ]
     },
     {
       "type": "multiple_choice",
-      "heading": "Section B: Choose the Correct Answer",
+      "heading": "${language === "Tamil" ? "பிரிவு B: சரியான விடையைத் தேர்க" : language === "Bilingual" ? "Section B: Choose the Correct Answer (சரியான விடையைத் தேர்க)" : "Section B: Choose the Correct Answer"}",
       "questions": [
-        { "id": 2, "question": "question text", "options": ["a) option1", "b) option2", "c) option3", "d) option4"], "answer": "a) option1" }
+        { "id": 5, "question": "question text", "options": ["a) option1", "b) option2", "c) option3", "d) option4"], "answer": "a) option1" }
       ]
     },
     {
       "type": "match_following",
-      "heading": "Section C: Match the Following",
+      "heading": "${language === "Tamil" ? "பிரிவு C: பொருத்துக" : language === "Bilingual" ? "Section C: Match the Following (பொருத்துக)" : "Section C: Match the Following"}",
       "questions": [
-        { "id": 7, "left": ["item1", "item2", "item3"], "right": ["match1", "match2", "match3"], "answers": ["match1", "match3", "match2"] }
+        { "id": 8, "left": ["item1", "item2", "item3", "item4"], "right": ["match_a", "match_b", "match_c", "match_d"], "answers": ["match_b", "match_d", "match_a", "match_c"] }
       ]
     },
     {
       "type": "short_answer",
-      "heading": "Section D: Answer in One or Two Sentences",
+      "heading": "${language === "Tamil" ? "பிரிவு D: சுருக்கமாக விடை எழுதுக" : language === "Bilingual" ? "Section D: Short Answer (சுருக்கமாக விடை எழுதுக)" : "Section D: Answer in One or Two Sentences"}",
       "questions": [
-        { "id": 9, "question": "question text", "answer": "model answer" }
+        { "id": 10, "question": "question text", "answer": "model answer 1-2 sentences" }
+      ]
+    },
+    ${diagramSection}
+    {
+      "type": "true_false",
+      "heading": "${language === "Tamil" ? "பிரிவு: சரியா? தவறா?" : language === "Bilingual" ? "Section: True or False (சரியா? தவறா?)" : "Section: True or False"}",
+      "questions": [
+        { "id": 12, "question": "statement to evaluate", "answer": "True" }
       ]
     }
   ]
 }
 
-Distribute the ${numQuestions} questions across sections appropriately. Make sure:
-1. Questions are 100% aligned with Samacheer Kalvi ${grade} ${subject} textbook content for "${topic}"
-2. Language is age-appropriate and encouraging
-3. Answer key includes all correct answers
-4. For LKG/UKG, focus on matching, drawing, and simple fill-in-the-blanks (no complex MCQ)
-5. Answers are factually correct and match the official textbook`;
+CRITICAL RULES:
+1. Distribute ${numQuestions} questions sensibly across all sections
+2. For LKG/UKG: Only simple matching, fill-in-blanks, drawing — NO complex MCQ or short answers
+3. Questions must be from actual Samacheer Kalvi ${grade} ${subject} textbook for "${topic}"
+4. ${language === "Tamil" ? "ALL text must be in Tamil script — no romanized Tamil, no English" : language === "Bilingual" ? "Every question must have both English and Tamil" : "Keep English simple and clear"}
+5. Answers must be factually correct per Samacheer Kalvi textbooks
+6. Make it encouraging and fun for children`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -100,12 +154,13 @@ Distribute the ${numQuestions} questions across sections appropriately. Make sur
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
         stream: false,
+        temperature: 0.4,
       }),
     });
 
@@ -133,19 +188,20 @@ Distribute the ${numQuestions} questions across sections appropriately. Make sur
     const aiData = await response.json();
     const content = aiData.choices?.[0]?.message?.content || "";
 
-    // Parse JSON from AI response
     let worksheet;
     try {
-      // Strip markdown code blocks if present
       const cleaned = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
       worksheet = JSON.parse(cleaned);
     } catch {
-      console.error("Failed to parse AI response:", content);
+      console.error("Failed to parse AI response:", content.substring(0, 500));
       return new Response(
         JSON.stringify({ error: "Failed to parse worksheet. Please try regenerating." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Mark if diagram is needed
+    worksheet._hasDiagram = hasDiagram;
 
     return new Response(JSON.stringify({ worksheet }), {
       status: 200,
