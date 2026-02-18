@@ -65,7 +65,18 @@ interface FormData_ {
   numQuestions: number;
   language: string;
   difficulty: string;
+  questionTypes: string[];
 }
+
+// ─── Question Type Options ────────────────────────────────────────────────────
+const QUESTION_TYPES = [
+  { id: "multiple_choice",  label: "Multiple Choice",    emoji: "🔘", tamil: "பலவுள் தேர்வு" },
+  { id: "fill_in_blanks",   label: "Fill in the Blanks", emoji: "✏️",  tamil: "காலி இடம்" },
+  { id: "match_following",  label: "Match the Following",emoji: "🔗",  tamil: "பொருத்துக" },
+  { id: "true_false",       label: "True or False",      emoji: "✅",  tamil: "சரி/தவறு" },
+  { id: "short_answer",     label: "Short Answer",       emoji: "📝",  tamil: "குறு விடை" },
+  { id: "diagram",          label: "Label/Draw",         emoji: "🖊️",  tamil: "படம் வரை" },
+];
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -243,6 +254,7 @@ export default function WorksheetMaker() {
     numQuestions: 10,
     language: "English",
     difficulty: "Medium",
+    questionTypes: [],
   });
   const [worksheet, setWorksheet] = useState<Worksheet | null>(null);
   const [loading, setLoading] = useState(false);
@@ -394,31 +406,36 @@ export default function WorksheetMaker() {
 
       case "match_following":
         return section.questions.map((q) => (
-          <div key={q.id} className="mb-4">
-            <div className="grid grid-cols-2 gap-6 ml-4">
-              <div className="space-y-2.5">
-                <p className="font-bold text-xs text-gray-500 uppercase tracking-wider mb-2 print:text-gray-700">Column A</p>
-                {q.left?.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="font-bold text-gray-600 w-5 shrink-0">{i + 1}.</span>
-                    <span className="border border-gray-300 rounded px-2.5 py-1 text-sm flex-1 print:border-black tamil-font">{item}</span>
-                    <div className="w-10 border-b border-dashed border-gray-400 print:border-black" />
-                  </div>
-                ))}
+          <div key={q.id} className="mb-6">
+            <div className="grid grid-cols-2 gap-0 ml-2 border border-gray-200 print:border-gray-500 rounded-xl overflow-hidden">
+              {/* Column A header */}
+              <div className="bg-sky-50 print:bg-gray-100 border-r border-gray-200 print:border-gray-500 px-4 py-2">
+                <p className="font-extrabold text-xs text-sky-700 print:text-gray-700 uppercase tracking-widest text-center">Column A</p>
               </div>
-              <div className="space-y-2.5">
-                <p className="font-bold text-xs text-gray-500 uppercase tracking-wider mb-2 print:text-gray-700">Column B</p>
-                {q.right?.map((item, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="font-bold text-gray-600 w-5 shrink-0">{String.fromCharCode(97 + i)}.</span>
-                    <span className="border border-gray-300 rounded px-2.5 py-1 text-sm flex-1 print:border-black tamil-font">{item}</span>
-                  </div>
-                ))}
+              {/* Column B header */}
+              <div className="bg-emerald-50 print:bg-gray-100 px-4 py-2">
+                <p className="font-extrabold text-xs text-emerald-700 print:text-gray-700 uppercase tracking-widest text-center">Column B</p>
               </div>
+              {/* Rows */}
+              {(q.left || []).map((item, i) => (
+                <>
+                  {/* Left cell */}
+                  <div key={`l-${i}`} className="flex items-center gap-2 border-t border-r border-gray-100 print:border-gray-300 px-4 py-2.5">
+                    <span className="font-bold text-sky-600 print:text-gray-700 w-5 shrink-0 text-sm">{i + 1}.</span>
+                    <span className="text-sm tamil-font text-gray-800 print:text-black flex-1">{item}</span>
+                    <div className="w-12 border-b-2 border-dashed border-gray-300 print:border-gray-500 shrink-0" title="write match letter here" />
+                  </div>
+                  {/* Right cell */}
+                  <div key={`r-${i}`} className="flex items-center gap-2 border-t border-gray-100 print:border-gray-300 px-4 py-2.5">
+                    <span className="font-bold text-emerald-600 print:text-gray-700 w-5 shrink-0 text-sm">{String.fromCharCode(97 + i)}.</span>
+                    <span className="text-sm tamil-font text-gray-800 print:text-black">{q.right?.[i]}</span>
+                  </div>
+                </>
+              ))}
             </div>
             {showAnswers && (
-              <div className="mt-3 ml-4 p-2 bg-green-50 rounded print:bg-transparent print:border print:border-green-700">
-                <p className="text-green-700 text-sm font-semibold print:text-green-900">
+              <div className="mt-2 ml-2 p-2 bg-green-50 rounded print:bg-transparent print:border print:border-green-700">
+                <p className="text-green-700 text-sm font-semibold print:text-green-900 tamil-font">
                   ✓ {q.left?.map((l, i) => `${i + 1}→${q.answers?.[i]}`).join("  |  ")}
                 </p>
               </div>
@@ -610,6 +627,51 @@ export default function WorksheetMaker() {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Question Types multi-select */}
+            <div className="md:col-span-2">
+              <Label className="text-sm font-bold text-gray-700 mb-1.5 block">
+                Question Types <span className="text-gray-400 font-normal">(optional — leave blank for balanced mix)</span>
+              </Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {QUESTION_TYPES.map((qt) => {
+                  const selected = formData.questionTypes.includes(qt.id);
+                  return (
+                    <button
+                      key={qt.id}
+                      type="button"
+                      onClick={() => {
+                        const types = selected
+                          ? formData.questionTypes.filter((t) => t !== qt.id)
+                          : [...formData.questionTypes, qt.id];
+                        setFormData({ ...formData, questionTypes: types });
+                      }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all text-left ${
+                        selected
+                          ? "border-sky-500 bg-sky-50 text-sky-700 shadow-sm"
+                          : "border-gray-200 bg-gray-50 text-gray-600 hover:border-sky-300 hover:bg-sky-50"
+                      }`}
+                    >
+                      <span className="text-base">{qt.emoji}</span>
+                      <div className="min-w-0">
+                        <div className="leading-tight">{qt.label}</div>
+                        <div className="text-xs text-gray-400 tamil-font leading-tight">{qt.tamil}</div>
+                      </div>
+                      {selected && (
+                        <div className="ml-auto w-4 h-4 rounded-full bg-sky-500 flex items-center justify-center shrink-0">
+                          <span className="text-white text-[10px] font-bold">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              {formData.questionTypes.length > 0 && (
+                <p className="text-xs text-sky-600 mt-1.5 font-medium">
+                  Selected: {formData.questionTypes.map(id => QUESTION_TYPES.find(q => q.id === id)?.label).join(", ")}
+                </p>
+              )}
             </div>
           </div>
 
