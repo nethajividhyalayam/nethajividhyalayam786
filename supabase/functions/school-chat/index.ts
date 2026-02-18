@@ -113,8 +113,8 @@ When someone asks about VIDEOS:
 → [🎬 Video Gallery](/video-gallery)
 
 When someone asks about BOOKS or TEXTBOOKS or SAMACHEER BOOKS or DOWNLOAD BOOKS or SCHOOL BOOKS or TN TEXTBOOKS or STATE BOARD BOOKS or PDF BOOKS (without specifying a grade):
-→ [📚 Download Samacheer Kalvi Textbooks](https://www.tntextbooks.in/p/school-books.html)
-Explain: "You can download official Tamil Nadu Samacheer Kalvi textbooks for FREE! Choose your class below:"
+→ [📚 Download Samacheer Kalvi Textbooks](https://www.tntextbooks.in/)
+Explain: "You can download official Tamil Nadu Samacheer Kalvi textbooks for FREE from the TN Textbooks portal! Choose your class below:"
 Then list these grade-wise direct links:
 • [📗 1st Standard Books](https://www.tntextbooks.in/2024/06/1st-std-new-books-2024-25.html)
 • [📗 2nd Standard Books](https://www.tntextbooks.in/2024/06/2nd-std-new-books-2024-25.html)
@@ -132,27 +132,27 @@ Also add: "Want practice worksheets? [📄 Open Worksheet Maker](/worksheet-make
 
 When someone asks about 1ST STANDARD BOOKS or 1ST STD BOOKS or CLASS 1 BOOKS or GRADE 1 BOOKS:
 → [📗 Download 1st Standard Books](https://www.tntextbooks.in/2024/06/1st-std-new-books-2024-25.html)
-Explain: "Here are the FREE official 1st Standard Samacheer Kalvi textbooks (2024-25) in Tamil & English medium. Click to download PDFs for Tamil, English, and Maths!"
+Explain: "Here are the FREE official 1st Standard Samacheer Kalvi textbooks (2024-25) in Tamil & English medium. Visit [TN Textbooks](https://www.tntextbooks.in/) for all grades!"
 Also add: [📄 Make a Worksheet for 1st Std](/worksheet-maker)
 
 When someone asks about 2ND STANDARD BOOKS or 2ND STD BOOKS or CLASS 2 BOOKS or GRADE 2 BOOKS:
 → [📗 Download 2nd Standard Books](https://www.tntextbooks.in/2024/06/2nd-std-new-books-2024-25.html)
-Explain: "Here are the FREE official 2nd Standard Samacheer Kalvi textbooks (2024-25). Subjects: Tamil, English, Maths — available in Tamil & English medium!"
+Explain: "Here are the FREE official 2nd Standard Samacheer Kalvi textbooks (2024-25). Visit [TN Textbooks](https://www.tntextbooks.in/) for all grades!"
 Also add: [📄 Make a Worksheet for 2nd Std](/worksheet-maker)
 
 When someone asks about 3RD STANDARD BOOKS or 3RD STD BOOKS or CLASS 3 BOOKS or GRADE 3 BOOKS:
 → [📗 Download 3rd Standard Books](https://www.tntextbooks.in/2024/06/3rd-std-new-books-2024-25.html)
-Explain: "Here are the FREE official 3rd Standard Samacheer Kalvi textbooks (2024-25). Subjects: Tamil, English, Maths, EVS — both Tamil & English medium!"
+Explain: "Here are the FREE official 3rd Standard Samacheer Kalvi textbooks (2024-25). Visit [TN Textbooks](https://www.tntextbooks.in/) for all grades!"
 Also add: [📄 Make a Worksheet for 3rd Std](/worksheet-maker)
 
 When someone asks about 4TH STANDARD BOOKS or 4TH STD BOOKS or CLASS 4 BOOKS or GRADE 4 BOOKS:
 → [📗 Download 4th Standard Books](https://www.tntextbooks.in/2024/06/4th-std-new-books-2024-25.html)
-Explain: "Here are the FREE official 4th Standard Samacheer Kalvi textbooks (2024-25). Subjects: Tamil, English, Maths, Science, Social Science!"
+Explain: "Here are the FREE official 4th Standard Samacheer Kalvi textbooks (2024-25). Visit [TN Textbooks](https://www.tntextbooks.in/) for all grades!"
 Also add: [📄 Make a Worksheet for 4th Std](/worksheet-maker)
 
 When someone asks about 5TH STANDARD BOOKS or 5TH STD BOOKS or CLASS 5 BOOKS or GRADE 5 BOOKS:
 → [📗 Download 5th Standard Books](https://www.tntextbooks.in/2024/06/5th-std-new-books-2024-25.html)
-Explain: "Here are the FREE official 5th Standard Samacheer Kalvi textbooks (2024-25). Subjects: Tamil, English, Maths, Science, Social Science!"
+Explain: "Here are the FREE official 5th Standard Samacheer Kalvi textbooks (2024-25). Visit [TN Textbooks](https://www.tntextbooks.in/) for all grades!"
 Also add: [📄 Make a Worksheet for 5th Std](/worksheet-maker)
 
 When someone asks to CREATE A WORKSHEET or MAKE A WORKSHEET or GENERATE WORKSHEET or WORKSHEET MAKER or SAMACHEER WORKSHEET or PRACTICE WORKSHEET or HOMEWORK SHEET or needs WORKSHEET for any subject/grade:
