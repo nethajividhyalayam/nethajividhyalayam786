@@ -551,7 +551,7 @@ export default function SpokenEnglish() {
   // ── Render: Home ──────────────────────────────────────────────────────────
   if (screen === "home") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-100 via-green-50 to-yellow-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-sky-100 via-green-50 to-yellow-50 flex flex-col overflow-x-hidden">
         {showVoicePicker && (
           <VoicePickerModal selected={voiceKey} onSelect={setVoiceKey} onClose={() => setShowVoicePicker(false)} />
         )}
@@ -609,8 +609,8 @@ export default function SpokenEnglish() {
                   className={cn(
                     "p-3 rounded-2xl border-2 text-left transition-all font-semibold text-sm",
                     topic === name
-                      ? `bg-gradient-to-br ${data.color} text-white border-transparent shadow-lg scale-[1.03]`
-                      : "bg-white border-gray-200 text-gray-700 hover:border-green-300 hover:shadow-sm"
+                  ? `bg-gradient-to-br ${data.color} text-white border-transparent shadow-lg`
+                      : "bg-white border-gray-200 text-gray-700"
                   )}
                 >
                   <span className="text-xl">{data.emoji}</span>
@@ -644,7 +644,7 @@ export default function SpokenEnglish() {
           <div className="space-y-3">
             <button
               onClick={() => { setCurrentIndex(0); setFeedback(null); setSpokenText(""); setShowResult(false); setScreen("practice"); }}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl py-4 px-6 flex items-center justify-between shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-2xl py-4 px-6 flex items-center justify-between shadow-lg active:opacity-90 transition-opacity touch-manipulation"
             >
               <div className="flex items-center gap-3">
                 <BookOpen className="h-6 w-6" />
@@ -658,7 +658,7 @@ export default function SpokenEnglish() {
 
             <button
               onClick={() => { setConvMessages([]); setConvStarted(false); setFeedback(null); setScreen("conversation"); }}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl py-4 px-6 flex items-center justify-between shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-2xl py-4 px-6 flex items-center justify-between shadow-lg active:opacity-90 transition-opacity touch-manipulation"
             >
               <div className="flex items-center gap-3">
                 <MessageCircle className="h-6 w-6" />
@@ -706,18 +706,18 @@ export default function SpokenEnglish() {
   if (screen === "practice") {
     const starInfo = feedback ? STAR_MESSAGES[feedback.stars] || STAR_MESSAGES[1] : null;
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-green-50 to-emerald-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-green-50 to-emerald-50 flex flex-col overflow-x-hidden">
         {/* Header */}
-        <div className={`bg-gradient-to-r ${topicData.color} px-4 py-4 text-white shadow-lg`}>
+        <div className={`bg-gradient-to-r ${topicData.color} px-4 py-4 text-white shadow-lg flex-shrink-0`}>
           <div className="flex items-center gap-2 max-w-md mx-auto">
-            <button onClick={() => { stopAudio(); setScreen("home"); }} className="p-1 rounded-full bg-white/20 hover:bg-white/30">
+            <button onClick={() => { stopAudio(); setScreen("home"); }} className="p-1 rounded-full bg-white/20 touch-manipulation">
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="flex-1 text-center">
               <p className="font-extrabold text-lg">{topicData.emoji} {topic}</p>
               <p className="text-xs text-white/80">Grade {grade} • {currentVoice.emoji} {currentVoice.label}</p>
             </div>
-            <button onClick={() => setShowVoicePicker(true)} className="p-1 rounded-full bg-white/20 hover:bg-white/30">
+            <button onClick={() => setShowVoicePicker(true)} className="p-1 rounded-full bg-white/20 touch-manipulation">
               <Settings className="h-5 w-5" />
             </button>
           </div>
@@ -727,7 +727,7 @@ export default function SpokenEnglish() {
           <VoicePickerModal selected={voiceKey} onSelect={setVoiceKey} onClose={() => setShowVoicePicker(false)} />
         )}
 
-        <div className="flex-1 px-4 py-5 max-w-md mx-auto w-full flex flex-col gap-4 overflow-y-auto">
+        <div className="flex-1 px-4 py-5 max-w-md mx-auto w-full flex flex-col gap-4 overflow-y-auto overflow-x-hidden">
           {/* Curriculum badge */}
           <div className="text-center">
             <span className="text-xs bg-white text-gray-500 px-3 py-1 rounded-full border border-gray-200 font-medium">
@@ -752,7 +752,7 @@ export default function SpokenEnglish() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => speak(currentSentence, Math.max(0.65, gradeSpeed - 0.12))}
+                onClick={() => speak(currentSentence, Math.max(0.7, gradeSpeed - 0.08))}
                 disabled={isPlaying || isRecording || isDemoPlaying}
                 className="gap-1 text-blue-700 border-blue-200 hover:bg-blue-50"
               >
@@ -762,7 +762,7 @@ export default function SpokenEnglish() {
           </div>
 
           {/* Mic Section */}
-          <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-3" style={{ minHeight: 120 }}>
             <MicButton isRecording={isRecording} onClick={handleMicToggle} disabled={isProcessing || isPlaying} />
             <p className="text-sm font-semibold text-gray-600">
               {isProcessing ? "⏳ Analysing your speech…" : isRecording ? "🔴 Recording… tap to stop" : "Tap mic to speak"}
@@ -896,18 +896,18 @@ export default function SpokenEnglish() {
   // ── Render: Conversation ──────────────────────────────────────────────────
   if (screen === "conversation") {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-fuchsia-50 flex flex-col">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-fuchsia-50 flex flex-col overflow-x-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-4 text-white shadow-lg">
+        <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-4 text-white shadow-lg flex-shrink-0">
           <div className="flex items-center gap-2 max-w-md mx-auto">
-            <button onClick={() => { stopAudio(); setScreen("home"); }} className="p-1 rounded-full bg-white/20 hover:bg-white/30">
+            <button onClick={() => { stopAudio(); setScreen("home"); }} className="p-1 rounded-full bg-white/20 touch-manipulation">
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div className="flex-1 text-center">
               <p className="font-extrabold text-lg">💬 Talk with Sparky</p>
               <p className="text-xs text-white/80">Grade {grade} • {topic} • {currentVoice.emoji} {currentVoice.label}</p>
             </div>
-            <button onClick={() => setShowVoicePicker(true)} className="p-1 rounded-full bg-white/20 hover:bg-white/30">
+            <button onClick={() => setShowVoicePicker(true)} className="p-1 rounded-full bg-white/20 touch-manipulation">
               <Settings className="h-5 w-5" />
             </button>
           </div>
