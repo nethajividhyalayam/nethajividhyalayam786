@@ -1162,11 +1162,19 @@ export default function WorksheetMaker() {
                   );
                 })}
               </div>
-              {formData.questionTypes.length > 0 && (
+              {formData.questionTypes.length > 0 ? (
                 <p className="text-xs text-sky-600 mt-1.5 font-medium">
                   Selected: {formData.questionTypes.map(id => QUESTION_TYPES.find(q => q.id === id)?.label).join(", ")}
                 </p>
-              )}
+              ) : formData.curriculum === "Oxford Merry Birds (Integrated Term Course)" ? (
+                <div className="mt-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-xs text-amber-700 font-semibold">🐦 Merry Birds auto-mix (when none selected):</p>
+                  <p className="text-xs text-amber-600 mt-0.5">
+                    ✏️ Fill Missing Sounds/Letters &nbsp;·&nbsp; 🔗 Match Rhyming Words &nbsp;·&nbsp; 🔘 Story MCQ &nbsp;·&nbsp; ✅ Phonics True/False &nbsp;·&nbsp; 🖊️ Draw & Colour
+                  </p>
+                </div>
+              ) : null}
+
             </div>
           </div>
 

@@ -112,9 +112,35 @@ Your worksheets are:
       diagram: "Label/Draw diagram (Section E)",
     };
     const selectedTypes: string[] = Array.isArray(questionTypes) && questionTypes.length > 0 ? questionTypes : [];
+
+    // Merry Birds: per-type style guidance + auto-default mix when nothing selected
+    const merryBirdsTypeGuide = isMerryBirds ? `
+🐦 MERRY BIRDS QUESTION TYPE STYLE GUIDE — follow these rules precisely:
+
+• fill_in_blanks → Use for MISSING LETTERS / MISSING SOUNDS (e.g. "c_t", "b__d") OR simple sentence gaps ("The cat sat on the ___"). For phonics topics, at least half the blanks should be missing letter/sound questions.
+
+• match_following → Use for: RHYMING WORDS (cat ↔ bat), OPPOSITES (big ↔ small), ANIMALS & THEIR HOMES (dog ↔ kennel), WORDS & PICTURES descriptions. Column A = word/animal, Column B = rhyme/opposite/home. Keep items short (1–3 words).
+
+• multiple_choice → Use for STORY COMPREHENSION ("In the story, who baked the bread?") or VOCABULARY questions ("Which word means happy? a) sad  b) glad  c) mad  d) bad"). 4 options always.
+
+• diagram → Use for DRAW AND COLOR activities: "Draw a _____ from the story and colour it." or "Draw and label the parts of a ___". Keep label count to 3–4 max.
+
+• short_answer → Use for simple 1-sentence story recall ("Who helped the Little Red Hen?") or rhyme completion ("Jack and Jill went up the _____").
+
+• true_false → Use for story fact checks ("The hen made bread. True or False?") or phonics checks ("'cat' has the short 'a' sound. True or False?").
+` : "";
+
     const questionTypeInstruction = selectedTypes.length > 0
-      ? `⭐ IMPORTANT: The teacher has specifically requested these question types — PRIORITIZE and INCLUDE them: ${selectedTypes.map(t => TYPE_LABEL_MAP[t] || t).join(", ")}. Focus the majority of questions on these types. Still include other types lightly to reach the total count.`
-      : "Use a balanced mix of fill-in-blanks, matching, multiple choice, and short answers distributed across sections.";
+      ? `⭐ IMPORTANT: The teacher has specifically requested these question types — PRIORITIZE and INCLUDE them: ${selectedTypes.map(t => TYPE_LABEL_MAP[t] || t).join(", ")}. Focus the majority of questions on these types.${merryBirdsTypeGuide}`
+      : isMerryBirds
+        ? `⭐ DEFAULT MERRY BIRDS MIX (no types selected): Include these as your PRIMARY question types:
+1. fill_in_blanks — "Fill Missing Sounds/Letters" (e.g. c_t, sh_p, missing word in rhyme)
+2. match_following — "Match Rhyming Words" (cat↔bat, hen↔pen) AND "Animals & Their Homes"
+3. multiple_choice — Story/poem comprehension (1–2 questions)
+4. true_false — Phonics or story fact checks
+5. diagram — One "Draw and Colour" activity if topic suits it
+${merryBirdsTypeGuide}`
+        : "Use a balanced mix of fill-in-blanks, matching, multiple choice, and short answers distributed across sections.";
 
     const worksheetTitle = isMerryBirds
       ? `Merry Birds Worksheet - Class ${grade} - ${subject} - ${term} - ${topic}`
