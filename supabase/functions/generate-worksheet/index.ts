@@ -32,7 +32,8 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { grade, subject, topic, numQuestions, language, difficulty, questionTypes } = await req.json();
+    const { curriculum, grade, subject, topic, numQuestions, language, difficulty, questionTypes } = await req.json();
+    const isMerryBirds = curriculum === "Oxford Merry Birds (Integrated Term Course)";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -67,7 +68,21 @@ serve(async (req) => {
       ]
     },` : "";
 
-    const systemPrompt = `You are an expert educational content creator with 20+ years of experience in Tamil Nadu Samacheer Kalvi curriculum for classes LKG to 5th Standard. You have:
+    const systemPrompt = isMerryBirds
+      ? `You are an expert educational content creator specializing in the Oxford Merry Birds series for LKG to 5th Standard (Integrated Term Course by Oxford University Press India). You have:
+- Complete knowledge of Oxford Merry Birds textbooks content for every grade and subject
+- Expertise in activity-based, joyful, child-friendly learning approaches
+- Deep understanding of phonics, simple stories, rhymes, basic grammar (a/an, this/that), numbers, shapes, colors
+- Experience with EVS topics like family, animals, plants, community helpers in Merry Birds style
+- Skills in creating picture-friendly, engaging, skill-building worksheets for young learners
+
+Your worksheets are:
+✓ 100% Oxford Merry Birds Integrated Term Course aligned
+✓ Joyful, activity-based, and encouraging
+✓ Perfect for early childhood education (LKG–5th)
+✓ Print-ready with clear formatting
+✓ Rich with phonics, rhymes, and visual-friendly questions`
+      : `You are an expert educational content creator with 20+ years of experience in Tamil Nadu Samacheer Kalvi curriculum for classes LKG to 5th Standard. You have:
 - Complete knowledge of Samacheer Kalvi textbooks content for every grade and subject
 - Expertise in Tamil language education (mother tongue and second language)  
 - Deep understanding of child psychology and age-appropriate learning
@@ -95,7 +110,21 @@ Your worksheets are:
       ? `⭐ IMPORTANT: The teacher has specifically requested these question types — PRIORITIZE and INCLUDE them: ${selectedTypes.map(t => TYPE_LABEL_MAP[t] || t).join(", ")}. Focus the majority of questions on these types. Still include other types lightly to reach the total count.`
       : "Use a balanced mix of fill-in-blanks, matching, multiple choice, and short answers distributed across sections.";
 
-    const userPrompt = `Create a complete, curriculum-aligned worksheet for Tamil Nadu Samacheer Kalvi with these specifications:
+    const worksheetTitle = isMerryBirds
+      ? `Merry Birds Worksheet - Class ${grade} - ${subject} - ${topic}`
+      : `Samacheer Kalvi Worksheet - ${grade} ${subject} - ${topic}`;
+
+    const curriculumRules = isMerryBirds
+      ? `3. Questions must be from Oxford Merry Birds ${grade} ${subject} for "${topic}" — use joyful, activity-based style with phonics, rhymes, simple stories
+4. For LKG/UKG/Class 1: Prioritize phonics, rhymes, coloring/draw, matching shapes/colors — NO complex MCQ or long answers
+5. Keep vocabulary simple, fun and encouraging. Use picture-friendly language
+6. Answers must be correct per Oxford Merry Birds Integrated Term Course content`
+      : `3. Questions must be from actual Samacheer Kalvi ${grade} ${subject} textbook for "${topic}"
+4. For LKG/UKG: Only simple matching, fill-in-blanks, drawing — NO complex MCQ or short answers
+5. Answers must be factually correct per Samacheer Kalvi textbooks
+6. Make it encouraging and fun for children`;
+
+    const userPrompt = `Create a complete, curriculum-aligned worksheet for ${isMerryBirds ? "Oxford Merry Birds Integrated Term Course" : "Tamil Nadu Samacheer Kalvi"} with these specifications:
 
 Grade: ${grade}
 Subject: ${subject}
@@ -104,13 +133,14 @@ Number of Questions: ${numQuestions}
 Language: ${language} — ${langInstruction}
 Difficulty: ${difficulty} — ${difficultyGuide}
 ${hasDiagram ? "⚠️ This topic requires a DRAW AND LABEL diagram section — include it!" : ""}
+${isMerryBirds ? "⭐ Oxford Merry Birds style: joyful, activity-based, phonics-rich, picture-friendly questions" : ""}
 
 ${questionTypeInstruction}
 
 Return ONLY valid JSON (no markdown, no code blocks, no explanations — just raw JSON):
 
 {
-  "title": "Samacheer Kalvi Worksheet - ${grade} ${subject} - ${topic}",
+  "title": "${worksheetTitle}",
   "grade": "${grade}",
   "subject": "${subject}",
   "topic": "${topic}",
@@ -157,11 +187,8 @@ Return ONLY valid JSON (no markdown, no code blocks, no explanations — just ra
 
 CRITICAL RULES:
 1. Distribute ${numQuestions} questions sensibly across all sections
-2. For LKG/UKG: Only simple matching, fill-in-blanks, drawing — NO complex MCQ or short answers
-3. Questions must be from actual Samacheer Kalvi ${grade} ${subject} textbook for "${topic}"
-4. ${language === "Tamil" ? "ALL text must be in Tamil script — no romanized Tamil, no English" : language === "Bilingual" ? "Every question must have both English and Tamil" : "Keep English simple and clear"}
-5. Answers must be factually correct per Samacheer Kalvi textbooks
-6. Make it encouraging and fun for children`;
+2. ${language === "Tamil" ? "ALL text must be in Tamil script — no romanized Tamil, no English" : language === "Bilingual" ? "Every question must have both English and Tamil" : "Keep English simple and clear"}
+${curriculumRules}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

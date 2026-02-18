@@ -59,6 +59,7 @@ interface SavedWorksheet {
 }
 
 interface FormData_ {
+  curriculum: string;
   grade: string;
   subject: string;
   topic: string;
@@ -79,6 +80,11 @@ const QUESTION_TYPES = [
 ];
 
 // ─── Constants ────────────────────────────────────────────────────────────────
+
+const CURRICULA = [
+  "Samacheer Kalvi (Tamil Nadu State Board)",
+  "Oxford Merry Birds (Integrated Term Course)",
+];
 
 const GRADES = ["LKG", "UKG", "1st", "2nd", "3rd", "4th", "5th"];
 const SUBJECTS = ["Tamil", "English", "Maths", "EVS/Science", "Social Studies"];
@@ -248,6 +254,7 @@ function DiagramBox({ topic, labels }: { topic: string; labels?: string[] }) {
 export default function WorksheetMaker() {
   const { toast } = useToast();
   const [formData, setFormData] = useState<FormData_>({
+    curriculum: "Samacheer Kalvi (Tamil Nadu State Board)",
     grade: "3rd",
     subject: "Maths",
     topic: "",
@@ -584,14 +591,20 @@ export default function WorksheetMaker() {
           <div className="flex items-center justify-center gap-3 mb-2">
             <GraduationCap className="h-8 w-8" />
             <h1 className="text-3xl md:text-4xl font-extrabold" style={{ fontFamily: "'Baloo 2', 'Noto Sans Tamil', sans-serif" }}>
-              Samacheer Worksheet Maker
+              {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
+                ? "Merry Birds Worksheet Maker"
+                : "Samacheer Worksheet Maker"}
             </h1>
           </div>
           <p className="text-sky-100 text-sm md:text-base max-w-xl mx-auto tamil-font">
-            AI-powered worksheets · Tamil Nadu Samacheer Kalvi · LKG – 5th Standard
+            {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
+              ? "AI-powered worksheets · Oxford Merry Birds Integrated Term Course · LKG – 5th"
+              : "AI-powered worksheets · Tamil Nadu Samacheer Kalvi · LKG – 5th Standard"}
           </p>
           <p className="text-sky-200 text-xs mt-1 tamil-font">
-            தமிழ்நாடு சமச்சீர் பாடத்திட்டம் · AI தொழில்நுட்பம்
+            {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
+              ? "Joyful · Activity-based · Phonics & Stories"
+              : "தமிழ்நாடு சமச்சீர் பாடத்திட்டம் · AI தொழில்நுட்பம்"}
           </p>
         </div>
       </div>
@@ -608,6 +621,55 @@ export default function WorksheetMaker() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            {/* Curriculum / Board — full width, at top */}
+            <div className="md:col-span-2">
+              <Label className="text-sm font-bold text-gray-700 mb-1.5 block">
+                📚 Curriculum / Board <span className="text-red-500">*</span>
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {CURRICULA.map((c) => {
+                  const active = formData.curriculum === c;
+                  const isMerry = c === "Oxford Merry Birds (Integrated Term Course)";
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => {
+                        const langUpdate = isMerry && formData.language === "Tamil" ? "English" : formData.language;
+                        setFormData({ ...formData, curriculum: c, language: langUpdate });
+                      }}
+                      className={`flex items-start gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all ${
+                        active
+                          ? "border-sky-500 bg-sky-50 shadow-sm"
+                          : "border-gray-200 bg-gray-50 hover:border-sky-300 hover:bg-sky-50"
+                      }`}
+                    >
+                      <span className="text-2xl shrink-0 mt-0.5">{isMerry ? "🐦" : "📖"}</span>
+                      <div>
+                        <p className={`text-sm font-bold leading-tight ${active ? "text-sky-700" : "text-gray-700"}`}>
+                          {isMerry ? "Oxford Merry Birds" : "Samacheer Kalvi"}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {isMerry ? "Integrated Term Course · OUP" : "Tamil Nadu State Board"}
+                        </p>
+                      </div>
+                      {active && (
+                        <div className="ml-auto w-5 h-5 rounded-full bg-sky-500 flex items-center justify-center shrink-0">
+                          <span className="text-white text-[11px] font-bold">✓</span>
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)" && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
+                  🐦 <strong>Merry Birds tip:</strong> English is the primary language for this series. Phonics, rhymes, stories, and activity-based questions will be prioritized.
+                </p>
+              )}
+            </div>
+
             {/* Grade */}
             <div>
               <Label className="text-sm font-bold text-gray-700 mb-1.5 block">Grade / Class</Label>
@@ -636,6 +698,12 @@ export default function WorksheetMaker() {
                 className="tamil-font bg-sky-50 border-gray-200 focus:ring-sky-400 text-base"
                 onKeyDown={(e) => e.key === "Enter" && generate()}
               />
+              {/* Curriculum-aware topic note */}
+              <p className="text-xs text-gray-500 mt-1.5 italic">
+                {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
+                  ? `💡 Enter topic/chapter name from your Merry Birds book (e.g., "The Little Red Hen" for stories, "Phonics - Short 'a'" for phonics, "My Family" for EVS).`
+                  : `💡 Enter topic/chapter name from your book (e.g., "Addition" for Maths, "Parts of Plant" for EVS, "எழுத்துக்கள்" for Tamil).`}
+              </p>
               {/* Topic suggestions */}
               {suggestions.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mt-2">
@@ -824,7 +892,11 @@ export default function WorksheetMaker() {
               {/* Header */}
               <div className="bg-gradient-to-r from-sky-600 to-emerald-600 print:bg-none print:border-b-4 print:border-sky-700 text-white print:text-black px-8 py-6 print:py-4">
                 <div className="text-center">
-                  <p className="text-xs text-sky-200 print:text-gray-600 mb-1 font-semibold">Tamil Nadu Samacheer Kalvi • தமிழ்நாடு சமச்சீர் கல்வி</p>
+                  <p className="text-xs text-sky-200 print:text-gray-600 mb-1 font-semibold">
+                    {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
+                      ? "Oxford Merry Birds • Integrated Term Course • OUP"
+                      : "Tamil Nadu Samacheer Kalvi • தமிழ்நாடு சமச்சீர் கல்வி"}
+                  </p>
                   <h2 className={`tamil-font text-xl md:text-2xl font-extrabold leading-snug print:text-black`}
                     style={{ fontFamily: "'Baloo 2', 'Noto Sans Tamil', serif" }}>
                     {worksheet.title}
