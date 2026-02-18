@@ -163,7 +163,7 @@ const Header = () => {
           </nav>
 
           {/* CTA Button & Mobile Menu Toggle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
             <a
               href="tel:+919841594945"
               className="hidden md:flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md text-sm font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
