@@ -120,7 +120,11 @@ const Contact = () => {
                 <a href="mailto:info@nethajividhyalayam.org" className="text-muted-foreground hover:text-accent transition-colors block">info@nethajividhyalayam.org</a>
               </div>
               <p className="text-sm text-muted-foreground mb-4">24-hour response time</p>
-              <a href="mailto:nethajividhyalayam@gmail.com" className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors">
+              <a
+                href="mailto:nethajividhyalayam@gmail.com,info@nethajividhyalayam.org"
+                className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md font-semibold text-sm hover:bg-accent/90 transition-colors"
+              >
+                <Mail className="h-4 w-4" />
                 Email Us
               </a>
             </div>

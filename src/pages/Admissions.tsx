@@ -363,7 +363,11 @@ const Admissions = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-base transition-colors ${activeTab === tab.id ? "bg-accent text-accent-foreground" : "bg-secondary text-foreground hover:bg-secondary/80"}`}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-base transition-all duration-200 shadow-sm ${
+                  activeTab === tab.id
+                    ? "bg-accent text-accent-foreground shadow-accent/30 scale-105"
+                    : "bg-primary text-primary-foreground hover:bg-primary/80"
+                }`}
               >
                 <tab.icon className="h-5 w-5" />
                 {tab.label}
