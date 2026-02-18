@@ -917,7 +917,7 @@ export default function WorksheetMaker() {
   // ─── JSX ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-sky-50 via-emerald-50 to-blue-50 ${fontClass}`}>
+    <div className={`min-h-screen bg-gradient-to-br from-sky-50 via-emerald-50 to-blue-50 overflow-x-hidden ${fontClass}`}>
       {/* Print styles */}
       <style>{`
         @media print {
@@ -935,7 +935,7 @@ export default function WorksheetMaker() {
       `}</style>
 
       {/* ── Page Header ── */}
-      <div className="no-print bg-gradient-to-r from-sky-600 to-emerald-600 text-white py-8 px-4">
+      <div className="no-print bg-gradient-to-r from-sky-600 to-emerald-600 text-white py-6 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-2">
             <GraduationCap className="h-8 w-8" />
