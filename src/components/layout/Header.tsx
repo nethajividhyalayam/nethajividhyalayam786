@@ -82,7 +82,7 @@ const Header = () => {
       )}
     >
       <div className="w-full px-6">
-        <div className="flex items-center justify-between h-[60px]">
+        <div className="flex items-center justify-between h-[110px]">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1 shrink-0 overflow-visible">
             <div className="w-[160px] h-[110px] shrink-0 flex items-center justify-center">
