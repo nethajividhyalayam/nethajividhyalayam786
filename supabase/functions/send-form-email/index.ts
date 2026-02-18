@@ -26,6 +26,7 @@ interface FormEmailRequest {
   fieldGroups: FieldGroup[];
   senderName: string;
   senderEmail?: string;
+  resumeUrl?: string;
   receiptDetails?: {
     referenceId: string;
     paymentMethod: string;
@@ -139,6 +140,16 @@ function buildAttachmentHTML(req: FormEmailRequest, dateStr: string, timeStr: st
 </html>`;
 }
 
+function buildResumeBlock(resumeUrl?: string): string {
+  if (!resumeUrl) return "";
+  return `
+    <div style="margin-bottom:24px;padding:16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;">
+      <h3 style="font-size:15px;font-weight:bold;color:#1e40af;margin:0 0 10px 0;">📎 Resume Attached</h3>
+      <p style="font-size:13px;color:#333;margin:0 0 8px;">The applicant has uploaded a resume. Click the button below to download it (link valid for 7 days):</p>
+      <a href="${resumeUrl}" target="_blank" style="display:inline-block;background:#1a3a5c;color:#fff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:bold;">⬇ Download Resume</a>
+    </div>`;
+}
+
 function buildSchoolEmail(req: FormEmailRequest, dateStr: string, timeStr: string): string {
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"/></head><body style="font-family:'Segoe UI',Arial,sans-serif;margin:0;padding:0;background:#f4f4f4;">
   <div style="max-width:650px;margin:20px auto;background:#fff;border-radius:12px;overflow:hidden;border:2px solid #1a3a5c;">
@@ -152,6 +163,7 @@ function buildSchoolEmail(req: FormEmailRequest, dateStr: string, timeStr: strin
     </div>
     <div style="padding:24px;">
       <p style="font-size:14px;color:#333;margin:0 0 20px;">New submission received from the website. A printable copy is attached.</p>
+      ${buildResumeBlock(req.resumeUrl)}
       ${buildReceiptHTML(req.receiptDetails)}
       ${buildFieldGroupsHTML(req.fieldGroups)}
     </div>

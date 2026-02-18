@@ -37,6 +37,7 @@ interface SendFormEmailParams {
   fieldGroups: FieldGroup[];
   senderName: string;
   senderEmail?: string;
+  resumeUrl?: string;
   receiptDetails?: {
     referenceId: string;
     paymentMethod: string;
