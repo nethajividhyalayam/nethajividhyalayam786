@@ -1,39 +1,80 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, Heart, Globe, Zap, ChevronRight } from "lucide-react";
+import { BookOpen, Heart, Globe, Zap, ChevronDown, ChevronUp } from "lucide-react";
 import useScrollToHash from "@/hooks/useScrollToHash";
+
+const stagesData = [
+  {
+    title: "Foundational Stage (Pre-KG)",
+    summary: "Play-based Learning, Phonics, Basic Numeracy, Motor Skills",
+    link: "/academics/nursery",
+    subjects: [
+      { name: "Language", detail: "Listening skills, action songs, rhymes, vocabulary" },
+      { name: "Numbers", detail: "Number recognition, counting (1–10)" },
+      { name: "Environmental Awareness", detail: "Self, family, colours, fruits, animals" },
+      { name: "Motor Skills", detail: "Scribbling, finger movements, play activities" },
+      { name: "Art & Craft", detail: "Colouring, tearing & pasting" },
+      { name: "Physical Activities", detail: "Free play, music & movement" },
+      { name: "Social Skills", detail: "Sharing, following instructions" },
+    ],
+  },
+  {
+    title: "Preparatory Stage (LKG)",
+    summary: "Core Subjects (Languages, Math, EVS), Discovery Learning, Reading Habits",
+    link: "/academics/nursery",
+    subjects: [
+      { name: "English", detail: "Phonics blending, simple sentences, picture reading, basic writing" },
+      { name: "Tamil", detail: "Vowels (உயிர் எழுத்து), consonants (மெய் எழுத்து), simple words" },
+      { name: "Mathematics", detail: "Numbers 1–50, shapes, patterns, addition concept" },
+      { name: "EVS", detail: "My body, seasons, plants, transport, community helpers" },
+      { name: "Art & Craft", detail: "Craft activities, drawing, colouring, paper folding" },
+      { name: "Physical Education", detail: "Group games, exercises, yoga for kids" },
+      { name: "Value Education", detail: "Respect, honesty, caring for others" },
+    ],
+  },
+  {
+    title: "Middle Stage (UKG)",
+    summary: "Subject Specialization (Science, Social Studies), Critical Thinking, Project Work",
+    link: "/academics/nursery",
+    subjects: [
+      { name: "English", detail: "Reading passages, comprehension, creative writing, grammar basics" },
+      { name: "Tamil", detail: "Uyir-mei letters, simple words, sentences, short stories" },
+      { name: "Mathematics", detail: "Numbers up to 100, addition & subtraction with carry, multiplication tables (1–5)" },
+      { name: "Science", detail: "Living vs non-living, plants & animals, our environment" },
+      { name: "Social Studies", detail: "Our school, neighbourhood, festivals, maps introduction" },
+      { name: "Art & Craft", detail: "Project-based art, model-making, display work" },
+      { name: "Computer Science", detail: "Introduction to computers, keyboard & mouse, basic software" },
+    ],
+  },
+  {
+    title: "Secondary Stage (Grade 1 to 5)",
+    summary: "Core Academics, Life Skills, Holistic Growth",
+    link: "/academics/primary",
+    subjects: [
+      { name: "English", detail: "Grammar, comprehension, creative writing, literature reading, vocabulary building" },
+      { name: "Tamil", detail: "Prose, poetry, grammar, composition and language enrichment" },
+      { name: "Mathematics", detail: "Number operations, fractions, decimals, geometry, data handling" },
+      { name: "Science", detail: "Living things, matter, force & energy, Earth and environment, basic experiments" },
+      { name: "Social Studies", detail: "History, civics, geography, map skills, cultural heritage" },
+      { name: "Computer Science", detail: "MS Office basics, internet safety, programming logic introduction" },
+      { name: "Physical Education", detail: "Outdoor sports, yoga, health & hygiene, team activities" },
+      { name: "Art & Craft / Music", detail: "Creative arts, visual expression, Indian classical music basics" },
+    ],
+  },
+];
+
+const pillars = [
+  { icon: BookOpen, title: "Academic Rigor", desc: "Challenging, research-based curriculum aligned with CBSE standards." },
+  { icon: Heart, title: "Character Development", desc: "Emphasis on values, ethics, and social responsibility." },
+  { icon: Globe, title: "Global Perspective", desc: "Exposure to diverse cultures, languages, and worldviews." },
+  { icon: Zap, title: "Skill-Based Learning", desc: "Focus on critical thinking, creativity, and problem-solving." },
+];
 
 const AcademicsCurriculum = () => {
   useScrollToHash();
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  const pillars = [
-    { icon: BookOpen, title: "Academic Rigor", desc: "Challenging, research-based curriculum aligned with CBSE standards." },
-    { icon: Heart, title: "Character Development", desc: "Emphasis on values, ethics, and social responsibility." },
-    { icon: Globe, title: "Global Perspective", desc: "Exposure to diverse cultures, languages, and worldviews." },
-    { icon: Zap, title: "Skill-Based Learning", desc: "Focus on critical thinking, creativity, and problem-solving." },
-  ];
-
-  const stages = [
-    {
-      title: "Foundational Stage (Pre-KG)",
-      subjects: "Play-based Learning, Phonics, Basic Numeracy, Motor Skills",
-      link: "/academics/nursery",
-    },
-    {
-      title: "Preparatory Stage (LKG)",
-      subjects: "Core Subjects (Languages, Math, EVS), Discovery Learning, Reading Habits",
-      link: "/academics/nursery",
-    },
-    {
-      title: "Middle Stage (UKG)",
-      subjects: "Subject Specialization (Science, Social Studies), Critical Thinking, Project Work",
-      link: "/academics/nursery",
-    },
-    {
-      title: "Secondary Stage (Grade 1 to 5)",
-      subjects: "Core Academics, Life Skills, Holistic Growth",
-      link: "/academics/primary",
-    },
-  ];
+  const toggle = (i: number) => setOpenIndex(openIndex === i ? null : i);
 
   return (
     <>
@@ -95,23 +136,58 @@ const AcademicsCurriculum = () => {
 
       {/* Curriculum Structure */}
       <section className="section-padding bg-background">
-        <div className="container-custom">
+        <div className="container-custom max-w-4xl">
           <div className="text-center mb-12">
             <p className="text-accent font-semibold mb-2 uppercase tracking-wider text-sm">Structure</p>
             <h2 className="section-title">Curriculum Structure</h2>
             <p className="text-muted-foreground">Comprehensive coverage across all grade levels.</p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {stages.map((s, i) => (
-              <div key={i} className="bg-card rounded-2xl p-6 shadow-md border border-border hover:border-accent transition-colors group">
-                <h3 className="font-serif font-bold text-primary mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{s.subjects}</p>
-                <Link
-                  to={s.link}
-                  className="inline-flex items-center gap-1 text-accent font-semibold text-sm hover:gap-2 transition-all"
-                >
-                  View Details <ChevronRight className="h-4 w-4" />
-                </Link>
+
+          <div className="space-y-4">
+            {stagesData.map((stage, i) => (
+              <div key={i} className="bg-card rounded-2xl shadow-md border border-border overflow-hidden">
+                {/* Header row */}
+                <div className="p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex-1">
+                    <h3 className="font-serif font-bold text-primary text-lg mb-1">{stage.title}</h3>
+                    <p className="text-sm text-muted-foreground">{stage.summary}</p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <Link
+                      to={stage.link}
+                      className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-semibold hover:bg-accent/90 transition-colors"
+                    >
+                      View Details
+                    </Link>
+                    <button
+                      onClick={() => toggle(i)}
+                      className="inline-flex items-center gap-1 border border-border rounded-full px-4 py-2 text-sm font-semibold text-foreground hover:bg-secondary transition-colors"
+                    >
+                      {openIndex === i ? (
+                        <><ChevronUp className="h-4 w-4" /> Hide Details</>
+                      ) : (
+                        <><ChevronDown className="h-4 w-4" /> Show Details</>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Expandable subjects */}
+                {openIndex === i && (
+                  <div className="border-t border-border px-6 pb-6 pt-4">
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      {stage.subjects.map((sub, j) => (
+                        <div key={j} className="flex gap-3 items-start">
+                          <span className="mt-1.5 w-2 h-2 rounded-full bg-accent shrink-0" />
+                          <div>
+                            <span className="font-semibold text-sm text-foreground">{sub.name}: </span>
+                            <span className="text-sm text-muted-foreground">{sub.detail}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -164,12 +240,12 @@ const AcademicsCurriculum = () => {
             Download our detailed curriculum handbook for a comprehensive overview of grade-wise syllabi,
             learning outcomes, and teaching methodologies.
           </p>
-          <a
-            href="/contact"
+          <Link
+            to="/contact"
             className="inline-flex items-center gap-2 bg-accent text-accent-foreground px-8 py-3 rounded-full font-bold hover:bg-accent/90 transition-colors"
           >
             Contact Us for Details
-          </a>
+          </Link>
         </div>
       </section>
     </>
