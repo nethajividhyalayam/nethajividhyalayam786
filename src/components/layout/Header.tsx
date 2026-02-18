@@ -77,12 +77,12 @@ const Header = () => {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-500",
+        "sticky top-0 z-50 w-full transition-all duration-500 overflow-visible",
         isScrolled ? "bg-primary/95 backdrop-blur-md shadow-lg" : "bg-primary",
       )}
     >
-      <div className="w-full px-6">
-        <div className="flex items-center justify-between h-[110px]">
+      <div className="w-full px-6 overflow-visible">
+        <div className="flex items-center justify-between h-[60px] overflow-visible">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1 shrink-0 overflow-visible">
             <div className="w-[160px] h-[110px] shrink-0 flex items-center justify-center">
