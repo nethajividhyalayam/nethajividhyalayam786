@@ -20,6 +20,7 @@ import AcademicsCurriculum from "./pages/AcademicsCurriculum";
 import FeeDesk from "./pages/FeeDesk";
 import VideoGallery from "./pages/VideoGallery";
 import WorksheetMaker from "./pages/WorksheetMaker";
+import SpokenEnglish from "./pages/SpokenEnglish";
 import Layout from "./components/layout/Layout";
 import useFaviconPulse from "./hooks/useFaviconPulse";
 import faviconLogo from "./assets/nethaji_logo2_circle.webp";
@@ -52,6 +53,7 @@ const App = () => {
             <Route path="/feedesk" element={<FeeDesk />} />
             <Route path="/video-gallery" element={<VideoGallery />} />
             <Route path="/worksheet-maker" element={<WorksheetMaker />} />
+            <Route path="/spoken-english" element={<SpokenEnglish />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
