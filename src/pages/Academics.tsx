@@ -26,17 +26,17 @@ const Academics = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                At Nethaji Vidhyalayam, we follow a comprehensive curriculum that balances academic excellence 
-                with experiential learning. Our approach is designed to develop critical thinking, creativity, 
-                and strong moral values in every student.
+                At Nethaji Vidhyalayam, we follow a comprehensive curriculum that balances academic excellence with
+                experiential learning. Our approach is designed to develop critical thinking, creativity, and strong
+                moral values in every student.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                From <strong>Pre KG</strong> to <strong>5th Grade</strong>, we emphasize experiential learning 
-                and grooming of young children, making them responsible citizens and leaders with a difference.
+                From <strong>Pre KG</strong> to <strong>5th Grade</strong>, we emphasize experiential learning and
+                grooming of young children, making them responsible citizens and leaders with a difference.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Our curriculum integrates modern teaching methodologies with Bharat cultural traditions, 
-                ensuring students receive a wholesome education through the English medium.
+                Our curriculum integrates modern teaching methodologies with Bharat cultural traditions, ensuring
+                students receive a wholesome education through the English medium.
               </p>
             </div>
             <div className="relative">
@@ -54,7 +54,7 @@ const Academics = () => {
         </div>
       </section>
 
-      {/* Pre-Primary */}
+      {/* Pre-Primary 
       <section id="pre-primary" className="section-padding bg-secondary">
         <div className="container-custom">
           <div className="text-center mb-12">
@@ -95,9 +95,9 @@ const Academics = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      {/* Primary */}
+      {/* Primary 
       <section id="primary" className="section-padding bg-background">
         <div className="container-custom">
           <div className="text-center mb-12">
@@ -138,7 +138,7 @@ const Academics = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Age Criteria Table */}
       <section className="section-padding bg-secondary">
