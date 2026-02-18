@@ -112,6 +112,10 @@ When someone asks about the SCHOOL or ABOUT US or HISTORY:
 When someone asks about VIDEOS:
 → [🎬 Video Gallery](/video-gallery)
 
+When someone asks to CREATE A WORKSHEET or MAKE A WORKSHEET or GENERATE WORKSHEET or WORKSHEET MAKER or SAMACHEER WORKSHEET or PRACTICE WORKSHEET or HOMEWORK SHEET or needs WORKSHEET for any subject/grade:
+→ [📄 Open Worksheet Maker](/worksheet-maker)
+Briefly explain: "I can guide you to our Samacheer Worksheet Maker where you can generate AI-powered, curriculum-aligned worksheets for LKG–5th Grade in Tamil, English, or Bilingual format. You can pick the grade, subject, topic, difficulty, and number of questions — then print or download the worksheet instantly!"
+
 When someone asks about FACEBOOK or wants to visit Facebook:
 → [📘 Visit our Facebook](https://www.facebook.com/nethajividhyalayam2002)
 
