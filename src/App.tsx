@@ -14,6 +14,9 @@ import Facilities from "./pages/Facilities";
 import Career from "./pages/Career";
 import Contact from "./pages/Contact";
 import Academics from "./pages/Academics";
+import AcademicsNursery from "./pages/AcademicsNursery";
+import AcademicsPrimary from "./pages/AcademicsPrimary";
+import AcademicsCurriculum from "./pages/AcademicsCurriculum";
 import FeeDesk from "./pages/FeeDesk";
 import VideoGallery from "./pages/VideoGallery";
 import Layout from "./components/layout/Layout";
@@ -39,6 +42,9 @@ const App = () => {
             <Route path="/events" element={<Events />} />
             <Route path="/calendar" element={<SchoolCalendar />} />
             <Route path="/academics" element={<Academics />} />
+            <Route path="/academics/nursery" element={<AcademicsNursery />} />
+            <Route path="/academics/primary" element={<AcademicsPrimary />} />
+            <Route path="/academics/curriculum" element={<AcademicsCurriculum />} />
             <Route path="/facilities" element={<Facilities />} />
             <Route path="/career" element={<Career />} />
             <Route path="/contact" element={<Contact />} />
