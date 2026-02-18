@@ -86,7 +86,10 @@ const Header = () => {
         <div className="flex items-center justify-between h-[60px]" style={{ overflow: "visible" }}>
           {/* Logo */}
           <Link to="/" className="flex items-center gap-1 shrink-0" style={{ overflow: "visible" }}>
-            <div className="w-[160px] h-[110px] shrink-0 flex items-start justify-center pt-1" style={{ overflow: "visible", position: "relative", zIndex: 10 }}>
+            <div
+              className="w-[160px] h-[110px] shrink-0 flex items-start justify-center pt-1"
+              style={{ overflow: "visible", position: "relative", zIndex: 10 }}
+            >
               <img
                 alt="Nethaji Vidhyalayam Logo"
                 className="w-[130px] h-[130px] object-contain drop-shadow-lg brightness-110 contrast-105 animate-logo-pulse-header"
@@ -164,7 +167,7 @@ const Header = () => {
           </nav>
 
           {/* CTA Button & Mobile Menu Toggle */}
-          <div className="flex items-center gap-1 shrink-0">
+          <div className="flex items-center gap-0.5 shrink-0">
             <a
               href="tel:+919841594945"
               title="Call Us: +91 9841594945"
