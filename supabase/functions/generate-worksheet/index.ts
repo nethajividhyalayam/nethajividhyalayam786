@@ -32,7 +32,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { grade, subject, topic, numQuestions, language, difficulty } = await req.json();
+    const { grade, subject, topic, numQuestions, language, difficulty, questionTypes } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -81,6 +81,20 @@ Your worksheets are:
 ✓ Print-ready with clear formatting
 ✓ Factually accurate per official textbooks`;
 
+    // Build question type instruction
+    const TYPE_LABEL_MAP: Record<string, string> = {
+      multiple_choice: "Multiple Choice (Section B)",
+      fill_in_blanks: "Fill in the Blanks (Section A)",
+      match_following: "Match the Following (Section C)",
+      short_answer: "Short Answer (Section D)",
+      true_false: "True or False",
+      diagram: "Label/Draw diagram (Section E)",
+    };
+    const selectedTypes: string[] = Array.isArray(questionTypes) && questionTypes.length > 0 ? questionTypes : [];
+    const questionTypeInstruction = selectedTypes.length > 0
+      ? `⭐ IMPORTANT: The teacher has specifically requested these question types — PRIORITIZE and INCLUDE them: ${selectedTypes.map(t => TYPE_LABEL_MAP[t] || t).join(", ")}. Focus the majority of questions on these types. Still include other types lightly to reach the total count.`
+      : "Use a balanced mix of fill-in-blanks, matching, multiple choice, and short answers distributed across sections.";
+
     const userPrompt = `Create a complete, curriculum-aligned worksheet for Tamil Nadu Samacheer Kalvi with these specifications:
 
 Grade: ${grade}
@@ -90,6 +104,8 @@ Number of Questions: ${numQuestions}
 Language: ${language} — ${langInstruction}
 Difficulty: ${difficulty} — ${difficultyGuide}
 ${hasDiagram ? "⚠️ This topic requires a DRAW AND LABEL diagram section — include it!" : ""}
+
+${questionTypeInstruction}
 
 Return ONLY valid JSON (no markdown, no code blocks, no explanations — just raw JSON):
 
