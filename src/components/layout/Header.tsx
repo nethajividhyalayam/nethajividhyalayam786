@@ -168,7 +168,7 @@ const Header = () => {
             <a
               href="tel:+919841594945"
               title="Call Us: +91 9841594945"
-              className="hidden md:flex items-center justify-center bg-accent text-accent-foreground w-9 h-9 rounded-md font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
+              className="flex items-center justify-center bg-accent text-accent-foreground w-9 h-9 rounded-md font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
             >
               <Phone className="h-4 w-4" />
             </a>
