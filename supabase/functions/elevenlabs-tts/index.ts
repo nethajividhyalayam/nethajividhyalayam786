@@ -20,13 +20,18 @@ const VOICES: Record<string, { id: string; label: string }> = {
 };
 
 // Grade → speed mapping: lower grades get slower speech
+// ElevenLabs valid range: 0.7 – 1.2
 function gradeToSpeed(grade: string, requestedSpeed?: number): number {
-  if (requestedSpeed !== undefined && requestedSpeed !== null) return requestedSpeed;
+  const SPEED_MIN = 0.7;
+  const SPEED_MAX = 1.2;
+  const clamp = (v: number) => Math.min(SPEED_MAX, Math.max(SPEED_MIN, v));
+
+  if (requestedSpeed !== undefined && requestedSpeed !== null) return clamp(requestedSpeed);
   const slowGrades: Record<string, number> = {
-    LKG: 0.72, UKG: 0.75, "1st": 0.78, "2nd": 0.80,
-    "3rd": 0.83, "4th": 0.86, "5th": 0.88,
+    LKG: 0.75, UKG: 0.78, "1st": 0.80, "2nd": 0.83,
+    "3rd": 0.85, "4th": 0.88, "5th": 0.90,
   };
-  return slowGrades[grade] ?? 0.85;
+  return clamp(slowGrades[grade] ?? 0.85);
 }
 
 serve(async (req) => {
