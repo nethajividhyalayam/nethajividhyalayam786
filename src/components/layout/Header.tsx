@@ -77,27 +77,28 @@ const Header = () => {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-500 overflow-visible",
+        "sticky top-0 z-50 w-full transition-all duration-500",
         isScrolled ? "bg-primary/95 backdrop-blur-md shadow-lg" : "bg-primary",
       )}
+      style={{ overflow: "visible" }}
     >
-      <div className="w-full px-6 overflow-visible">
-        <div className="flex items-center justify-between h-[60px] overflow-visible">
+      <div className="w-full px-4" style={{ overflow: "visible" }}>
+        <div className="flex items-center justify-between h-[60px]" style={{ overflow: "visible" }}>
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1 shrink-0 overflow-visible">
-            <div className="w-[160px] h-[110px] shrink-0 flex items-start justify-center pt-1">
+          <Link to="/" className="flex items-center gap-1 shrink-0" style={{ overflow: "visible" }}>
+            <div className="w-[48px] shrink-0 flex items-center justify-center" style={{ overflow: "visible", position: "relative", zIndex: 10 }}>
               <img
                 alt="Nethaji Vidhyalayam Logo"
-                className="w-[130px] h-[130px] object-contain drop-shadow-lg brightness-110 contrast-105 animate-logo-pulse-header"
-                style={{ imageRendering: "-webkit-optimize-contrast" }}
+                className="w-[72px] h-[72px] object-contain drop-shadow-lg brightness-110 contrast-105 animate-logo-pulse-header"
+                style={{ imageRendering: "-webkit-optimize-contrast", position: "relative" }}
                 src={logo}
               />
             </div>
-            <div className="hidden sm:block text-center">
-              <h1 className="font-serif font-extrabold text-[23px] text-primary-foreground leading-tight tracking-tight">
+            <div className="hidden sm:block text-center ml-3">
+              <h1 className="font-serif font-extrabold text-[18px] text-primary-foreground leading-tight tracking-tight">
                 NETHAJI VIDHYALAYAM
               </h1>
-              <p className="font-sans font-bold text-accent text-[11px] tracking-widest">
+              <p className="font-sans font-bold text-accent text-[10px] tracking-widest">
                 Nurturing Tomorrow's Leaders
               </p>
               {/* Optional motto/subtitle 
@@ -110,8 +111,8 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center justify-center flex-1 mx-4">
-            <div className="flex items-center gap-0.5">
+          <nav className="hidden lg:flex items-center justify-center flex-1 mx-1">
+            <div className="flex items-center gap-0">
               {navItems.map((item) => (
                 <div
                   key={item.label}
@@ -122,7 +123,7 @@ const Header = () => {
                   <Link
                     to={item.path}
                     className={cn(
-                      "nav-link-animated flex items-center gap-0.5 px-3 py-2 text-sm font-bold rounded-md transition-all duration-300 whitespace-nowrap",
+                      "nav-link-animated flex items-center gap-0.5 px-2 py-2 text-xs font-bold rounded-md transition-all duration-300 whitespace-nowrap",
                       isActive(item.path)
                         ? "text-accent bg-primary-foreground/10"
                         : "text-primary-foreground/90 hover:text-accent hover:bg-primary-foreground/10 hover:scale-105",
@@ -163,13 +164,14 @@ const Header = () => {
           </nav>
 
           {/* CTA Button & Mobile Menu Toggle */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             <a
               href="tel:+919841594945"
-              className="hidden md:flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-md text-sm font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
+              title="Call Us: +91 9841594945"
+              className="hidden md:flex items-center gap-1 bg-accent text-accent-foreground px-2.5 py-2 rounded-md text-xs font-bold hover:bg-accent/90 hover:shadow-lg transition-all duration-300"
             >
               <Phone className="h-3.5 w-3.5" />
-              <span>Call Us</span>
+              <span className="hidden xl:inline">Call Us</span>
             </a>
 
             <button
