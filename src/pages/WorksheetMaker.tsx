@@ -372,12 +372,16 @@ export default function WorksheetMaker() {
     switch (section.type) {
       case "fill_in_blanks":
         return section.questions.map((q, qIdx) => (
-          <div key={q.id} className="mb-4">
-            <p className="font-medium text-gray-800 print:text-black leading-relaxed">
+          <div key={q.id} className={`mb-5 ${gradeLineHeight}`}>
+            <p className={`font-medium text-gray-800 print:text-black ${gradeFontSize} leading-[2.4]`}>
               <span className="font-bold mr-2 text-sky-700 print:text-black">{q.id}.</span>
               {editMode ? (
                 <input className="border-b border-gray-400 outline-none w-full mt-1 bg-transparent tamil-font" value={q.question || ""} onChange={(e) => updateQuestion(sIdx, qIdx, "question", e.target.value)} />
-              ) : q.question}
+              ) : (
+                <span dangerouslySetInnerHTML={{
+                  __html: (q.question || "").replace(/_{2,}|\[_+\]/g, '<span class="inline-block border-b-2 border-gray-500 print:border-black min-w-[120px] mx-1 align-bottom">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>')
+                }} />
+              )}
             </p>
             {showAnswers && <p className="text-green-700 text-sm mt-1 ml-6 print:text-green-900 font-semibold">✓ {q.answer}</p>}
           </div>
@@ -385,18 +389,18 @@ export default function WorksheetMaker() {
 
       case "multiple_choice":
         return section.questions.map((q, qIdx) => (
-          <div key={q.id} className="mb-5">
-            <p className="font-medium text-gray-800 print:text-black mb-2 leading-relaxed">
+          <div key={q.id} className={`mb-6 ${gradeLineHeight}`}>
+            <p className={`font-medium text-gray-800 print:text-black mb-3 ${gradeFontSize} leading-relaxed`}>
               <span className="font-bold mr-2 text-sky-700 print:text-black">{q.id}.</span>
               {editMode ? (
                 <input className="border-b border-gray-400 outline-none w-full mt-1 bg-transparent tamil-font" value={q.question || ""} onChange={(e) => updateQuestion(sIdx, qIdx, "question", e.target.value)} />
               ) : q.question}
             </p>
-            <div className="grid grid-cols-2 gap-2 ml-6">
+            <div className="grid grid-cols-2 gap-3 ml-6">
               {q.options?.map((opt, oi) => (
-                <label key={oi} className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-gray-400 rounded-sm shrink-0 print:border-black" />
-                  <span className="text-sm text-gray-700 print:text-black tamil-font">{opt}</span>
+                <label key={oi} className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 border-2 border-gray-400 rounded-sm shrink-0 mt-0.5 print:border-black" />
+                  <span className={`${gradeFontSize} text-gray-700 print:text-black tamil-font`}>{String.fromCharCode(65 + oi)}) {opt}</span>
                 </label>
               ))}
             </div>
@@ -406,37 +410,44 @@ export default function WorksheetMaker() {
 
       case "match_following":
         return section.questions.map((q) => (
-          <div key={q.id} className="mb-6">
-            <div className="grid grid-cols-2 gap-0 ml-2 border border-gray-200 print:border-gray-500 rounded-xl overflow-hidden">
-              {/* Column A header */}
-              <div className="bg-sky-50 print:bg-gray-100 border-r border-gray-200 print:border-gray-500 px-4 py-2">
-                <p className="font-extrabold text-xs text-sky-700 print:text-gray-700 uppercase tracking-widest text-center">Column A</p>
+          <div key={q.id} className="mb-8">
+            <div className="w-full border-2 border-gray-300 print:border-gray-600 rounded-xl overflow-hidden">
+              {/* Header row */}
+              <div className="grid grid-cols-2">
+                <div className="bg-sky-100 print:bg-gray-100 border-r-2 border-gray-300 print:border-gray-600 px-5 py-2.5">
+                  <p className="font-extrabold text-xs text-sky-700 print:text-gray-800 uppercase tracking-widest text-center">
+                    Column A — கிடுக்கிகள்
+                  </p>
+                </div>
+                <div className="bg-emerald-100 print:bg-gray-100 px-5 py-2.5">
+                  <p className="font-extrabold text-xs text-emerald-700 print:text-gray-800 uppercase tracking-widest text-center">
+                    Column B — பொருத்துக
+                  </p>
+                </div>
               </div>
-              {/* Column B header */}
-              <div className="bg-emerald-50 print:bg-gray-100 px-4 py-2">
-                <p className="font-extrabold text-xs text-emerald-700 print:text-gray-700 uppercase tracking-widest text-center">Column B</p>
-              </div>
-              {/* Rows */}
+              {/* Data rows */}
               {(q.left || []).map((item, i) => (
-                <>
-                  {/* Left cell */}
-                  <div key={`l-${i}`} className="flex items-center gap-2 border-t border-r border-gray-100 print:border-gray-300 px-4 py-2.5">
-                    <span className="font-bold text-sky-600 print:text-gray-700 w-5 shrink-0 text-sm">{i + 1}.</span>
-                    <span className="text-sm tamil-font text-gray-800 print:text-black flex-1">{item}</span>
-                    <div className="w-12 border-b-2 border-dashed border-gray-300 print:border-gray-500 shrink-0" title="write match letter here" />
+                <div key={i} className={`grid grid-cols-2 border-t-2 border-gray-200 print:border-gray-400 ${i % 2 === 0 ? "bg-white" : "bg-gray-50 print:bg-transparent"}`}>
+                  <div className="flex items-center gap-3 border-r-2 border-gray-300 print:border-gray-600 px-5 py-3 min-h-[3rem]">
+                    <span className="font-extrabold text-sky-600 print:text-gray-800 w-6 shrink-0 text-sm">{i + 1}.</span>
+                    <span className={`${gradeFontSize} tamil-font text-gray-800 print:text-black flex-1 leading-snug`}>{item}</span>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <span className="text-xs text-gray-400 print:hidden">ans:</span>
+                      <div className="w-10 h-6 border-b-2 border-dashed border-gray-400 print:border-gray-700" />
+                    </div>
                   </div>
-                  {/* Right cell */}
-                  <div key={`r-${i}`} className="flex items-center gap-2 border-t border-gray-100 print:border-gray-300 px-4 py-2.5">
-                    <span className="font-bold text-emerald-600 print:text-gray-700 w-5 shrink-0 text-sm">{String.fromCharCode(97 + i)}.</span>
-                    <span className="text-sm tamil-font text-gray-800 print:text-black">{q.right?.[i]}</span>
+                  <div className="flex items-center gap-3 px-5 py-3 min-h-[3rem]">
+                    <span className="font-extrabold text-emerald-600 print:text-gray-800 w-6 shrink-0 text-sm">{String.fromCharCode(97 + i)}.</span>
+                    <span className={`${gradeFontSize} tamil-font text-gray-800 print:text-black flex-1 leading-snug`}>{q.right?.[i]}</span>
                   </div>
-                </>
+                </div>
               ))}
             </div>
+            <p className="text-xs text-gray-400 mt-1.5 ml-1 italic print:hidden">Write the matching letter (a, b, c…) in the dashed box beside each item in Column A.</p>
             {showAnswers && (
-              <div className="mt-2 ml-2 p-2 bg-green-50 rounded print:bg-transparent print:border print:border-green-700">
+              <div className="mt-2 p-3 bg-green-50 rounded-lg border border-green-200 print:bg-transparent print:border-green-700">
                 <p className="text-green-700 text-sm font-semibold print:text-green-900 tamil-font">
-                  ✓ {q.left?.map((l, i) => `${i + 1}→${q.answers?.[i]}`).join("  |  ")}
+                  ✓ Answers: {q.left?.map((l, i) => `${i + 1} → ${q.answers?.[i]}`).join("  |  ")}
                 </p>
               </div>
             )}
@@ -445,16 +456,19 @@ export default function WorksheetMaker() {
 
       case "short_answer":
         return section.questions.map((q, qIdx) => (
-          <div key={q.id} className="mb-6">
-            <p className="font-medium text-gray-800 print:text-black mb-2 leading-relaxed">
+          <div key={q.id} className={`mb-7 ${gradeLineHeight}`}>
+            <p className={`font-medium text-gray-800 print:text-black mb-3 ${gradeFontSize} leading-relaxed`}>
               <span className="font-bold mr-2 text-sky-700 print:text-black">{q.id}.</span>
               {editMode ? (
                 <input className="border-b border-gray-400 outline-none w-full mt-1 bg-transparent tamil-font" value={q.question || ""} onChange={(e) => updateQuestion(sIdx, qIdx, "question", e.target.value)} />
               ) : q.question}
             </p>
-            <div className="ml-6 space-y-2.5">
-              <div className="border-b border-gray-300 h-7 print:border-gray-500" />
-              <div className="border-b border-gray-300 h-7 print:border-gray-500" />
+            <div className="ml-6 space-y-3">
+              <div className="border-b-2 border-gray-300 h-8 print:border-gray-500" />
+              <div className="border-b-2 border-gray-300 h-8 print:border-gray-500" />
+              {["LKG","UKG","1st","2nd"].includes(formData.grade) && (
+                <div className="border-b-2 border-gray-300 h-8 print:border-gray-500" />
+              )}
             </div>
             {showAnswers && <p className="text-green-700 text-sm mt-2 ml-6 print:text-green-900 font-semibold">✓ {q.answer}</p>}
           </div>
@@ -462,30 +476,63 @@ export default function WorksheetMaker() {
 
       case "true_false":
         return section.questions.map((q, qIdx) => (
-          <div key={q.id} className="mb-4">
-            <p className="font-medium text-gray-800 print:text-black leading-relaxed">
-              <span className="font-bold mr-2 text-sky-700 print:text-black">{q.id}.</span>
-              {editMode ? (
-                <input className="border-b border-gray-400 outline-none w-full mt-1 bg-transparent tamil-font" value={q.question || ""} onChange={(e) => updateQuestion(sIdx, qIdx, "question", e.target.value)} />
-              ) : q.question}
-              <span className="ml-4 inline-flex gap-4 text-sm">
-                <label className="flex items-center gap-1.5"><div className="w-4 h-4 border-2 border-gray-400 rounded-sm print:border-black" /><span className="print:text-black">True ✓</span></label>
-                <label className="flex items-center gap-1.5"><div className="w-4 h-4 border-2 border-gray-400 rounded-sm print:border-black" /><span className="print:text-black">False ✗</span></label>
-              </span>
-            </p>
+          <div key={q.id} className={`mb-5 ${gradeLineHeight}`}>
+            <div className={`flex items-start gap-3 font-medium text-gray-800 print:text-black ${gradeFontSize} leading-relaxed`}>
+              <span className="font-bold text-sky-700 print:text-black shrink-0">{q.id}.</span>
+              <div className="flex-1">
+                {editMode ? (
+                  <input className="border-b border-gray-400 outline-none w-full bg-transparent tamil-font" value={q.question || ""} onChange={(e) => updateQuestion(sIdx, qIdx, "question", e.target.value)} />
+                ) : <span>{q.question}</span>}
+                <div className="flex gap-6 mt-2 ml-1">
+                  <label className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-gray-400 rounded-sm print:border-black" />
+                    <span className="font-semibold print:text-black">✓ True / சரி</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-gray-400 rounded-sm print:border-black" />
+                    <span className="font-semibold print:text-black">✗ False / தவறு</span>
+                  </label>
+                </div>
+              </div>
+            </div>
             {showAnswers && <p className="text-green-700 text-sm mt-1 ml-6 print:text-green-900 font-semibold">✓ {q.answer}</p>}
           </div>
         ));
 
       case "diagram":
         return section.questions.map((q) => (
-          <div key={q.id} className="mb-4">
-            <p className="font-medium text-gray-800 print:text-black mb-4 tamil-font leading-relaxed">
+          <div key={q.id} className="mb-8">
+            <p className={`font-medium text-gray-800 print:text-black mb-4 tamil-font ${gradeFontSize} leading-relaxed`}>
               <span className="font-bold mr-2 text-sky-700 print:text-black">{q.id}.</span>
               {q.question}
             </p>
             <div className="ml-4">
-              <DiagramBox topic={formData.topic} labels={q.diagramLabels} />
+              {(() => {
+                const lower = formData.topic.toLowerCase();
+                const isKnown = ["plant","flower","தாவரம்","செடி","மரம்","பூ","body","human","உடல்","மனித","solar","planet","சூரிய","கோள்","water cycle","நீர் சுழற்சி","rain","cloud"].some(k => lower.includes(k));
+                return isKnown ? (
+                  <DiagramBox topic={formData.topic} labels={q.diagramLabels} />
+                ) : (
+                  <div className="border-2 border-dashed border-gray-400 print:border-gray-600 rounded-xl bg-gray-50 print:bg-white overflow-hidden">
+                    <div className="w-full h-52 print:h-64 flex flex-col items-center justify-center text-gray-300 print:text-gray-400 gap-2 border-b-2 border-dashed border-gray-300 print:border-gray-500">
+                      <PenLine className="h-12 w-12 opacity-30" />
+                      <p className="text-base font-bold text-gray-400 print:text-gray-600">[ Draw here / இங்கே வரைக ]</p>
+                      <p className="text-xs text-gray-300 print:text-gray-500 tamil-font">Draw and label the diagram in the box above</p>
+                    </div>
+                    <div className="px-6 py-4">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Label the parts below / கீழே பாகங்களை எழுதுக:</p>
+                      <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                        {(q.diagramLabels && q.diagramLabels.length > 0 ? q.diagramLabels : ["Part 1", "Part 2", "Part 3", "Part 4"]).map((lbl, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-gray-500 w-5 shrink-0">{i + 1}.</span>
+                            <div className="flex-1 border-b-2 border-dashed border-gray-400 print:border-gray-600 min-h-[1.5rem]" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
             {showAnswers && q.answer && (
               <p className="text-green-700 text-sm mt-2 ml-6 print:text-green-900 font-semibold">✓ {q.answer}</p>
@@ -501,6 +548,16 @@ export default function WorksheetMaker() {
   const isTamil = formData.language === "Tamil";
   const fontClass = isTamil ? "tamil-font" : "";
 
+  // Grade-based font size: lower grades get larger text for readability
+  const gradeFontSize = (() => {
+    if (["LKG", "UKG"].includes(formData.grade)) return "text-xl";
+    if (["1st", "2nd"].includes(formData.grade)) return "text-lg";
+    if (formData.grade === "3rd") return "text-base";
+    return "text-sm";
+  })();
+
+  const gradeLineHeight = ["LKG", "UKG", "1st", "2nd"].includes(formData.grade) ? "leading-loose" : "leading-relaxed";
+
   // ─── JSX ───────────────────────────────────────────────────────────────────
 
   return (
@@ -513,7 +570,12 @@ export default function WorksheetMaker() {
           .worksheet-card { box-shadow: none !important; border: 1px solid #aaa !important; }
           @page { margin: 1.5cm; size: A4 portrait; }
         }
-        .tamil-font, .tamil-font * { font-family: 'Noto Sans Tamil', 'Noto Serif Tamil', sans-serif !important; }
+        .tamil-font, .tamil-font * { font-family: 'Noto Sans Tamil', 'Noto Serif Tamil', 'Baloo 2', sans-serif !important; }
+        ${isTamil ? `
+          .worksheet-card, .worksheet-card * {
+            font-family: 'Noto Sans Tamil', 'Noto Serif Tamil', 'Baloo 2', sans-serif !important;
+          }
+        ` : ""}
       `}</style>
 
       {/* ── Page Header ── */}
@@ -797,17 +859,17 @@ export default function WorksheetMaker() {
               </div>
 
               {/* Sections */}
-              <div className="px-8 py-6 space-y-8">
+              <div className={`px-8 py-6 space-y-10 ${isTamil ? "tamil-font" : ""}`}>
                 {worksheet.sections?.map((section, sIdx) => (
                   <div key={sIdx}>
-                    <h3 className="tamil-font font-bold text-gray-900 text-base border-b-2 border-sky-200 print:border-gray-500 pb-2 mb-4 flex items-center gap-2"
+                    <h3 className="tamil-font font-bold text-gray-900 text-base border-b-2 border-sky-200 print:border-gray-500 pb-2 mb-5 flex items-center gap-2"
                       style={{ fontFamily: "'Baloo 2', 'Noto Sans Tamil', sans-serif" }}>
                       {section.type === "fill_in_blanks" && <PenLine className="h-4 w-4 text-sky-500 print:hidden" />}
                       {section.type === "multiple_choice" && <CheckSquare className="h-4 w-4 text-emerald-500 print:hidden" />}
                       {section.type === "diagram" && <span className="print:hidden">📐</span>}
                       {section.heading}
                     </h3>
-                    <div className="tamil-font space-y-1">
+                    <div className={`${isTamil ? "tamil-font" : ""} space-y-1`}>
                       {renderSection(section, sIdx)}
                     </div>
                   </div>
