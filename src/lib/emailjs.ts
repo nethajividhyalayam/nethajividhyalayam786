@@ -38,6 +38,9 @@ interface SendFormEmailParams {
   senderName: string;
   senderEmail?: string;
   resumeUrl?: string;
+  resumeStoragePath?: string;
+  resumeFileName?: string;
+  resumeMimeType?: string;
   receiptDetails?: {
     referenceId: string;
     paymentMethod: string;

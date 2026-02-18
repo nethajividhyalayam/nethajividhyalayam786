@@ -89,15 +89,17 @@ const Career = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      let resumeUrl = "";
+      let resumeStoragePath = "";
+      let resumeFileName = "";
+      let resumeMimeType = "";
 
       if (resumeFile) {
         setResumeUploading(true);
         const ext = resumeFile.name.split(".").pop();
-        const fileName = `${Date.now()}_${formData.name.replace(/\s+/g, "_")}.${ext}`;
+        const storageName = `${Date.now()}_${formData.name.replace(/\s+/g, "_")}.${ext}`;
         const { error: uploadError } = await supabase.storage
           .from("resumes")
-          .upload(fileName, resumeFile, { contentType: resumeFile.type, upsert: false });
+          .upload(storageName, resumeFile, { contentType: resumeFile.type, upsert: false });
         setResumeUploading(false);
         if (uploadError) {
           console.error("Resume upload error:", uploadError);
@@ -105,19 +107,12 @@ const Career = () => {
           setLoading(false);
           return;
         }
-        const { data: signedData } = await supabase.storage
-          .from("resumes")
-          .createSignedUrl(fileName, 60 * 60 * 24 * 7);
-        resumeUrl = signedData?.signedUrl || "";
+        resumeStoragePath = storageName;
+        resumeFileName = resumeFile.name;
+        resumeMimeType = resumeFile.type;
       }
 
       const fieldGroups = getFieldGroups();
-      if (resumeUrl) {
-        fieldGroups.push({
-          heading: "Resume",
-          fields: [{ label: "Download Resume (valid 7 days)", value: resumeUrl }],
-        });
-      }
 
       sendEmail({
         from_name: formData.name,
@@ -141,7 +136,9 @@ const Career = () => {
         fieldGroups,
         senderName: formData.name,
         senderEmail: formData.email,
-        resumeUrl,
+        resumeStoragePath,
+        resumeFileName,
+        resumeMimeType,
       }).catch(console.error);
 
       setSubmitted(true);

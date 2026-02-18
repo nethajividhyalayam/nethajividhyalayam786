@@ -1,7 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const supabaseAdmin = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,6 +32,9 @@ interface FormEmailRequest {
   senderName: string;
   senderEmail?: string;
   resumeUrl?: string;
+  resumeStoragePath?: string;
+  resumeFileName?: string;
+  resumeMimeType?: string;
   receiptDetails?: {
     referenceId: string;
     paymentMethod: string;
@@ -140,14 +148,33 @@ function buildAttachmentHTML(req: FormEmailRequest, dateStr: string, timeStr: st
 </html>`;
 }
 
-function buildResumeBlock(resumeUrl?: string): string {
-  if (!resumeUrl) return "";
+function buildResumeBlock(hasResume: boolean, resumeFileName?: string): string {
+  if (!hasResume) return "";
   return `
     <div style="margin-bottom:24px;padding:16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;">
       <h3 style="font-size:15px;font-weight:bold;color:#1e40af;margin:0 0 10px 0;">📎 Resume Attached</h3>
-      <p style="font-size:13px;color:#333;margin:0 0 8px;">The applicant has uploaded a resume. Click the button below to download it (link valid for 7 days):</p>
-      <a href="${resumeUrl}" target="_blank" style="display:inline-block;background:#1a3a5c;color:#fff;text-decoration:none;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:bold;">⬇ Download Resume</a>
+      <p style="font-size:13px;color:#333;margin:0;">The applicant's resume (<strong>${resumeFileName || "resume"}</strong>) is attached to this email as a file.</p>
     </div>`;
+}
+
+async function fetchResumeAttachment(storagePath: string, resumeFileName: string, mimeType: string) {
+  const { data, error } = await supabaseAdmin.storage.from("resumes").download(storagePath);
+  if (error || !data) {
+    console.error("Failed to download resume:", error);
+    return null;
+  }
+  const arrayBuffer = await data.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = "";
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64 = btoa(binary);
+  return {
+    filename: resumeFileName,
+    content: base64,
+    content_type: mimeType,
+  };
 }
 
 function buildSchoolEmail(req: FormEmailRequest, dateStr: string, timeStr: string): string {
@@ -163,7 +190,7 @@ function buildSchoolEmail(req: FormEmailRequest, dateStr: string, timeStr: strin
     </div>
     <div style="padding:24px;">
       <p style="font-size:14px;color:#333;margin:0 0 20px;">New submission received from the website. A printable copy is attached.</p>
-      ${buildResumeBlock(req.resumeUrl)}
+      ${buildResumeBlock(!!req.resumeStoragePath, req.resumeFileName)}
       ${buildReceiptHTML(req.receiptDetails)}
       ${buildFieldGroupsHTML(req.fieldGroups)}
     </div>
@@ -301,27 +328,42 @@ const handler = async (req: Request): Promise<Response> => {
     const attachmentFilename = getAttachmentFilename(body);
     const attachmentBase64 = toBase64(attachmentHTML);
 
-    const attachment = {
+    const htmlAttachment = {
       filename: attachmentFilename,
       content: attachmentBase64,
       content_type: "text/html",
     };
 
+    // Build attachments array — always include HTML, conditionally include resume file
+    const schoolAttachments: typeof htmlAttachment[] = [htmlAttachment];
+
+    if (body.resumeStoragePath && body.resumeFileName && body.resumeMimeType) {
+      const resumeAttachment = await fetchResumeAttachment(
+        body.resumeStoragePath,
+        body.resumeFileName,
+        body.resumeMimeType
+      );
+      if (resumeAttachment) {
+        schoolAttachments.push(resumeAttachment);
+        console.log("Resume file attached:", body.resumeFileName);
+      }
+    }
+
     const subject = getSubjectLine(body);
     const schoolHTML = buildSchoolEmail(body, dateStr, timeStr);
 
-    // Send to school with attachment
+    // Send to school with HTML summary + actual resume file attached
     const schoolResult = await resend.emails.send({
       from: `${SCHOOL_NAME} Website <onboarding@resend.dev>`,
       to: [SCHOOL_EMAIL],
       subject,
       html: schoolHTML,
       reply_to: senderEmail || undefined,
-      attachments: [attachment],
+      attachments: schoolAttachments,
     });
     console.log("School email sent:", schoolResult);
 
-    // Send thank-you copy to parent/enquirer with attachment
+    // Send thank-you copy to parent/enquirer with HTML summary only (no resume)
     if (senderEmail && senderEmail.includes("@")) {
       const parentHTML = buildParentEmail(body, dateStr, timeStr);
       const parentSubject = getParentSubject(body);
@@ -331,7 +373,7 @@ const handler = async (req: Request): Promise<Response> => {
         to: [senderEmail],
         subject: parentSubject,
         html: parentHTML,
-        attachments: [attachment],
+        attachments: [htmlAttachment],
       });
       console.log("Parent copy sent:", parentResult);
     }
