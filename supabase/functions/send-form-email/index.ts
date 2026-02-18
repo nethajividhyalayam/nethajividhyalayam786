@@ -77,76 +77,8 @@ function buildReceiptHTML(details: FormEmailRequest["receiptDetails"]): string {
     </div>`;
 }
 
-// Generate the printable/downloadable HTML attachment
-function buildAttachmentHTML(req: FormEmailRequest, dateStr: string, timeStr: string): string {
-  const receiptHTML = req.receiptDetails
-    ? `<div style="margin-bottom:20px;padding:12px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;">
-        <h3 style="font-size:15px;font-weight:bold;color:#166534;margin-bottom:8px;">Payment Details</h3>
-        <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:4px 10px;font-weight:600;width:40%;font-size:13px;">Reference / Transaction ID</td><td style="padding:4px 10px;font-size:13px;">${req.receiptDetails.referenceId}</td></tr>
-          <tr><td style="padding:4px 10px;font-weight:600;font-size:13px;">Payment Method</td><td style="padding:4px 10px;font-size:13px;">${req.receiptDetails.paymentMethod}</td></tr>
-          ${req.receiptDetails.amount ? `<tr><td style="padding:4px 10px;font-weight:600;font-size:13px;">Amount Paid</td><td style="padding:4px 10px;font-size:13px;">₹${req.receiptDetails.amount}</td></tr>` : ""}
-        </table>
-      </div>`
-    : "";
 
-  const fieldGroupsHTML = req.fieldGroups
-    .map(
-      (group) => `
-      <div style="margin-bottom:20px;">
-        <h3 style="font-size:15px;font-weight:bold;color:#1a3a5c;border-bottom:2px solid #d4a843;padding-bottom:6px;margin-bottom:12px;">${group.heading}</h3>
-        <table style="width:100%;border-collapse:collapse;">
-          ${group.fields
-            .map(
-              (f) => `
-            <tr>
-              <td style="padding:6px 10px;font-weight:600;color:#333;width:40%;border-bottom:1px solid #eee;font-size:13px;">${f.label}</td>
-              <td style="padding:6px 10px;color:#555;border-bottom:1px solid #eee;font-size:13px;">${f.value || "—"}</td>
-            </tr>`
-            )
-            .join("")}
-        </table>
-      </div>`
-    )
-    .join("");
 
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <title>${req.title} - ${SCHOOL_NAME}</title>
-  <style>
-    @media print { body { margin: 0; } .no-print { display: none !important; } }
-    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background: #fff; color: #333; }
-  </style>
-</head>
-<body>
-  <div style="max-width:700px;margin:0 auto;border:2px solid #1a3a5c;border-radius:12px;overflow:hidden;">
-    <div style="background:#1a3a5c;color:#fff;padding:20px;text-align:center;">
-      <h1 style="margin:0;font-size:22px;letter-spacing:1px;">${SCHOOL_NAME}</h1>
-      <p style="margin:4px 0 0;font-size:12px;opacity:0.85;">${SCHOOL_ADDRESS}</p>
-      <p style="margin:4px 0 0;font-size:12px;opacity:0.85;">Phone: ${SCHOOL_PHONE} | Email: ${SCHOOL_EMAIL}</p>
-    </div>
-    <div style="background:#d4a843;padding:10px 20px;text-align:center;">
-      <h2 style="margin:0;font-size:17px;color:#1a3a5c;text-transform:uppercase;letter-spacing:1px;">${req.title}</h2>
-      ${req.subtitle ? `<p style="margin:4px 0 0;font-size:12px;color:#1a3a5c;">${req.subtitle}</p>` : ""}
-    </div>
-    <div style="padding:12px 24px;display:flex;justify-content:space-between;font-size:12px;color:#666;border-bottom:1px solid #eee;">
-      <span><strong>Date:</strong> ${dateStr}</span>
-      <span><strong>Time:</strong> ${timeStr}</span>
-    </div>
-    <div style="padding:20px 24px;">
-      ${receiptHTML}
-      ${fieldGroupsHTML}
-    </div>
-    <div style="background:#f5f5f5;padding:12px 24px;text-align:center;font-size:11px;color:#888;border-top:1px solid #eee;">
-      <p style="margin:0;">This is a computer-generated document from ${SCHOOL_NAME}.</p>
-      <p style="margin:4px 0 0;">Generated on ${dateStr} at ${timeStr}</p>
-    </div>
-  </div>
-</body>
-</html>`;
-}
 
 function buildResumeBlock(hasResume: boolean, resumeFileName?: string): string {
   if (!hasResume) return "";
@@ -287,21 +219,8 @@ function getParentSubject(req: FormEmailRequest): string {
   }
 }
 
-function getAttachmentFilename(req: FormEmailRequest): string {
-  const safeName = req.senderName.replace(/[^a-zA-Z0-9]/g, "_");
-  switch (req.formType) {
-    case "contact": return `Contact_Enquiry_${safeName}.html`;
-    case "admission": return `Admission_Application_${safeName}.html`;
-    case "fee_payment": return `Fee_Payment_Receipt_${safeName}.html`;
-    case "career": return `Career_Application_${safeName}.html`;
-    default: return `${req.title.replace(/\s+/g, "_")}_${safeName}.html`;
-  }
-}
 
-// Encode string to base64
-function toBase64(str: string): string {
-  return btoa(unescape(encodeURIComponent(str)));
-}
+
 
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
@@ -323,19 +242,8 @@ const handler = async (req: Request): Promise<Response> => {
     const dateStr = now.toLocaleDateString("en-IN", { day: "2-digit", month: "long", year: "numeric" });
     const timeStr = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
-    // Generate the printable HTML attachment
-    const attachmentHTML = buildAttachmentHTML(body, dateStr, timeStr);
-    const attachmentFilename = getAttachmentFilename(body);
-    const attachmentBase64 = toBase64(attachmentHTML);
-
-    const htmlAttachment = {
-      filename: attachmentFilename,
-      content: attachmentBase64,
-      content_type: "text/html",
-    };
-
-    // Build attachments array — always include HTML, conditionally include resume file
-    const schoolAttachments: typeof htmlAttachment[] = [htmlAttachment];
+    // Build attachments — only the actual resume file (no HTML attachment)
+    const schoolAttachments: { filename: string; content: string; content_type: string }[] = [];
 
     if (body.resumeStoragePath && body.resumeFileName && body.resumeMimeType) {
       const resumeAttachment = await fetchResumeAttachment(
@@ -352,18 +260,18 @@ const handler = async (req: Request): Promise<Response> => {
     const subject = getSubjectLine(body);
     const schoolHTML = buildSchoolEmail(body, dateStr, timeStr);
 
-    // Send to school with HTML summary + actual resume file attached
+    // Send to school — full details in email body + resume file attached (no HTML file)
     const schoolResult = await resend.emails.send({
       from: `${SCHOOL_NAME} Website <onboarding@resend.dev>`,
       to: [SCHOOL_EMAIL],
       subject,
       html: schoolHTML,
       reply_to: senderEmail || undefined,
-      attachments: schoolAttachments,
+      attachments: schoolAttachments.length > 0 ? schoolAttachments : undefined,
     });
     console.log("School email sent:", schoolResult);
 
-    // Send thank-you copy to parent/enquirer with HTML summary only (no resume)
+    // Send thank-you copy to parent/enquirer — no attachments, details inline
     if (senderEmail && senderEmail.includes("@")) {
       const parentHTML = buildParentEmail(body, dateStr, timeStr);
       const parentSubject = getParentSubject(body);
@@ -373,7 +281,6 @@ const handler = async (req: Request): Promise<Response> => {
         to: [senderEmail],
         subject: parentSubject,
         html: parentHTML,
-        attachments: [htmlAttachment],
       });
       console.log("Parent copy sent:", parentResult);
     }
