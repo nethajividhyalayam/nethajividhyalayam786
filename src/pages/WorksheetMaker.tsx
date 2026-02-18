@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import PWAInstallBanner from "@/components/ui/PWAInstallBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -956,6 +957,16 @@ export default function WorksheetMaker() {
               : "தமிழ்நாடு சமச்சீர் பாடத்திட்டம் · AI தொழில்நுட்பம்"}
           </p>
         </div>
+      </div>
+
+      {/* PWA Install Banner */}
+      <div className="no-print max-w-4xl mx-auto px-4 pt-4">
+        <PWAInstallBanner
+          appName="Worksheet Maker"
+          appEmoji="📄"
+          appColor="from-sky-500 to-emerald-600"
+          description="Generate worksheets offline • Save to home screen • No app store needed"
+        />
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">

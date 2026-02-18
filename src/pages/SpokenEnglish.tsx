@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import PWAInstallBanner from "@/components/ui/PWAInstallBanner";
 import {
   Mic, MicOff, Volume2, Play, RotateCcw, Star,
   ChevronRight, MessageCircle, BookOpen, Sparkles, Globe,
@@ -561,6 +562,16 @@ export default function SpokenEnglish() {
           <div className="text-4xl mb-1">🗣️</div>
           <h1 className="text-2xl font-extrabold tracking-tight">Spoken English</h1>
           <p className="text-green-100 text-sm mt-0.5">Practice App for Kids • Nethaji Vidhyalayam</p>
+        </div>
+
+        {/* PWA Install Banner */}
+        <div className="max-w-md mx-auto w-full pt-3">
+          <PWAInstallBanner
+            appName="Spoken English Practice"
+            appEmoji="🗣️"
+            appColor="from-green-500 to-emerald-600"
+            description="Practice offline • Works without internet • Save to home screen"
+          />
         </div>
 
         <div className="flex-1 px-4 py-5 max-w-md mx-auto w-full space-y-5">
