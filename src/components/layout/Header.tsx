@@ -30,9 +30,9 @@ const navItems = [
     label: "Academics",
     path: "/academics",
     children: [
-      { label: "Curriculum", path: "/academics" },
-      { label: "Pre-Primary", path: "/academics#pre-primary" },
-      { label: "Primary", path: "/academics#primary" },
+      { label: "Curriculum", path: "/academics/curriculum" },
+      { label: "Nursery (Pre-KG – UKG)", path: "/academics/nursery" },
+      { label: "Primary (Grade 1–5)", path: "/academics/primary" },
     ],
   },
   { label: "Facilities", path: "/facilities" },
