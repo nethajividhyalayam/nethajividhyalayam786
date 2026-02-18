@@ -32,7 +32,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { curriculum, grade, subject, topic, numQuestions, language, difficulty, questionTypes } = await req.json();
+    const { curriculum, term, grade, subject, topic, numQuestions, language, difficulty, questionTypes } = await req.json();
     const isMerryBirds = curriculum === "Oxford Merry Birds (Integrated Term Course)";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -111,8 +111,8 @@ Your worksheets are:
       : "Use a balanced mix of fill-in-blanks, matching, multiple choice, and short answers distributed across sections.";
 
     const worksheetTitle = isMerryBirds
-      ? `Merry Birds Worksheet - Class ${grade} - ${subject} - ${topic}`
-      : `Samacheer Kalvi Worksheet - ${grade} ${subject} - ${topic}`;
+      ? `Merry Birds Worksheet - Class ${grade} - ${subject} - ${term} - ${topic}`
+      : `Samacheer Kalvi Worksheet - ${grade} ${subject} - ${term} - ${topic}`;
 
     const curriculumRules = isMerryBirds
       ? `3. Questions must be from Oxford Merry Birds ${grade} ${subject} for "${topic}" — use joyful, activity-based style with phonics, rhymes, simple stories
@@ -128,12 +128,13 @@ Your worksheets are:
 
 Grade: ${grade}
 Subject: ${subject}
+Term: ${term || "Term 1"}
 Topic/Chapter: ${topic}
 Number of Questions: ${numQuestions}
 Language: ${language} — ${langInstruction}
 Difficulty: ${difficulty} — ${difficultyGuide}
 ${hasDiagram ? "⚠️ This topic requires a DRAW AND LABEL diagram section — include it!" : ""}
-${isMerryBirds ? "⭐ Oxford Merry Birds style: joyful, activity-based, phonics-rich, picture-friendly questions" : ""}
+${isMerryBirds ? `⭐ Oxford Merry Birds style (${term || "Term 1"}): joyful, activity-based, phonics-rich, picture-friendly questions aligned with ${term || "Term 1"} content` : `Focus on ${term || "Term 1"} topics from the official Samacheer Kalvi ${grade} ${subject} textbook`}
 
 ${questionTypeInstruction}
 

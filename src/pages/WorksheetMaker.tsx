@@ -19,6 +19,7 @@ import {
   PenLine,
   List,
   CheckSquare,
+  ChevronDown,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -60,6 +61,7 @@ interface SavedWorksheet {
 
 interface FormData_ {
   curriculum: string;
+  term: string;
   grade: string;
   subject: string;
   topic: string;
@@ -86,8 +88,14 @@ const CURRICULA = [
   "Oxford Merry Birds (Integrated Term Course)",
 ];
 
+const TERMS = ["Term 1", "Term 2", "Term 3"];
+
 const GRADES = ["LKG", "UKG", "1st", "2nd", "3rd", "4th", "5th"];
-const SUBJECTS = ["Tamil", "English", "Maths", "EVS/Science", "Social Studies"];
+
+// Subjects per curriculum
+const SAMACHEER_SUBJECTS = ["Tamil", "English", "Maths", "EVS/Science", "Social Studies"];
+const MERRY_BIRDS_SUBJECTS = ["English", "Maths", "EVS/Science", "Tamil"];
+
 const LANGUAGES = ["English", "Tamil", "Bilingual"];
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 const STORAGE_KEY = "samacheer_worksheets_v2";
@@ -255,6 +263,7 @@ export default function WorksheetMaker() {
   const { toast } = useToast();
   const [formData, setFormData] = useState<FormData_>({
     curriculum: "Samacheer Kalvi (Tamil Nadu State Board)",
+    term: "Term 1",
     grade: "3rd",
     subject: "Maths",
     topic: "",
@@ -349,7 +358,7 @@ export default function WorksheetMaker() {
     toast({ title: "Worksheet loaded!", description: saved.title });
   };
 
-  // ─── Print / PDF ───────────────────────────────────────────────────────────
+  // ─── Print / PDF / Word ────────────────────────────────────────────────────
 
   const handlePrint = () => {
     const prev = showAnswers;
@@ -358,6 +367,85 @@ export default function WorksheetMaker() {
       window.print();
       setTimeout(() => setShowAnswers(prev), 500);
     }, 300);
+  };
+
+  const handleDownloadWord = () => {
+    if (!worksheet) return;
+    // Build a simple HTML string that Word can open as .doc
+    const sections = worksheet.sections?.map((section) => {
+      const qs = section.questions.map((q) => {
+        if (section.type === "fill_in_blanks") {
+          return `<p style="margin:8px 0"><b>${q.id}.</b> ${(q.question || "").replace(/_{2,}|\[_+\]/g, "___________________________")}</p>`;
+        }
+        if (section.type === "multiple_choice") {
+          const opts = (q.options || []).map((o, i) => `&nbsp;&nbsp;${String.fromCharCode(65+i)}) ${o}`).join("<br/>");
+          return `<p style="margin:8px 0"><b>${q.id}.</b> ${q.question}</p><p style="margin-left:20px">${opts}</p>`;
+        }
+        if (section.type === "match_following") {
+          const rows = (q.left || []).map((l, i) =>
+            `<tr><td style="border:1px solid #ccc;padding:6px;width:50%">${i+1}. ${l}</td><td style="border:1px solid #ccc;padding:6px;width:50%">${String.fromCharCode(97+i)}. ${q.right?.[i] || ""}</td></tr>`
+          ).join("");
+          return `<table style="width:100%;border-collapse:collapse;margin:8px 0">${rows}</table>`;
+        }
+        if (section.type === "true_false") {
+          return `<p style="margin:8px 0"><b>${q.id}.</b> ${q.question} &nbsp;&nbsp;[ True / False ]</p>`;
+        }
+        if (section.type === "short_answer") {
+          return `<p style="margin:8px 0"><b>${q.id}.</b> ${q.question}</p><p style="border-bottom:1px solid #999;margin:4px 20px">&nbsp;</p><p style="border-bottom:1px solid #999;margin:4px 20px">&nbsp;</p>`;
+        }
+        if (section.type === "diagram") {
+          return `<p style="margin:8px 0"><b>${q.id}.</b> ${q.question}</p><div style="border:2px dashed #aaa;width:80%;height:180px;margin:8px 0;display:flex;align-items:center;justify-content:center"><span style="color:#aaa">[ Draw here ]</span></div>`;
+        }
+        return `<p style="margin:8px 0"><b>${q.id}.</b> ${q.question || ""}</p>`;
+      }).join("");
+      return `<h3 style="background:#e0f2fe;padding:8px 12px;margin-top:20px;font-size:14px">${section.heading}</h3>${qs}`;
+    }).join("") || "";
+
+    const answerKey = showAnswers ? `
+      <div style="page-break-before:always">
+        <h2 style="color:#166534">Answer Key</h2>
+        ${worksheet.sections?.map(s => `
+          <p><b>${s.heading}</b></p>
+          ${s.questions.filter(q=>q.answer).map(q =>
+            s.type === "match_following"
+              ? `<p>${q.id}. ${q.left?.map((l,i) => `${l} → ${q.answers?.[i]}`).join(" | ")}</p>`
+              : `<p>${q.id}. ${q.answer}</p>`
+          ).join("")}
+        `).join("")}
+      </div>` : "";
+
+    const html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+      <head><meta charset="utf-8"><title>${worksheet.title}</title>
+      <style>
+        body { font-family: 'Noto Sans Tamil', Arial, sans-serif; font-size: 13px; color: #111; margin: 40px; }
+        h1 { font-size: 18px; text-align: center; color: #1a3a5c; }
+        h2 { font-size: 15px; color: #1a3a5c; }
+        h3 { font-size: 13px; }
+        p { margin: 6px 0; }
+        table { border-collapse: collapse; width: 100%; }
+      </style>
+      </head>
+      <body>
+        <h1>${worksheet.title}</h1>
+        <p style="text-align:center;color:#555">${formData.curriculum} · ${formData.grade} · ${formData.subject} · ${formData.term}</p>
+        <hr/>
+        <p><b>Name:</b> _____________________________ &nbsp;&nbsp; <b>Date:</b> __________________ &nbsp;&nbsp; <b>Score:</b> ______ / ${formData.numQuestions}</p>
+        <p style="background:#fffde7;padding:8px;border-left:4px solid #f59e0b"><b>Instructions:</b> ${worksheet.instructions}</p>
+        ${sections}
+        ${answerKey}
+      </body></html>`;
+
+    const blob = new Blob(["\ufeff", html], { type: "application/msword" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${worksheet.title.replace(/[^a-zA-Z0-9\u0B80-\u0BFF\s]/g, "")}.doc`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({ title: "Word file downloaded! 📄", description: "Open with Microsoft Word or LibreOffice." });
   };
 
   // ─── Edit helpers ──────────────────────────────────────────────────────────
@@ -637,7 +725,10 @@ export default function WorksheetMaker() {
                       type="button"
                       onClick={() => {
                         const langUpdate = isMerry && formData.language === "Tamil" ? "English" : formData.language;
-                        setFormData({ ...formData, curriculum: c, language: langUpdate });
+                        // Reset subject if it's not available in the new curriculum
+                        const newSubjects = isMerry ? MERRY_BIRDS_SUBJECTS : SAMACHEER_SUBJECTS;
+                        const subjectUpdate = newSubjects.includes(formData.subject) ? formData.subject : newSubjects[0];
+                        setFormData({ ...formData, curriculum: c, language: langUpdate, subject: subjectUpdate });
                       }}
                       className={`flex items-start gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all ${
                         active
@@ -670,6 +761,19 @@ export default function WorksheetMaker() {
               )}
             </div>
 
+            {/* Term */}
+            <div>
+              <Label className="text-sm font-bold text-gray-700 mb-1.5 block">Term / தவணை</Label>
+              <div className="flex gap-2">
+                {TERMS.map((t) => (
+                  <button key={t} type="button" onClick={() => setFormData({ ...formData, term: t })}
+                    className={`flex-1 py-2 rounded-lg text-sm font-semibold border-2 transition-all ${formData.term === t ? "border-sky-500 bg-sky-500 text-white shadow-sm" : "border-gray-200 bg-gray-50 text-gray-600 hover:border-sky-300"}`}>
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Grade */}
             <div>
               <Label className="text-sm font-bold text-gray-700 mb-1.5 block">Grade / Class</Label>
@@ -682,7 +786,7 @@ export default function WorksheetMaker() {
             <div>
               <Label className="text-sm font-bold text-gray-700 mb-1.5 block">Subject / பாடம்</Label>
               <select className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-sky-50 focus:outline-none focus:ring-2 focus:ring-sky-400 transition tamil-font" value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })}>
-                {SUBJECTS.map((s) => <option key={s}>{s}</option>)}
+                {(formData.curriculum === "Oxford Merry Birds (Integrated Term Course)" ? MERRY_BIRDS_SUBJECTS : SAMACHEER_SUBJECTS).map((s) => <option key={s}>{s}</option>)}
               </select>
             </div>
 
@@ -865,26 +969,47 @@ export default function WorksheetMaker() {
             {/* Action bar */}
             <div className="no-print flex flex-wrap gap-2 mb-4">
               <Button onClick={handlePrint} variant="outline" className="gap-2 border-gray-300">
-                <Printer className="h-4 w-4" /> Print / PDF
+                <Printer className="h-4 w-4" /> Print
               </Button>
               <Button onClick={() => setShowAnswers(!showAnswers)} variant="outline" className="gap-2 border-gray-300">
                 {showAnswers ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                {showAnswers ? "Hide Answers" : "Show Answer Key"}
+                {showAnswers ? "Hide Answers" : "Answer Key"}
               </Button>
               <Button onClick={() => setEditMode(!editMode)} variant="outline"
                 className={`gap-2 ${editMode ? "border-amber-400 bg-amber-50 text-amber-700" : "border-gray-300"}`}>
                 <FileText className="h-4 w-4" />
-                {editMode ? "Done Editing" : "Edit Questions"}
+                {editMode ? "Done Editing" : "Edit"}
               </Button>
               <Button onClick={saveWorksheet} variant="outline" className="gap-2 border-gray-300">
-                <Save className="h-4 w-4" /> Save Locally
+                <Save className="h-4 w-4" /> Save
               </Button>
               <Button onClick={generate} variant="outline" className="gap-2 border-gray-300">
                 <RefreshCw className="h-4 w-4" /> Regenerate
               </Button>
-              <Button onClick={handlePrint} className="gap-2 bg-sky-600 hover:bg-sky-700 text-white ml-auto">
-                <Download className="h-4 w-4" /> Download PDF
-              </Button>
+              {/* Download dropdown */}
+              <div className="relative group ml-auto">
+                <Button className="gap-2 bg-sky-600 hover:bg-sky-700 text-white pr-3">
+                  <Download className="h-4 w-4" /> Download <ChevronDown className="h-3 w-3 ml-1" />
+                </Button>
+                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 hidden group-hover:block min-w-[180px] overflow-hidden">
+                  <button onClick={handlePrint}
+                    className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-gray-700 hover:bg-sky-50 hover:text-sky-700 transition-colors border-b border-gray-100">
+                    <Printer className="h-4 w-4 text-sky-500" />
+                    <div className="text-left">
+                      <div className="font-semibold">Save as PDF</div>
+                      <div className="text-xs text-gray-400">Print → Save as PDF</div>
+                    </div>
+                  </button>
+                  <button onClick={handleDownloadWord}
+                    className="w-full flex items-center gap-2.5 px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                    <FileText className="h-4 w-4 text-blue-500" />
+                    <div className="text-left">
+                      <div className="font-semibold">Save as Word</div>
+                      <div className="text-xs text-gray-400">Open in Word / LibreOffice</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Worksheet document */}
