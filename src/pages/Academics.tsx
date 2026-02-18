@@ -21,7 +21,7 @@ const Academics = () => {
         <div className="container-custom">
           <div className="text-center mb-12">
             <p className="text-accent font-semibold mb-2 uppercase tracking-wider text-sm">Our Approach</p>
-            <h2 className="section-title">Curriculum Overview</h2>
+            <h2 className="section-title">Academic Program Overview</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
