@@ -153,15 +153,13 @@ const AcademicsCurriculum = () => {
                     <p className="text-sm text-muted-foreground">{stage.summary}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <Link
-                      to={stage.link}
-                      className="inline-flex items-center gap-1 bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-semibold hover:bg-accent/90 transition-colors"
-                    >
-                      View Details
-                    </Link>
                     <button
                       onClick={() => toggle(i)}
-                      className="inline-flex items-center gap-1 border border-border rounded-full px-4 py-2 text-sm font-semibold text-foreground hover:bg-secondary transition-colors"
+                      className={`inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 shadow-sm ${
+                        openIndex === i
+                          ? "bg-accent text-accent-foreground hover:bg-accent/80"
+                          : "bg-primary text-primary-foreground hover:bg-primary/80"
+                      }`}
                     >
                       {openIndex === i ? (
                         <><ChevronUp className="h-4 w-4" /> Hide Details</>
