@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { offlineDb } from "@/lib/offlineDb";
 import {
   BookOpen,
   Download,
@@ -521,17 +523,35 @@ function DiagramBox({ topic, labels }: { topic: string; labels?: string[] }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function WorksheetMaker() {
+  const isOnline = useOnlineStatus();
   const { toast } = useToast();
-  const [formData, setFormData] = useState<FormData_>({
-    curriculum: "Samacheer Kalvi (Tamil Nadu State Board)",
-    term: "Term 1",
-    grade: "3rd",
-    subject: "Maths",
-    topic: "",
-    numQuestions: 10,
-    language: "English",
-    difficulty: "Medium",
-    questionTypes: [],
+  const [formData, setFormData] = useState<FormData_>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("worksheet_form_settings") || "{}");
+      return {
+        curriculum: saved.curriculum || "Samacheer Kalvi (Tamil Nadu State Board)",
+        term: saved.term || "Term 1",
+        grade: saved.grade || "3rd",
+        subject: saved.subject || "Maths",
+        topic: "",
+        numQuestions: 10,
+        language: saved.language || "English",
+        difficulty: saved.difficulty || "Medium",
+        questionTypes: saved.questionTypes || [],
+      };
+    } catch {
+      return {
+        curriculum: "Samacheer Kalvi (Tamil Nadu State Board)",
+        term: "Term 1",
+        grade: "3rd",
+        subject: "Maths",
+        topic: "",
+        numQuestions: 10,
+        language: "English",
+        difficulty: "Medium",
+        questionTypes: [],
+      };
+    }
   });
   const [worksheet, setWorksheet] = useState<Worksheet | null>(null);
   const [loading, setLoading] = useState(false);
@@ -545,6 +565,33 @@ export default function WorksheetMaker() {
       return [];
     }
   });
+
+  // Load from IndexedDB on mount (merge with localStorage)
+  useEffect(() => {
+    offlineDb.getAllWorksheets().then((idbItems) => {
+      if (!idbItems.length) return;
+      setSavedList((prev) => {
+        const existingIds = new Set(prev.map((w) => w.id));
+        const merged = [...prev, ...idbItems.filter((w) => !existingIds.has(w.id))].slice(0, 50);
+        return merged;
+      });
+    }).catch(() => {});
+  }, []);
+
+  // Auto-save form settings to localStorage for offline resume
+  useEffect(() => {
+    try {
+      localStorage.setItem("worksheet_form_settings", JSON.stringify({
+        curriculum: formData.curriculum,
+        term: formData.term,
+        grade: formData.grade,
+        subject: formData.subject,
+        language: formData.language,
+        difficulty: formData.difficulty,
+        questionTypes: formData.questionTypes,
+      }));
+    } catch {}
+  }, [formData.curriculum, formData.term, formData.grade, formData.subject, formData.language, formData.difficulty, formData.questionTypes]);
   const [showSaved, setShowSaved] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
@@ -561,6 +608,11 @@ export default function WorksheetMaker() {
   const generate = async () => {
     if (!formData.topic.trim()) {
       toast({ title: "Please enter a topic", description: "e.g. Addition, Animals, எழுத்துக்கள்", variant: "destructive" });
+      return;
+    }
+    if (!isOnline) {
+      toast({ title: "You are offline 📶", description: "Worksheet generation needs internet. You can still view saved worksheets below.", variant: "destructive" });
+      setShowSaved(true);
       return;
     }
     setLoading(true);
@@ -604,20 +656,21 @@ export default function WorksheetMaker() {
       worksheet,
       formData,
     };
-    const updated = [saved, ...savedList].slice(0, 30);
+    const updated = [saved, ...savedList].slice(0, 50);
     setSavedList(updated);
+    // Save to localStorage (quick access) + IndexedDB (larger storage)
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      toast({ title: "Saved locally! 💾", description: "Accessible anytime, even offline." });
-    } catch {
-      toast({ title: "Storage full", description: "Please delete some saved worksheets first.", variant: "destructive" });
-    }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated.slice(0, 30)));
+    } catch {}
+    offlineDb.saveWorksheet(saved).catch(() => {});
+    toast({ title: "Saved locally! 💾", description: "Accessible anytime, even offline." });
   };
 
   const deleteSaved = (id: string) => {
     const updated = savedList.filter((w) => w.id !== id);
     setSavedList(updated);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    offlineDb.deleteWorksheet(id).catch(() => {});
   };
 
   const loadSaved = (saved: SavedWorksheet) => {
@@ -1208,11 +1261,24 @@ export default function WorksheetMaker() {
             </div>
           </div>
 
+          {/* Offline warning */}
+          {!isOnline && (
+            <div className="mb-4 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-800">
+              <span className="text-xl">📶</span>
+              <div>
+                <p className="font-bold">You are offline</p>
+                <p className="text-xs text-amber-700">Worksheet generation needs internet. Saved worksheets are available below.</p>
+              </div>
+            </div>
+          )}
+
           {/* Generate Button */}
-          <Button onClick={generate} disabled={loading}
-            className="w-full mt-6 h-14 text-lg font-bold bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-600 hover:to-emerald-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
+          <Button onClick={generate} disabled={loading || !isOnline}
+            className="w-full mt-2 h-14 text-lg font-bold bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-600 hover:to-emerald-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50">
             {loading ? (
               <><Loader2 className="h-5 w-5 animate-spin mr-2" />AI generating worksheet…</>
+            ) : !isOnline ? (
+              <><span className="mr-2">📶</span>Offline – Open Saved Worksheets</>
             ) : (
               <><Sparkles className="h-5 w-5 mr-2" />Generate Worksheet · தாள் உருவாக்கு</>
             )}

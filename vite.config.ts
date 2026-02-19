@@ -59,11 +59,11 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB – covers school photos
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}"],
         runtimeCaching: [
           {
-            // Cache Supabase REST API (data) — NetworkFirst so fresh data loads when online
+            // Supabase REST API – NetworkFirst (fresh data when online)
             urlPattern: /^https:\/\/ytqqkadcaihfzichukvw\.supabase\.co\/rest\/v1\/.*/i,
             handler: "NetworkFirst",
             options: {
@@ -73,31 +73,42 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
-            // Cache ElevenLabs TTS audio responses for offline replay
+            // ElevenLabs TTS audio – CacheFirst 30 days for offline replay
             urlPattern: /\/functions\/v1\/elevenlabs-tts/i,
             handler: "CacheFirst",
             options: {
               cacheName: "spoken-english-tts-cache",
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
           {
-            // Cache worksheet/feedback edge function responses
+            // Worksheet + Spoken English feedback edge functions – NetworkFirst
             urlPattern: /\/functions\/v1\/(generate-worksheet|spoken-english-feedback)/i,
             handler: "NetworkFirst",
             options: {
               cacheName: "edge-functions-cache",
-              expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 7 },
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 7 },
               networkTimeoutSeconds: 10,
             },
           },
           {
-            // Cache Google Fonts for offline Tamil font support
+            // AI chat edge function – NetworkFirst with short cache
+            urlPattern: /\/functions\/v1\/school-chat/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "school-chat-cache",
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 },
+              networkTimeoutSeconds: 8,
+            },
+          },
+          {
+            // Google Fonts stylesheet
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "StaleWhileRevalidate",
             options: { cacheName: "google-fonts-cache" },
           },
           {
+            // Google Fonts files
             urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
             handler: "CacheFirst",
             options: {

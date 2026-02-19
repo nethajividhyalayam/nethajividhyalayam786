@@ -160,6 +160,12 @@ const ChatWidget = () => {
     setInput("");
     setIsLoading(true);
     resetIdleTimer();
+    // Offline fallback
+    if (!navigator.onLine) {
+      setMessages((prev) => [...prev, { role: "assistant", content: "📶 You are currently offline. AI responses require an internet connection. Your messages are saved and will work once you're back online." }]);
+      setIsLoading(false);
+      return;
+    }
     try {
       const reply = await streamChat(updated);
       if (reply && voiceEnabled) await speakText(reply);
