@@ -15,7 +15,7 @@ const Footer = () => {
     { label: "Gallery", path: "/gallery" },
     { label: "Career", path: "/career" },
     { label: "Contact Us", path: "/contact" },
-    { label: "📄 Samacheer Worksheet Maker", path: "/worksheet-maker" },
+    { label: "📄 NethajiVidhyalayam Worksheet Maker", path: "/worksheet-maker" },
     { label: "🗣️ Spoken English Practice", path: "/spoken-english" },
   ];
 
