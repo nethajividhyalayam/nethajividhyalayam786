@@ -47,7 +47,15 @@ const navItems = [
     ],
   },
   { label: "Career", path: "/career" },
-  { label: "Worksheet Maker", path: "/worksheet-maker" },
+  {
+    label: "Tools",
+    path: "/worksheet-maker",
+    children: [
+      { label: "📄 Worksheet Maker", path: "/worksheet-maker" },
+      { label: "🗣️ Spoken English Practice", path: "/spoken-english" },
+      { label: "💰 FeeDesk", path: "/feedesk" },
+    ],
+  },
   { label: "Contact Us", path: "/contact" },
 ];
 
