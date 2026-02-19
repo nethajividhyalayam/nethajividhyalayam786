@@ -698,8 +698,13 @@ export default function WorksheetMaker() {
       </style>
       </head>
       <body>
-        <h1>${worksheet.title}</h1>
-        <p style="text-align:center;color:#555">${formData.curriculum} · ${formData.grade} · ${formData.subject} · ${formData.term}</p>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px">
+          <img src="${window.location.origin}/nethaji_logo_print.webp" alt="Logo" style="width:80px;height:80px;object-fit:contain" />
+          <div style="flex:1;text-align:center">
+            <h1 style="margin:0">${worksheet.title}</h1>
+            <p style="margin:4px 0;color:#555">${formData.curriculum} · ${formData.grade} · ${formData.subject} · ${formData.term}</p>
+          </div>
+        </div>
         <hr/>
         <p><b>Name:</b> _____________________________ &nbsp;&nbsp; <b>Date:</b> __________________ &nbsp;&nbsp; <b>Score:</b> ______ / ${formData.numQuestions}</p>
         <p style="background:#fffde7;padding:8px;border-left:4px solid #f59e0b"><b>Instructions:</b> ${worksheet.instructions}</p>
@@ -1312,7 +1317,15 @@ export default function WorksheetMaker() {
             <div className="worksheet-card bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden" id="worksheet">
               {/* Header */}
               <div className="bg-gradient-to-r from-sky-600 to-emerald-600 print:bg-none print:border-b-4 print:border-sky-700 text-white print:text-black px-8 py-6 print:py-4">
-                <div className="text-center">
+                <div className="flex items-center gap-4">
+                  {/* Logo */}
+                  <img
+                    src="/nethaji_logo_print.webp"
+                    alt="Nethaji Vidhyalayam"
+                    className="h-16 w-16 object-contain shrink-0 print:h-14 print:w-14"
+                    style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}
+                  />
+                  <div className="flex-1 text-center">
                   <p className="text-xs text-sky-200 print:text-gray-600 mb-1 font-semibold">
                     {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
                       ? "Oxford Merry Birds • Integrated Term Course • OUP"
@@ -1331,6 +1344,7 @@ export default function WorksheetMaker() {
                         📐 Includes Diagram
                       </span>
                     )}
+                  </div>
                   </div>
                 </div>
               </div>
