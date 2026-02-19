@@ -20,6 +20,7 @@ const Gallery = () => {
 
   // Featured image is the selected one, falling back to first filtered
   const featured = filtered.find((img) => img.id === selectedImageId) || filtered[0];
+  const featuredIndex = filtered.findIndex((img) => img.id === (featured?.id ?? -1));
 
   return (
     <>
@@ -42,7 +43,15 @@ const Gallery = () => {
             {galleryCategories.map((cat) => (
               <button
                 key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => {
+                  setSelectedCategory(cat);
+                  // Reset to first image of the new category
+                  const firstInCategory = galleryImages.find(
+                    (img) => cat === "All" || img.category === cat
+                  );
+                  setSelectedImageId(firstInCategory?.id ?? galleryImages[0]?.id ?? 0);
+                  setCurrentImage(0);
+                }}
                 className={`px-5 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
                   selectedCategory === cat
                     ? "bg-accent text-accent-foreground shadow-md scale-105"
@@ -57,8 +66,8 @@ const Gallery = () => {
           {/* Featured Image Card */}
           {featured && (
             <div
-              className="mb-12 bg-card rounded-2xl shadow-lg overflow-hidden cursor-pointer group border border-border"
-              onClick={() => openLightbox(0)}
+            className="mb-12 bg-card rounded-2xl shadow-lg overflow-hidden cursor-pointer group border border-border"
+              onClick={() => openLightbox(featuredIndex)}
             >
               <div className="flex flex-col md:flex-row">
                 {/* Featured Image */}
