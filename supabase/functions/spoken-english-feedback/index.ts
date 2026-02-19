@@ -51,8 +51,8 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
+    if (!GROQ_API_KEY) throw new Error("GROQ_API_KEY is not configured");
 
     const { targetText, spokenText, grade, topic, mode, conversationHistory, tamilMode } = await req.json();
 
@@ -127,19 +127,20 @@ Child just said: "${spokenText}"
 Respond naturally and encouragingly. In "feedback" field, write your conversational response. In "improvement" field, gently note any pronunciation tips if needed. In "nextWord" field, write the exact text you want to say back (for TTS). Keep it age-appropriate for ${grade}.`;
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "llama-3.1-8b-instant",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userMessage },
         ],
         response_format: { type: "json_object" },
+        max_tokens: 1024,
       }),
     });
 
