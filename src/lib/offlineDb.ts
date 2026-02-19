@@ -1,6 +1,6 @@
-// IndexedDB-based offline storage for FeeDesk
-const DB_NAME = "feedesk_offline";
-const DB_VERSION = 2;
+// IndexedDB-based offline storage for FeeDesk + all standalone apps
+const DB_NAME = "nethaji_offline";
+const DB_VERSION = 3;
 
 interface PendingMutation {
   id: string;
@@ -15,6 +15,7 @@ function openDB(): Promise<IDBDatabase> {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = () => {
       const db = req.result;
+      // FeeDesk stores
       if (!db.objectStoreNames.contains("students")) db.createObjectStore("students", { keyPath: "id" });
       if (!db.objectStoreNames.contains("payments")) db.createObjectStore("payments", { keyPath: "id" });
       if (!db.objectStoreNames.contains("fee_structure")) db.createObjectStore("fee_structure", { keyPath: "id" });
@@ -22,6 +23,10 @@ function openDB(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains("school_expenses")) db.createObjectStore("school_expenses", { keyPath: "id" });
       if (!db.objectStoreNames.contains("pending_mutations")) db.createObjectStore("pending_mutations", { keyPath: "id" });
       if (!db.objectStoreNames.contains("meta")) db.createObjectStore("meta", { keyPath: "key" });
+      // Worksheet Maker store (large JSON worksheets – localStorage has 5MB limit)
+      if (!db.objectStoreNames.contains("worksheets")) db.createObjectStore("worksheets", { keyPath: "id" });
+      // Spoken English session history store
+      if (!db.objectStoreNames.contains("spoken_sessions")) db.createObjectStore("spoken_sessions", { keyPath: "id" });
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -95,21 +100,32 @@ async function getMeta(key: string): Promise<any> {
 }
 
 export const offlineDb = {
-  // Cache data locally
+  // ── FeeDesk ────────────────────────────────────────────
   cacheStudents: (students: any[]) => putAll("students", students),
   cachePayments: (payments: any[]) => putAll("payments", payments),
   cacheFeeStructure: (items: any[]) => putAll("fee_structure", items),
   cacheCashRegister: (items: any[]) => putAll("cash_register", items),
   cacheSchoolExpenses: (items: any[]) => putAll("school_expenses", items),
 
-  // Get cached data
   getCachedStudents: () => getAll<any>("students"),
   getCachedPayments: () => getAll<any>("payments"),
   getCachedFeeStructure: () => getAll<any>("fee_structure"),
   getCachedCashRegister: () => getAll<any>("cash_register"),
   getCachedSchoolExpenses: () => getAll<any>("school_expenses"),
 
-  // Pending mutations queue
+  // ── Worksheet Maker ────────────────────────────────────
+  saveWorksheet: (ws: any) => putAll("worksheets", [ws]),
+  getAllWorksheets: () => getAll<any>("worksheets"),
+  deleteWorksheet: (id: string) => deleteItem("worksheets", id),
+  clearWorksheets: () => clearStore("worksheets"),
+
+  // ── Spoken English ─────────────────────────────────────
+  saveSpokenSession: (session: any) => putAll("spoken_sessions", [session]),
+  getAllSpokenSessions: () => getAll<any>("spoken_sessions"),
+  deleteSpokenSession: (id: string) => deleteItem("spoken_sessions", id),
+  clearSpokenSessions: () => clearStore("spoken_sessions"),
+
+  // ── Pending mutations (FeeDesk sync queue) ─────────────
   addPendingMutation: async (mutation: Omit<PendingMutation, "id" | "timestamp">) => {
     const item: PendingMutation = {
       ...mutation,
@@ -129,11 +145,11 @@ export const offlineDb = {
   removePendingMutation: (id: string) => deleteItem("pending_mutations", id),
   clearPendingMutations: () => clearStore("pending_mutations"),
 
-  // Last sync timestamp
+  // ── Meta / timestamps ──────────────────────────────────
   setLastSync: (ts: number) => setMeta("lastSync", ts),
   getLastSync: () => getMeta("lastSync") as Promise<number | null>,
 
-  // Offline auth: cache user session & role after successful online login
+  // ── Offline auth ───────────────────────────────────────
   cacheAuthSession: (session: { user: any; role: string; email: string; passwordHash: string }) =>
     setMeta("cachedAuth", session),
   getCachedAuthSession: () => getMeta("cachedAuth") as Promise<{ user: any; role: string; email: string; passwordHash: string } | null>,

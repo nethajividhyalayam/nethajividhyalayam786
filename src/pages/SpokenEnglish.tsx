@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { offlineDb } from "@/lib/offlineDb";
 import PWAInstallBanner from "@/components/ui/PWAInstallBanner";
 import {
   Mic, MicOff, Volume2, Play, RotateCcw, Star,
@@ -395,11 +397,18 @@ function VoicePickerModal({
 
 // ── Main Component ──────────────────────────────────────────────────────────
 export default function SpokenEnglish() {
+  const isOnline = useOnlineStatus();
   const [screen, setScreen] = useState<Screen>("home");
-  const [grade, setGrade] = useState("1st");
-  const [topic, setTopic] = useState("Greetings");
+  const [grade, setGrade] = useState(() => {
+    try { return localStorage.getItem("se_grade") || "1st"; } catch { return "1st"; }
+  });
+  const [topic, setTopic] = useState(() => {
+    try { return localStorage.getItem("se_topic") || "Greetings"; } catch { return "Greetings"; }
+  });
   const [tamilMode, setTamilMode] = useState(false);
-  const [voiceKey, setVoiceKey] = useState<VoiceKey>("laura");
+  const [voiceKey, setVoiceKey] = useState<VoiceKey>(() => {
+    try { return (localStorage.getItem("se_voice") as VoiceKey) || "laura"; } catch { return "laura"; }
+  });
   const [showVoicePicker, setShowVoicePicker] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
@@ -412,6 +421,18 @@ export default function SpokenEnglish() {
   const [convStarted, setConvStarted] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [isDemoPlaying, setIsDemoPlaying] = useState(false);
+  const [bestScore, setBestScore] = useState<number>(() => {
+    try { return Number(localStorage.getItem("se_best_score") || "0"); } catch { return 0; }
+  });
+
+  // Persist user preferences
+  useEffect(() => {
+    try {
+      localStorage.setItem("se_grade", grade);
+      localStorage.setItem("se_topic", topic);
+      localStorage.setItem("se_voice", voiceKey);
+    } catch {}
+  }, [grade, topic, voiceKey]);
 
   const mediaRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -486,7 +507,23 @@ export default function SpokenEnglish() {
         setSpokenText(spoken);
         const fb = await getFeedback({ targetText: currentSentence, spokenText: spoken, grade, topic, mode: "practice", tamilMode });
         setFeedback(fb);
-        setSessionScore((prev) => [...prev, fb.stars]);
+        setSessionScore((prev) => {
+          const updated = [...prev, fb.stars];
+          // Update best score and persist
+          const avg = Math.round(updated.reduce((a, b) => a + b, 0) / updated.length);
+          if (avg > bestScore) {
+            setBestScore(avg);
+            try { localStorage.setItem("se_best_score", String(avg)); } catch {}
+          }
+          // Save session entry to IndexedDB
+          const sessionEntry = {
+            id: `se_${Date.now()}`,
+            grade, topic, stars: fb.stars, sentence: currentSentence,
+            spokenText: spoken, savedAt: new Date().toISOString(),
+          };
+          offlineDb.saveSpokenSession(sessionEntry).catch(() => {});
+          return updated;
+        });
         setShowResult(true);
       } catch {
         setFeedback({ stars: 2, feedback: "Could not process your audio. Please try again!", encouragement: "Don't give up! 💪" });
@@ -499,7 +536,7 @@ export default function SpokenEnglish() {
       setSpokenText("");
       await startRecording();
     }
-  }, [isRecording, stopRecording, startRecording, currentSentence, grade, topic, tamilMode]);
+  }, [isRecording, stopRecording, startRecording, currentSentence, grade, topic, tamilMode, bestScore]);
 
   const nextSentence = useCallback(() => {
     setCurrentIndex((i) => i + 1);
