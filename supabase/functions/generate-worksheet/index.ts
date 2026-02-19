@@ -42,10 +42,10 @@ serve(async (req) => {
 
     const langInstruction =
       language === "Tamil"
-        ? "Write ALL questions, answers, instructions, and headings in Tamil script (தமிழில் எழுதவும்). Use proper Tamil grammar. Do not use English at all."
+        ? "STRICTLY write ALL content — every question, every answer, every option, every heading, every instruction — ONLY in Tamil script (தமிழ் மட்டுமே). ZERO English words allowed anywhere. Not even a single English letter. Every single word must be in pure Tamil script."
         : language === "Bilingual"
-        ? "Write each question in English first, then Tamil translation in parentheses. Format: 'English question (தமிழ் மொழிபெயர்ப்பு)'. Section headings also bilingual."
-        : "Write all content in clear, simple English appropriate for the grade level.";
+        ? "Write EVERY question in English first, then its Tamil translation immediately after in parentheses. Format: 'English question (தமிழ் மொழிபெயர்ப்பு)'. ALL section headings must be bilingual: 'English Heading (தமிழ் தலைப்பு)'. Both languages must always appear together for every piece of content."
+        : "Write ALL content ONLY in clear, simple English appropriate for the grade level. Do NOT include any Tamil script or Tamil words anywhere. Pure English only.";
 
     const difficultyGuide =
       difficulty === "Easy"
@@ -226,7 +226,13 @@ Return ONLY valid JSON (no markdown, no code blocks, no explanations — just ra
 
 CRITICAL RULES:
 1. Distribute ${numQuestions} questions sensibly across all sections
-2. ${language === "Tamil" ? "ALL text must be in Tamil script — no romanized Tamil, no English" : language === "Bilingual" ? "Every question must have both English and Tamil" : "Keep English simple and clear"}
+2. LANGUAGE ENFORCEMENT — THIS IS MANDATORY:
+${language === "Tamil"
+  ? "   ⛔ TAMIL ONLY: Every single word in the ENTIRE JSON output — questions, answers, options, headings, instructions — must be in Tamil script. NO English letters, NO English words, NO romanized Tamil. If you write even one English word, the worksheet is WRONG."
+  : language === "Bilingual"
+  ? "   ⚠️ BILINGUAL: Every question MUST have both English AND Tamil. Never write just English or just Tamil alone. Always pair them together."
+  : "   ⛔ ENGLISH ONLY: Every single word must be in English. NO Tamil script anywhere in the output."
+}
 ${curriculumRules}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
