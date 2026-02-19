@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { offlineDb } from "@/lib/offlineDb";
 import PWAInstallBanner from "@/components/ui/PWAInstallBanner";
+import OfflineBanner from "@/components/ui/OfflineBanner";
 import {
   Mic, MicOff, Volume2, Play, RotateCcw, Star,
   ChevronRight, MessageCircle, BookOpen, Sparkles, Globe,
@@ -590,6 +591,11 @@ export default function SpokenEnglish() {
   if (screen === "home") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-sky-100 via-green-50 to-yellow-50 flex flex-col overflow-x-hidden">
+        <OfflineBanner
+          isOnline={isOnline}
+          appName="Spoken English Practice"
+          offlineCapabilities="Practice mode works — voice recording needs internet"
+        />
         {showVoicePicker && (
           <VoicePickerModal selected={voiceKey} onSelect={setVoiceKey} onClose={() => setShowVoicePicker(false)} />
         )}

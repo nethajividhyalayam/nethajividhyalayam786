@@ -61,6 +61,19 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB – covers school photos
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}"],
+
+        // Offline fallback: navigate to /offline.html when no cache available
+        navigateFallback: "/offline.html",
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
+
+        // Additional assets to always pre-cache
+        additionalManifestEntries: [
+          { url: "/offline.html", revision: "1" },
+          { url: "/worksheet-maker", revision: null },
+          { url: "/spoken-english", revision: null },
+          { url: "/feedesk", revision: null },
+        ],
+
         runtimeCaching: [
           {
             // Supabase REST API – NetworkFirst (fresh data when online)
@@ -102,6 +115,16 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
+            // Supabase Auth – NetworkFirst so tokens refresh properly
+            urlPattern: /^https:\/\/ytqqkadcaihfzichukvw\.supabase\.co\/auth\/.*/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "supabase-auth-cache",
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 },
+            },
+          },
+          {
             // Google Fonts stylesheet
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "StaleWhileRevalidate",
@@ -116,8 +139,16 @@ export default defineConfig(({ mode }) => ({
               expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
             },
           },
+          {
+            // School photos and images – CacheFirst 7 days
+            urlPattern: /\/photos\/.*\.(jpg|jpeg|png|webp)/i,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "school-photos-cache",
+              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
         ],
-        navigateFallbackDenylist: [/^\/~oauth/],
       },
     }),
   ].filter(Boolean),

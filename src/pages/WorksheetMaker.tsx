@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PWAInstallBanner from "@/components/ui/PWAInstallBanner";
+import OfflineBanner from "@/components/ui/OfflineBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -993,6 +994,11 @@ export default function WorksheetMaker() {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br from-sky-50 via-emerald-50 to-blue-50 overflow-x-hidden ${fontClass}`}>
+      <OfflineBanner
+        isOnline={isOnline}
+        appName="Worksheet Maker"
+        offlineCapabilities="Saved worksheets available — AI generation needs internet"
+      />
       {/* Print styles */}
       <style>{`
         @media print {
