@@ -1316,35 +1316,35 @@ export default function WorksheetMaker() {
             {/* Worksheet document */}
             <div className="worksheet-card bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden" id="worksheet">
               {/* Header */}
-              <div className="bg-gradient-to-r from-sky-600 to-emerald-600 print:bg-none print:border-b-4 print:border-sky-700 text-white print:text-black px-8 py-6 print:py-4">
-                <div className="flex items-center gap-4">
-                  {/* Logo */}
-                  <img
-                    src="/nethaji_logo_print.webp"
-                    alt="Nethaji Vidhyalayam"
-                    className="h-28 w-28 object-contain shrink-0 print:h-24 print:w-24"
-                    style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}
-                  />
-                  <div className="flex-1 text-center">
+              <div className="bg-gradient-to-r from-sky-600 to-emerald-600 print:bg-none print:border-b-4 print:border-sky-700 text-white print:text-black px-6 py-5 print:py-3 relative">
+                {/* Logo — absolutely positioned top-left */}
+                <img
+                  src="/nethaji_logo_print.webp"
+                  alt="Nethaji Vidhyalayam"
+                  className="absolute left-6 top-1/2 -translate-y-1/2 h-20 w-20 object-contain print:h-18 print:w-18"
+                  style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}
+                />
+                {/* Centered title content */}
+                <div className="text-center px-24">
                   <p className="text-xs text-sky-200 print:text-gray-600 mb-1 font-semibold">
                     {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
                       ? "Oxford Merry Birds • Integrated Term Course • OUP"
                       : "Tamil Nadu Samacheer Kalvi • தமிழ்நாடு சமச்சீர் கல்வி"}
                   </p>
-                  <h2 className={`tamil-font text-xl md:text-2xl font-extrabold leading-snug print:text-black`}
+                  <h2 className={`tamil-font text-base md:text-lg font-extrabold leading-tight print:text-black`}
                     style={{ fontFamily: "'Baloo 2', 'Noto Sans Tamil', serif" }}>
                     {worksheet.title}
                   </h2>
-                  <div className="flex items-center justify-center gap-3 mt-2 flex-wrap text-sm">
-                    {[worksheet.grade, worksheet.subject, formData.difficulty, formData.language].map((tag) => (
-                      <span key={tag} className="bg-white/20 print:bg-transparent print:border print:border-gray-500 print:text-gray-700 text-white rounded-full px-3 py-0.5 font-semibold">{tag}</span>
-                    ))}
+                  <div className="flex flex-wrap justify-center gap-2 mt-2">
+                    <span className="bg-white/20 print:bg-transparent print:border print:border-sky-700 print:text-sky-900 text-white rounded-full px-3 py-0.5 text-xs font-semibold">{formData.grade}</span>
+                    <span className="bg-white/20 print:bg-transparent print:border print:border-sky-700 print:text-sky-900 text-white rounded-full px-3 py-0.5 text-xs font-semibold">{formData.subject}</span>
+                    <span className="bg-white/20 print:bg-transparent print:border print:border-sky-700 print:text-sky-900 text-white rounded-full px-3 py-0.5 text-xs font-semibold">{formData.difficulty}</span>
+                    <span className="bg-white/20 print:bg-transparent print:border print:border-sky-700 print:text-sky-900 text-white rounded-full px-3 py-0.5 text-xs font-semibold">{formData.language === "bilingual" ? "Bilingual" : formData.language === "tamil" ? "Tamil" : "English"}</span>
                     {worksheet._hasDiagram && (
-                      <span className="bg-amber-400/40 print:bg-transparent print:border print:border-amber-600 print:text-amber-800 text-white rounded-full px-3 py-0.5 font-semibold">
+                      <span className="bg-amber-400/40 print:bg-transparent print:border print:border-amber-600 print:text-amber-800 text-white rounded-full px-3 py-0.5 text-xs font-semibold">
                         📐 Includes Diagram
                       </span>
                     )}
-                  </div>
                   </div>
                 </div>
               </div>
