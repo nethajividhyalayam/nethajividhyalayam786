@@ -21,6 +21,7 @@ import {
   List,
   CheckSquare,
   ChevronDown,
+  Share2,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -629,6 +630,14 @@ export default function WorksheetMaker() {
       window.print();
       setTimeout(() => setShowAnswers(prev), 500);
     }, 300);
+  };
+
+  const handleShareWhatsApp = () => {
+    if (!worksheet) return;
+    const pageUrl = window.location.href;
+    const message = `📚 *NethajiVidhyalayam Worksheet Maker*\n\n✏️ *${worksheet.title}*\n🎓 Grade: ${worksheet.grade} | Subject: ${worksheet.subject} | ${formData.term}\n\nGenerate your own worksheets here:\n${pageUrl}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
   };
 
   const handleDownloadWord = () => {
@@ -1263,6 +1272,15 @@ export default function WorksheetMaker() {
               </Button>
               <Button onClick={generate} variant="outline" className="gap-2 border-gray-300">
                 <RefreshCw className="h-4 w-4" /> Regenerate
+              </Button>
+              {/* Download dropdown */}
+              {/* WhatsApp Share */}
+              <Button
+                onClick={handleShareWhatsApp}
+                className="gap-2 bg-green-500 hover:bg-green-600 text-white"
+              >
+                <Share2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Share on</span> WhatsApp
               </Button>
               {/* Download dropdown */}
               <div className="relative group ml-auto">
