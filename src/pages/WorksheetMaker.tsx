@@ -699,7 +699,7 @@ export default function WorksheetMaker() {
       </head>
       <body>
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px">
-          <img src="${window.location.origin}/nethaji_logo_print.webp" alt="Logo" style="width:80px;height:80px;object-fit:contain" />
+          <img src="${window.location.origin}/nethaji_logo_print.webp" alt="Logo" style="width:110px;height:110px;object-fit:contain" />
           <div style="flex:1;text-align:center">
             <h1 style="margin:0">${worksheet.title}</h1>
             <p style="margin:4px 0;color:#555">${formData.curriculum} · ${formData.grade} · ${formData.subject} · ${formData.term}</p>
@@ -1322,7 +1322,7 @@ export default function WorksheetMaker() {
                   <img
                     src="/nethaji_logo_print.webp"
                     alt="Nethaji Vidhyalayam"
-                    className="h-16 w-16 object-contain shrink-0 print:h-14 print:w-14"
+                    className="h-28 w-28 object-contain shrink-0 print:h-24 print:w-24"
                     style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}
                   />
                   <div className="flex-1 text-center">
