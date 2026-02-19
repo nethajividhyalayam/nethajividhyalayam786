@@ -119,35 +119,35 @@ When someone asks about BOOKS or TEXTBOOKS or SAMACHEER BOOKS or DOWNLOAD BOOKS 
 → [📚 Download Samacheer Kalvi Textbooks](https://www.tntextbooks.in/)
 Explain: "You can download official Tamil Nadu Samacheer Kalvi textbooks for FREE! Choose your class:"
 Then list these grade-wise direct links:
-• [📗 1st Standard Books](https://www.tntextbooks.in/2024/06/1st-std-new-books-2024-25.html) — Tamil, English, Maths, EVS
-• [📗 2nd Standard Books](https://www.tntextbooks.in/2024/06/2nd-std-new-books-2024-25.html) — Tamil, English, Maths, EVS
-• [📗 3rd Standard Books](https://www.tntextbooks.in/2024/06/3rd-std-new-books-2024-25.html) — Tamil, English, Maths, EVS/Science, Social
-• [📗 4th Standard Books](https://www.tntextbooks.in/2024/06/4th-std-new-books-2024-25.html) — Tamil, English, Maths, EVS/Science, Social
-• [📗 5th Standard Books](https://www.tntextbooks.in/2024/06/5th-std-new-books-2024-25.html) — Tamil, English, Maths, Science, Social
+• [📗 1st Standard Books](https://www.tntextbooks.in/p/1st-books.html) — Tamil, English, Maths, EVS
+• [📗 2nd Standard Books](https://www.tntextbooks.in/p/2nd-books.html) — Tamil, English, Maths, EVS
+• [📗 3rd Standard Books](https://www.tntextbooks.in/p/3rd-books.html) — Tamil, English, Maths, EVS/Science, Social
+• [📗 4th Standard Books](https://www.tntextbooks.in/p/4th-books.html) — Tamil, English, Maths, EVS/Science, Social
+• [📗 5th Standard Books](https://www.tntextbooks.in/p/5th-books.html) — Tamil, English, Maths, Science, Social
 Also add: "Want practice worksheets? [📄 Open Worksheet Maker](/worksheet-maker)"
 
 When someone asks about 1ST STANDARD BOOKS or CLASS 1 BOOKS:
-→ [📗 Download 1st Standard Samacheer Books](https://www.tntextbooks.in/2024/06/1st-std-new-books-2024-25.html)
+→ [📗 Download 1st Standard Samacheer Books](https://www.tntextbooks.in/p/1st-books.html)
 Explain: "1st Standard subjects: Tamil, English, Maths, EVS. All FREE to download in Tamil & English medium!"
 Also add: [📄 Make a Worksheet for 1st Std](/worksheet-maker)
 
 When someone asks about 2ND STANDARD BOOKS or CLASS 2 BOOKS:
-→ [📗 Download 2nd Standard Samacheer Books](https://www.tntextbooks.in/2024/06/2nd-std-new-books-2024-25.html)
+→ [📗 Download 2nd Standard Samacheer Books](https://www.tntextbooks.in/p/2nd-books.html)
 Explain: "2nd Standard subjects: Tamil, English, Maths, EVS. All FREE!"
 Also add: [📄 Make a Worksheet for 2nd Std](/worksheet-maker)
 
 When someone asks about 3RD STANDARD BOOKS or CLASS 3 BOOKS:
-→ [📗 Download 3rd Standard Samacheer Books](https://www.tntextbooks.in/2024/06/3rd-std-new-books-2024-25.html)
+→ [📗 Download 3rd Standard Samacheer Books](https://www.tntextbooks.in/p/3rd-books.html)
 Explain: "3rd Standard subjects: Tamil, English, Maths, EVS/Science, Social Studies. All FREE!"
 Also add: [📄 Make a Worksheet for 3rd Std](/worksheet-maker)
 
 When someone asks about 4TH STANDARD BOOKS or CLASS 4 BOOKS:
-→ [📗 Download 4th Standard Samacheer Books](https://www.tntextbooks.in/2024/06/4th-std-new-books-2024-25.html)
+→ [📗 Download 4th Standard Samacheer Books](https://www.tntextbooks.in/p/4th-books.html)
 Explain: "4th Standard subjects: Tamil, English, Maths, Science, Social Studies. All FREE!"
 Also add: [📄 Make a Worksheet for 4th Std](/worksheet-maker)
 
 When someone asks about 5TH STANDARD BOOKS or CLASS 5 BOOKS:
-→ [📗 Download 5th Standard Samacheer Books](https://www.tntextbooks.in/2024/06/5th-std-new-books-2024-25.html)
+→ [📗 Download 5th Standard Samacheer Books](https://www.tntextbooks.in/p/5th-books.html)
 Explain: "5th Standard subjects: Tamil, English, Maths, Science, Social Studies. All FREE!"
 Also add: [📄 Make a Worksheet for 5th Std](/worksheet-maker)
 

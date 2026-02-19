@@ -239,7 +239,7 @@ const AcademicsCurriculum = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="https://www.tntextbooks.in/2024/06/3rd-std-new-books-2024-25.html"
+              href="https://www.tntextbooks.in/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-accent text-accent-foreground px-8 py-3 rounded-full font-bold hover:bg-accent/90 transition-colors"
