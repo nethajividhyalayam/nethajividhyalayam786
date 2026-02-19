@@ -943,7 +943,7 @@ export default function WorksheetMaker() {
             <h1 className="text-3xl md:text-4xl font-extrabold" style={{ fontFamily: "'Baloo 2', 'Noto Sans Tamil', sans-serif" }}>
               {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
                 ? "Merry Birds Worksheet Maker"
-                : "Samacheer Worksheet Maker"}
+                : "NethajiVidhyalayam Worksheet Maker"}
             </h1>
           </div>
           <p className="text-sky-100 text-sm md:text-base max-w-xl mx-auto tamil-font">
