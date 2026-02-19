@@ -356,7 +356,7 @@ When someone asks about the TAMIL PANCHANGAM or PANCHANGAM details:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "openai/gpt-5-nano",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
@@ -372,6 +372,27 @@ When someone asks about the TAMIL PANCHANGAM or PANCHANGAM details:
         });
       }
       if (response.status === 402) {
+        // Try fallback model
+        const fallback = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-lite",
+            messages: [
+              { role: "system", content: systemPrompt },
+              ...messages,
+            ],
+            stream: true,
+          }),
+        });
+        if (fallback.ok) {
+          return new Response(fallback.body, {
+            headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+          });
+        }
         return new Response(JSON.stringify({ error: "Service temporarily unavailable." }), {
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });

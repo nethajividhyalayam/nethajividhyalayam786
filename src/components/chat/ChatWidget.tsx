@@ -169,8 +169,14 @@ const ChatWidget = () => {
     try {
       const reply = await streamChat(updated);
       if (reply && voiceEnabled) await speakText(reply);
-    } catch {
-      setMessages((prev) => [...prev, { role: "assistant", content: "Sorry, I couldn't respond right now. Please try again." }]);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      const friendlyMsg = msg.includes("402") || msg.includes("unavailable")
+        ? "⚠️ AI service is temporarily busy. Please try again in a moment, or call us at [📞 9841594945](tel:+919841594945)"
+        : msg.includes("429")
+        ? "⏳ Too many requests. Please wait a moment and try again."
+        : "🔌 Couldn't connect right now. Please check your internet and try again.";
+      setMessages((prev) => [...prev, { role: "assistant", content: friendlyMsg }]);
     } finally {
       setIsLoading(false);
     }
