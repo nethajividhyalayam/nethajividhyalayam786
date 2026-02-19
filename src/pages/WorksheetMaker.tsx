@@ -535,6 +535,7 @@ export default function WorksheetMaker() {
   });
   const [worksheet, setWorksheet] = useState<Worksheet | null>(null);
   const [loading, setLoading] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
   const [showAnswers, setShowAnswers] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [savedList, setSavedList] = useState<SavedWorksheet[]>(() => {
@@ -564,29 +565,35 @@ export default function WorksheetMaker() {
     }
     setLoading(true);
     setWorksheet(null);
+    setGenerateError(null);
     setShowAnswers(false);
     try {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/generate-worksheet`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData }),
       });
       const data = await res.json();
+      if (res.status === 402) {
+        const errMsg = "AI worksheet generation is temporarily unavailable (usage limit reached). Please try again later.";
+        setGenerateError(errMsg);
+        toast({ title: "Service Unavailable", description: errMsg, variant: "destructive" });
+        return;
+      }
       if (!res.ok || data.error) throw new Error(data.error || "Generation failed");
       setWorksheet(data.worksheet);
       toast({ title: "Worksheet generated! ✨", description: "Scroll down to view your worksheet." });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to generate worksheet";
+      setGenerateError(msg);
       toast({ title: "Generation failed", description: msg, variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
-
-  // ─── Local Save (IndexedDB-backed via localStorage for simplicity) ─────────
 
   const saveWorksheet = () => {
     if (!worksheet) return;
@@ -1252,6 +1259,16 @@ export default function WorksheetMaker() {
                 <p className="text-gray-400 text-sm mt-1 tamil-font">தாள் உருவாக்கப்படுகிறது… AI Samacheer Kalvi பாடத்திட்டத்தை பின்பற்றுகிறது</p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── Error State ── */}
+        {generateError && !loading && !worksheet && (
+          <div className="no-print mt-8 mx-auto max-w-lg text-center bg-red-50 border border-red-200 rounded-2xl p-8">
+            <div className="text-4xl mb-3">⚠️</div>
+            <h3 className="text-lg font-bold text-red-700 mb-2">Worksheet Generation Failed</h3>
+            <p className="text-sm text-red-600 mb-4">{generateError}</p>
+            <p className="text-xs text-gray-500">Please try again in a few minutes. If the problem persists, contact the administrator.</p>
           </div>
         )}
 
