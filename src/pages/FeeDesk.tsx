@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import OfflineBanner from "@/components/ui/OfflineBanner";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1062,6 +1063,11 @@ const FeeDesk = () => {
 
   return (
     <div className="min-h-screen bg-secondary">
+      <OfflineBanner
+        isOnline={isOnline}
+        appName="FeeDesk"
+        offlineCapabilities="All data available offline — changes will sync when online"
+      />
       {/* Top bar */}
       <div className="bg-primary text-primary-foreground px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
