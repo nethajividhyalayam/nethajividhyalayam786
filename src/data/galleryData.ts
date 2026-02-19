@@ -79,6 +79,49 @@ export const galleryImages: GalleryImage[] = [
     category: "Campus",
     description: "Engaging classroom sessions where students actively participate in learning, experiments, and interactive educational activities.",
   },
+  // ── Memories ──
+  {
+    id: 10,
+    src: "/photos/memories/memory-1.jpg",
+    alt: "Special Occasion Memories",
+    category: "Memories",
+    description: "Cherished moments from special school celebrations and cultural events that bring the school community together in joy and festivity.",
+  },
+  {
+    id: 11,
+    src: "/photos/memories/memory-2.jpg",
+    alt: "Celebration Moments",
+    category: "Memories",
+    description: "A wonderful gathering of school family members dressed in traditional attire, celebrating the rich cultural heritage and school milestones.",
+  },
+  {
+    id: 12,
+    src: "/photos/memories/memory-3.jpg",
+    alt: "Cultural Attire Celebration",
+    category: "Memories",
+    description: "Elegant moments captured during school cultural festivities, showcasing the vibrant traditions and joyful spirit of our school community.",
+  },
+  {
+    id: 13,
+    src: "/photos/memories/memory-4.jpg",
+    alt: "Festive School Gathering",
+    category: "Memories",
+    description: "Beautifully dressed participants at a school cultural event, reflecting the pride and tradition that define our school's celebratory occasions.",
+  },
+  {
+    id: 14,
+    src: "/photos/memories/memory-5.jpg",
+    alt: "School Community Memories",
+    category: "Memories",
+    description: "Two members of the school community sharing a joyful moment at a cultural celebration, dressed in stunning traditional outfits.",
+  },
+  {
+    id: 15,
+    src: "/photos/memories/memory-6.jpg",
+    alt: "Memorable Moments",
+    category: "Memories",
+    description: "A candid, elegant portrait capturing the warmth and grace of our school's cultural events and the cherished memories they create.",
+  },
 ];
 
 /** All unique categories derived from the gallery data */
