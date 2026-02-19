@@ -1321,11 +1321,11 @@ export default function WorksheetMaker() {
                 <img
                   src="/nethaji_logo_print.webp"
                   alt="Nethaji Vidhyalayam"
-                  className="absolute left-6 top-1/2 -translate-y-1/2 h-20 w-20 object-contain print:h-18 print:w-18"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-28 w-28 object-contain print:h-24 print:w-24"
                   style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}
                 />
                 {/* Centered title content */}
-                <div className="text-center px-24">
+                <div className="text-center px-32">
                   <p className="text-xs text-sky-200 print:text-gray-600 mb-1 font-semibold">
                     {formData.curriculum === "Oxford Merry Birds (Integrated Term Course)"
                       ? "Oxford Merry Birds • Integrated Term Course • OUP"
